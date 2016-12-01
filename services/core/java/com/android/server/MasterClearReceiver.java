@@ -34,9 +34,6 @@ import java.io.IOException;
 public class MasterClearReceiver extends BroadcastReceiver {
     private static final String TAG = "MasterClear";
 
-    /* {@hide} */
-    public static final String EXTRA_WIPE_MEDIA = "wipe_media";
-
     @Override
     public void onReceive(final Context context, final Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_REMOTE_INTENT)) {
@@ -50,6 +47,7 @@ public class MasterClearReceiver extends BroadcastReceiver {
         final String reason = intent.getStringExtra(Intent.EXTRA_REASON);
         final boolean wipeExternalStorage = intent.getBooleanExtra(
                 Intent.EXTRA_WIPE_EXTERNAL_STORAGE, false);
+        final boolean forceWipe = intent.getBooleanExtra(Intent.EXTRA_FORCE_MASTER_CLEAR, false);
 
         Slog.w(TAG, "!!! FACTORY RESET !!!");
         // The reboot call is blocking, so we need to do it on another thread.
@@ -57,8 +55,7 @@ public class MasterClearReceiver extends BroadcastReceiver {
             @Override
             public void run() {
                 try {
-                    boolean wipeMedia = intent.getBooleanExtra(EXTRA_WIPE_MEDIA, true);
-                    RecoverySystem.rebootWipeUserData(context, shutdown, reason, wipeMedia);
+                    RecoverySystem.rebootWipeUserData(context, shutdown, reason, forceWipe);
                     Log.wtf(TAG, "Still running after master clear?!");
                 } catch (IOException e) {
                     Slog.e(TAG, "Can't perform master clear/factory reset", e);

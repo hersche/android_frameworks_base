@@ -16,15 +16,17 @@
 
 package com.android.systemui.statusbar.policy;
 
+import android.annotation.DrawableRes;
+import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.content.res.ThemeConfig;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.hardware.input.InputManager;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.AttributeSet;
@@ -42,28 +44,27 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 
 import com.android.systemui.R;
-import com.android.systemui.statusbar.phone.NavbarEditor;
+import com.android.systemui.statusbar.phone.ButtonDispatcher;
+
+import cyanogenmod.power.PerformanceManager;
 
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK;
 
-import cyanogenmod.power.PerformanceManager;
+public class KeyButtonView extends ImageView implements ButtonDispatcher.ButtonInterface {
 
-public class KeyButtonView extends ImageView {
+    private int mContentDescriptionRes;
 
     public static final int CURSOR_REPEAT_FLAGS = KeyEvent.FLAG_SOFT_KEYBOARD
             | KeyEvent.FLAG_KEEP_TOUCH_MODE;
 
-    private int mContentDescriptionRes;
     private long mDownTime;
     private int mCode;
-    private boolean mIsSmall;
     private int mTouchSlop;
     private boolean mSupportsLongpress = true;
-    private boolean mInEditMode;
     private AudioManager mAudioManager;
     private boolean mGestureAborted;
-    private boolean mPerformedLongClick;
+    private boolean mLongClicked;
 
     private PerformanceManager mPerf;
 
@@ -77,13 +78,14 @@ public class KeyButtonView extends ImageView {
                     sendEvent(KeyEvent.ACTION_DOWN, CURSOR_REPEAT_FLAGS,
                             System.currentTimeMillis(), false);
                     postDelayed(mCheckLongPress, ViewConfiguration.getKeyRepeatDelay());
-                } else if (isLongClickable()) {
-                    // Just an old-fashioned ImageView
-                    mPerformedLongClick = true;
-                    performLongClick();
-                } else {
+                } else if (mCode != 0) {
                     sendEvent(KeyEvent.ACTION_DOWN, KeyEvent.FLAG_LONG_PRESS);
                     sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
+                    mLongClicked = true;
+                } else if (isLongClickable()) {
+                    // Just an old-fashioned ImageView
+                    performLongClick();
+                    mLongClicked = true;
                 }
             }
         }
@@ -116,6 +118,24 @@ public class KeyButtonView extends ImageView {
         mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         setBackground(new KeyButtonRipple(context, this));
         mPerf = PerformanceManager.getInstance(context);
+    }
+
+    public void setCode(int code) {
+        mCode = code;
+    }
+
+    public void loadAsync(String uri) {
+        new AsyncTask<String, Void, Drawable>() {
+            @Override
+            protected Drawable doInBackground(String... params) {
+                return Icon.createWithContentUri(params[0]).loadDrawable(mContext);
+            }
+
+            @Override
+            protected void onPostExecute(Drawable drawable) {
+                setImageDrawable(drawable);
+            }
+        }.execute(uri);
     }
 
     @Override
@@ -164,83 +184,7 @@ public class KeyButtonView extends ImageView {
         return super.performAccessibilityActionInternal(action, arguments);
     }
 
-    @Override
-    public Resources getResources() {
-        ThemeConfig themeConfig = mContext.getResources().getConfiguration().themeConfig;
-        Resources res = null;
-        if (themeConfig != null) {
-            try {
-                final String navbarThemePkgName = themeConfig.getOverlayForNavBar();
-                final String sysuiThemePkgName = themeConfig.getOverlayForStatusBar();
-                // Check if the same theme is applied for systemui, if so we can skip this
-                if (navbarThemePkgName != null && !navbarThemePkgName.equals(sysuiThemePkgName)) {
-                    res = mContext.getPackageManager().getThemedResourcesForApplication(
-                            mContext.getPackageName(), navbarThemePkgName);
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                // don't care since we'll handle res being null below
-            }
-        }
-
-        return res != null ? res : super.getResources();
-    }
-
-    public void setEditMode(boolean editMode) {
-        mInEditMode = editMode;
-        updateVisibility();
-    }
-
-    public void setInfo(NavbarEditor.ButtonInfo item, boolean isVertical, boolean isSmall) {
-        final Resources res = getResources();
-        setInfo(item, isVertical, isSmall, res);
-    }
-
-    public void setInfo(NavbarEditor.ButtonInfo item, boolean isVertical, boolean isSmall,
-            Resources res) {
-        final int keyDrawableResId;
-
-        setTag(item);
-        setContentDescription(res.getString(item.contentDescription));
-        mCode = item.keyCode;
-        mIsSmall = isSmall;
-
-        if (isSmall) {
-            keyDrawableResId = item.sideResource;
-        } else if (!isVertical) {
-            keyDrawableResId = item.portResource;
-        } else {
-            keyDrawableResId = item.landResource;
-        }
-        // The reason for setImageDrawable vs setImageResource is because setImageResource calls
-        // relayout() w/o any checks. setImageDrawable performs size checks and only calls relayout
-        // if necessary. We rely on this because otherwise the setX/setY attributes which are post
-        // layout cause it to mess up the layout.
-        setImageDrawable(res.getDrawable(keyDrawableResId));
-        updateVisibility();
-    }
-
-    private void updateVisibility() {
-        if (mInEditMode) {
-            setVisibility(View.VISIBLE);
-            return;
-        }
-
-        NavbarEditor.ButtonInfo info = (NavbarEditor.ButtonInfo) getTag();
-        if (info == NavbarEditor.NAVBAR_EMPTY) {
-            setVisibility(mIsSmall ? View.INVISIBLE : View.GONE);
-        } else if (info == NavbarEditor.NAVBAR_CONDITIONAL_MENU) {
-            setVisibility(View.INVISIBLE);
-        }
-    }
-
-    private boolean supportsLongPress() {
-        return mSupportsLongpress;
-    }
-
     public boolean onTouchEvent(MotionEvent ev) {
-        if (mInEditMode) {
-            return false;
-        }
         final int action = ev.getAction();
         int x, y;
         if (action == MotionEvent.ACTION_DOWN) {
@@ -256,6 +200,7 @@ public class KeyButtonView extends ImageView {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mDownTime = SystemClock.uptimeMillis();
+                mLongClicked = false;
                 setPressed(true);
                 if (mCode == KeyEvent.KEYCODE_DPAD_LEFT || mCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
                     sendEvent(KeyEvent.ACTION_DOWN, KeyEvent.FLAG_VIRTUAL_HARD_KEY
@@ -266,12 +211,8 @@ public class KeyButtonView extends ImageView {
                     // Provide the same haptic feedback that the system offers for virtual keys.
                     performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 }
-
-                if (supportsLongPress()) {
-                    removeCallbacks(mCheckLongPress);
-                    postDelayed(mCheckLongPress, ViewConfiguration.getLongPressTimeout());
-                }
-
+                removeCallbacks(mCheckLongPress);
+                postDelayed(mCheckLongPress, ViewConfiguration.getLongPressTimeout());
                 break;
             case MotionEvent.ACTION_MOVE:
                 x = (int) ev.getX();
@@ -286,16 +227,10 @@ public class KeyButtonView extends ImageView {
                 if (mCode != 0) {
                     sendEvent(KeyEvent.ACTION_UP, KeyEvent.FLAG_CANCELED);
                 }
-
                 removeCallbacks(mCheckLongPress);
-
-                if (supportsLongPress()) {
-                    removeCallbacks(mCheckLongPress);
-                }
-
                 break;
             case MotionEvent.ACTION_UP:
-                final boolean doIt = isPressed();
+                final boolean doIt = isPressed() && !mLongClicked;
                 setPressed(false);
                 if (mCode != 0) {
                     if (doIt) {
@@ -307,17 +242,11 @@ public class KeyButtonView extends ImageView {
                     }
                 } else {
                     // no key code, just a regular ImageView
-                    if (doIt && !mPerformedLongClick) {
+                    if (doIt) {
                         performClick();
                     }
                 }
-
                 removeCallbacks(mCheckLongPress);
-
-                if (supportsLongPress()) {
-                    removeCallbacks(mCheckLongPress);
-                }
-                mPerformedLongClick = false;
                 break;
         }
 
@@ -349,9 +278,30 @@ public class KeyButtonView extends ImageView {
                 InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
     }
 
+    @Override
     public void abortCurrentGesture() {
         setPressed(false);
         mGestureAborted = true;
+    }
+
+    @Override
+    public void setImageResource(@DrawableRes int resId) {
+        super.setImageResource(resId);
+    }
+
+    @Override
+    public void setImageDrawable(@Nullable Drawable drawable) {
+        super.setImageDrawable(drawable);
+    }
+
+    @Override
+    public void setLandscape(boolean landscape) {
+        //no op
+    }
+
+    @Override
+    public void setCarMode(boolean carMode) {
+        // no op
     }
 }
 

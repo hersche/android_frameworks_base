@@ -59,8 +59,11 @@ import java.util.UUID;
  *
  * <div class="special reference">
  * <h3>Developer Guides</h3>
- * <p>For more information about using Bluetooth, read the
- * <a href="{@docRoot}guide/topics/wireless/bluetooth.html">Bluetooth</a> developer guide.</p>
+ * <p>
+ * For more information about using Bluetooth, read the <a href=
+ * "{@docRoot}guide/topics/connectivity/bluetooth.html">Bluetooth</a> developer
+ * guide.
+ * </p>
  * </div>
  *
  * {@see BluetoothAdapter}
@@ -879,18 +882,16 @@ public final class BluetoothDevice implements Parcelable {
      *
      * <p>Requires {@link android.Manifest.permission#BLUETOOTH_ADMIN}.
      *
-     * @param hash - Simple Secure pairing hash
-     * @param randomizer - The random key obtained using OOB
+     * @param transport - Transport to use
+     * @param oobData - Out Of Band data
      * @return false on immediate error, true if bonding will begin
      *
      * @hide
      */
-    public boolean createBondOutOfBand(byte[] hash, byte[] randomizer) {
-        //TODO(BT)
-        /*
+    public boolean createBondOutOfBand(int transport, OobData oobData) {
         try {
-            return sService.createBondOutOfBand(this, hash, randomizer);
-        } catch (RemoteException e) {Log.e(TAG, "", e);}*/
+            return sService.createBondOutOfBand(this, transport, oobData);
+        } catch (RemoteException e) {Log.e(TAG, "", e);}
         return false;
     }
 

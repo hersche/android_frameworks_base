@@ -45,6 +45,7 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
 
     private final AppearAnimationUtils mAppearAnimationUtils;
     private final DisappearAnimationUtils mDisappearAnimationUtils;
+    private final DisappearAnimationUtils mDisappearAnimationUtilsLocked;
     private ViewGroup mContainer;
     private ViewGroup mRow0;
     private ViewGroup mRow1;
@@ -53,6 +54,7 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
     private View mDivider;
     private int mDisappearYTranslation;
     private View[][] mViews;
+    private final KeyguardUpdateMonitor mKeyguardUpdateMonitor;
 
     private static List<Integer> sNumbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 0);
 
@@ -67,13 +69,20 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
                 125, 0.6f /* translationScale */,
                 0.45f /* delayScale */, AnimationUtils.loadInterpolator(
                         mContext, android.R.interpolator.fast_out_linear_in));
+        mDisappearAnimationUtilsLocked = new DisappearAnimationUtils(context,
+                (long) (125 * KeyguardPatternView.DISAPPEAR_MULTIPLIER_LOCKED),
+                0.6f /* translationScale */,
+                0.45f /* delayScale */, AnimationUtils.loadInterpolator(
+                        mContext, android.R.interpolator.fast_out_linear_in));
         mDisappearYTranslation = getResources().getDimensionPixelSize(
                 R.dimen.disappear_y_translation);
+        mKeyguardUpdateMonitor = KeyguardUpdateMonitor.getInstance(context);
     }
 
+    @Override
     protected void resetState() {
         super.resetState();
-        mSecurityMessageDisplay.setMessage(R.string.kg_pin_instructions, false);
+        mSecurityMessageDisplay.setMessage(getMessageWithCount(R.string.kg_pin_instructions), false);
     }
 
     @Override
@@ -173,7 +182,10 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
         setTranslationY(0);
         AppearAnimationUtils.startTranslationYAnimation(this, 0 /* delay */, 280 /* duration */,
                 mDisappearYTranslation, mDisappearAnimationUtils.getInterpolator());
-        mDisappearAnimationUtils.startAnimation2d(mViews,
+        DisappearAnimationUtils disappearAnimationUtils = mKeyguardUpdateMonitor.isUserUnlocked()
+                ? mDisappearAnimationUtils
+                : mDisappearAnimationUtilsLocked;
+        disappearAnimationUtils.startAnimation2d(mViews,
                 new Runnable() {
                     @Override
                     public void run() {

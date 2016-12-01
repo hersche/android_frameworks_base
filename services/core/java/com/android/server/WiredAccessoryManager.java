@@ -333,8 +333,7 @@ final class WiredAccessoryManager implements WiredAccessoryCallbacks {
                         FileReader file = new FileReader(uei.getSwitchStatePath());
                         int len = file.read(buffer, 0, 1024);
                         file.close();
-                        curState = validateSwitchState(
-                                Integer.valueOf((new String(buffer, 0, len)).trim()));
+                        curState = Integer.parseInt((new String(buffer, 0, len)).trim());
 
                         if (curState > 0) {
                             updateStateLocked(uei.getDevPath(), uei.getDevName(), curState);
@@ -357,13 +356,6 @@ final class WiredAccessoryManager implements WiredAccessoryCallbacks {
                 UEventInfo uei = mUEventInfo.get(i);
                 startObserving("DEVPATH="+uei.getDevPath());
             }
-        }
-
-        private int validateSwitchState(int state) {
-            // Some drivers, namely HTC headset ones, add additional bits to
-            // the switch state. As we only are able to deal with the states
-            // 0, 1 and 2, mask out all the other bits
-            return state & 0x3;
         }
 
         private List<UEventInfo> makeObservedUEventList() {
@@ -438,7 +430,7 @@ final class WiredAccessoryManager implements WiredAccessoryCallbacks {
                     // Let only the dock emu audio jack sensing do that.
                     return;
                 }
-                int state = validateSwitchState(Integer.parseInt(event.get("SWITCH_STATE")));
+                int state = Integer.parseInt(event.get("SWITCH_STATE"));
                 synchronized (mLock) {
                     updateStateLocked(devPath, name, state);
                 }

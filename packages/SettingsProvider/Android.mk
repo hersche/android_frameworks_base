@@ -8,6 +8,7 @@ LOCAL_SRC_FILES := $(call all-subdir-java-files) \
 
 LOCAL_JAVA_LIBRARIES := telephony-common ims-common
 LOCAL_STATIC_JAVA_LIBRARIES := org.cyanogenmod.platform.sdk
+
 LOCAL_PACKAGE_NAME := SettingsProvider
 LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true

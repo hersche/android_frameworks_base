@@ -16,13 +16,15 @@
 
 package android.media;
 
+import android.annotation.NonNull;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.system.OsConstants;
 import android.util.Log;
 import android.util.Pair;
-
-import libcore.io.IoUtils;
-import libcore.io.Streams;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -52,33 +54,40 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import libcore.io.IoUtils;
+import libcore.io.Streams;
+
 /**
- * This is a class for reading and writing Exif tags in a JPEG file.
+ * This is a class for reading and writing Exif tags in a JPEG file or a RAW image file.
+ * <p>
+ * Supported formats are: JPEG, DNG, CR2, NEF, NRW, ARW, RW2, ORF and RAF.
+ * <p>
+ * Attribute mutation is supported for JPEG image files.
  */
 public class ExifInterface {
     private static final String TAG = "ExifInterface";
     private static final boolean DEBUG = false;
 
     // The Exif tag names
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_ARTIST = "Artist";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_BITS_PER_SAMPLE = "BitsPerSample";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_COMPRESSION = "Compression";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_COPYRIGHT = "Copyright";
     /** Type is String. */
     public static final String TAG_DATETIME = "DateTime";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_IMAGE_DESCRIPTION = "ImageDescription";
     /** Type is int. */
     public static final String TAG_IMAGE_LENGTH = "ImageLength";
     /** Type is int. */
     public static final String TAG_IMAGE_WIDTH = "ImageWidth";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_JPEG_INTERCHANGE_FORMAT = "JPEGInterchangeFormat";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_JPEG_INTERCHANGE_FORMAT_LENGTH = "JPEGInterchangeFormatLength";
     /** Type is String. */
     public static final String TAG_MAKE = "Make";
@@ -86,149 +95,175 @@ public class ExifInterface {
     public static final String TAG_MODEL = "Model";
     /** Type is int. */
     public static final String TAG_ORIENTATION = "Orientation";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_PHOTOMETRIC_INTERPRETATION = "PhotometricInterpretation";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_PLANAR_CONFIGURATION = "PlanarConfiguration";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_PRIMARY_CHROMATICITIES = "PrimaryChromaticities";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_REFERENCE_BLACK_WHITE = "ReferenceBlackWhite";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_RESOLUTION_UNIT = "ResolutionUnit";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_ROWS_PER_STRIP = "RowsPerStrip";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SAMPLES_PER_PIXEL = "SamplesPerPixel";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_SOFTWARE = "Software";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_STRIP_BYTE_COUNTS = "StripByteCounts";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_STRIP_OFFSETS = "StripOffsets";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_TRANSFER_FUNCTION = "TransferFunction";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_WHITE_POINT = "WhitePoint";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_X_RESOLUTION = "XResolution";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_Y_CB_CR_COEFFICIENTS = "YCbCrCoefficients";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_Y_CB_CR_POSITIONING = "YCbCrPositioning";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_Y_CB_CR_SUB_SAMPLING = "YCbCrSubSampling";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_Y_RESOLUTION = "YResolution";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_APERTURE_VALUE = "ApertureValue";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_BRIGHTNESS_VALUE = "BrightnessValue";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_CFA_PATTERN = "CFAPattern";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_COLOR_SPACE = "ColorSpace";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_COMPONENTS_CONFIGURATION = "ComponentsConfiguration";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_COMPRESSED_BITS_PER_PIXEL = "CompressedBitsPerPixel";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_CONTRAST = "Contrast";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_CUSTOM_RENDERED = "CustomRendered";
     /** Type is String. */
     public static final String TAG_DATETIME_DIGITIZED = "DateTimeDigitized";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_DATETIME_ORIGINAL = "DateTimeOriginal";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_DEVICE_SETTING_DESCRIPTION = "DeviceSettingDescription";
-    /** Type is double. @hide */
+    /** Type is double. */
     public static final String TAG_DIGITAL_ZOOM_RATIO = "DigitalZoomRatio";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_EXIF_VERSION = "ExifVersion";
-    /** Type is double. @hide */
+    /** Type is double. */
     public static final String TAG_EXPOSURE_BIAS_VALUE = "ExposureBiasValue";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_EXPOSURE_INDEX = "ExposureIndex";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_EXPOSURE_MODE = "ExposureMode";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_EXPOSURE_PROGRAM = "ExposureProgram";
     /** Type is double. */
     public static final String TAG_EXPOSURE_TIME = "ExposureTime";
     /** Type is double. */
+    public static final String TAG_F_NUMBER = "FNumber";
+    /**
+     * Type is double.
+     *
+     * @deprecated use {@link #TAG_F_NUMBER} instead
+     */
+    @Deprecated
     public static final String TAG_APERTURE = "FNumber";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_FILE_SOURCE = "FileSource";
     /** Type is int. */
     public static final String TAG_FLASH = "Flash";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_FLASH_ENERGY = "FlashEnergy";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_FLASHPIX_VERSION = "FlashpixVersion";
     /** Type is rational. */
     public static final String TAG_FOCAL_LENGTH = "FocalLength";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_FOCAL_LENGTH_IN_35MM_FILM = "FocalLengthIn35mmFilm";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_FOCAL_PLANE_RESOLUTION_UNIT = "FocalPlaneResolutionUnit";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_FOCAL_PLANE_X_RESOLUTION = "FocalPlaneXResolution";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_FOCAL_PLANE_Y_RESOLUTION = "FocalPlaneYResolution";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_GAIN_CONTROL = "GainControl";
     /** Type is int. */
+    public static final String TAG_ISO_SPEED_RATINGS = "ISOSpeedRatings";
+    /**
+     * Type is int.
+     *
+     * @deprecated use {@link #TAG_ISO_SPEED_RATINGS} instead
+     */
+    @Deprecated
     public static final String TAG_ISO = "ISOSpeedRatings";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_IMAGE_UNIQUE_ID = "ImageUniqueID";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_LIGHT_SOURCE = "LightSource";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_MAKER_NOTE = "MakerNote";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_MAX_APERTURE_VALUE = "MaxApertureValue";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_METERING_MODE = "MeteringMode";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_OECF = "OECF";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_PIXEL_X_DIMENSION = "PixelXDimension";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_PIXEL_Y_DIMENSION = "PixelYDimension";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_RELATED_SOUND_FILE = "RelatedSoundFile";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SATURATION = "Saturation";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SCENE_CAPTURE_TYPE = "SceneCaptureType";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_SCENE_TYPE = "SceneType";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SENSING_METHOD = "SensingMethod";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SHARPNESS = "Sharpness";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_SHUTTER_SPEED_VALUE = "ShutterSpeedValue";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_SPATIAL_FREQUENCY_RESPONSE = "SpatialFrequencyResponse";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_SPECTRAL_SENSITIVITY = "SpectralSensitivity";
     /** Type is String. */
     public static final String TAG_SUBSEC_TIME = "SubSecTime";
-    /** Type is String. */
+    /**
+     * Type is String.
+     *
+     * @deprecated use {@link #TAG_SUBSEC_TIME_DIGITIZED} instead
+     */
     public static final String TAG_SUBSEC_TIME_DIG = "SubSecTimeDigitized";
     /** Type is String. */
+    public static final String TAG_SUBSEC_TIME_DIGITIZED = "SubSecTimeDigitized";
+    /**
+     * Type is String.
+     *
+     * @deprecated use {@link #TAG_SUBSEC_TIME_ORIGINAL} instead
+     */
     public static final String TAG_SUBSEC_TIME_ORIG = "SubSecTimeOriginal";
-    /** Type is int. @hide */
+    /** Type is String. */
+    public static final String TAG_SUBSEC_TIME_ORIGINAL = "SubSecTimeOriginal";
+    /** Type is int. */
     public static final String TAG_SUBJECT_AREA = "SubjectArea";
-    /** Type is double. @hide */
+    /** Type is double. */
     public static final String TAG_SUBJECT_DISTANCE = "SubjectDistance";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SUBJECT_DISTANCE_RANGE = "SubjectDistanceRange";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_SUBJECT_LOCATION = "SubjectLocation";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_USER_COMMENT = "UserComment";
     /** Type is int. */
     public static final String TAG_WHITE_BALANCE = "WhiteBalance";
@@ -242,33 +277,33 @@ public class ExifInterface {
      * level. Type is int.
      */
     public static final String TAG_GPS_ALTITUDE_REF = "GPSAltitudeRef";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_AREA_INFORMATION = "GPSAreaInformation";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_DOP = "GPSDOP";
     /** Type is String. */
     public static final String TAG_GPS_DATESTAMP = "GPSDateStamp";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_DEST_BEARING = "GPSDestBearing";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_DEST_BEARING_REF = "GPSDestBearingRef";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_DEST_DISTANCE = "GPSDestDistance";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_DEST_DISTANCE_REF = "GPSDestDistanceRef";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_DEST_LATITUDE = "GPSDestLatitude";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_DEST_LATITUDE_REF = "GPSDestLatitudeRef";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_DEST_LONGITUDE = "GPSDestLongitude";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_DEST_LONGITUDE_REF = "GPSDestLongitudeRef";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_GPS_DIFFERENTIAL = "GPSDifferential";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_IMG_DIRECTION = "GPSImgDirection";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_IMG_DIRECTION_REF = "GPSImgDirectionRef";
     /** Type is rational. Format is "num1/denom1,num2/denom2,num3/denom3". */
     public static final String TAG_GPS_LATITUDE = "GPSLatitude";
@@ -278,33 +313,33 @@ public class ExifInterface {
     public static final String TAG_GPS_LONGITUDE = "GPSLongitude";
     /** Type is String. */
     public static final String TAG_GPS_LONGITUDE_REF = "GPSLongitudeRef";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_MAP_DATUM = "GPSMapDatum";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_MEASURE_MODE = "GPSMeasureMode";
     /** Type is String. Name of GPS processing method used for location finding. */
     public static final String TAG_GPS_PROCESSING_METHOD = "GPSProcessingMethod";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_SATELLITES = "GPSSatellites";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_SPEED = "GPSSpeed";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_SPEED_REF = "GPSSpeedRef";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_STATUS = "GPSStatus";
     /** Type is String. Format is "hh:mm:ss". */
     public static final String TAG_GPS_TIMESTAMP = "GPSTimeStamp";
-    /** Type is rational. @hide */
+    /** Type is rational. */
     public static final String TAG_GPS_TRACK = "GPSTrack";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_TRACK_REF = "GPSTrackRef";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_GPS_VERSION_ID = "GPSVersionID";
-    /** Type is String. @hide */
+    /** Type is String. */
     public static final String TAG_INTEROPERABILITY_INDEX = "InteroperabilityIndex";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_THUMBNAIL_IMAGE_LENGTH = "ThumbnailImageLength";
-    /** Type is int. @hide */
+    /** Type is int. */
     public static final String TAG_THUMBNAIL_IMAGE_WIDTH = "ThumbnailImageWidth";
 
     // Private tags used for pointing the other IFD offset. The types of the following tags are int.
@@ -334,6 +369,9 @@ public class ExifInterface {
     // Constants used for white balance
     public static final int WHITEBALANCE_AUTO = 0;
     public static final int WHITEBALANCE_MANUAL = 1;
+
+    private static final byte[] JPEG_SIGNATURE = new byte[] {(byte) 0xff, (byte) 0xd8, (byte) 0xff};
+    private static final int JPEG_SIGNATURE_SIZE = 3;
 
     private static SimpleDateFormat sFormatter;
 
@@ -815,10 +853,10 @@ public class ExifInterface {
     // Primary image IFD Exif Private tags (See JEITA CP-3451 Table 15. page 55).
     private static final ExifTag[] IFD_EXIF_TAGS = new ExifTag[] {
             new ExifTag(TAG_EXPOSURE_TIME, 33434, IFD_FORMAT_URATIONAL),
-            new ExifTag(TAG_APERTURE, 33437, IFD_FORMAT_URATIONAL),
+            new ExifTag(TAG_F_NUMBER, 33437, IFD_FORMAT_URATIONAL),
             new ExifTag(TAG_EXPOSURE_PROGRAM, 34850, IFD_FORMAT_USHORT),
             new ExifTag(TAG_SPECTRAL_SENSITIVITY, 34852, IFD_FORMAT_STRING),
-            new ExifTag(TAG_ISO, 34855, IFD_FORMAT_USHORT),
+            new ExifTag(TAG_ISO_SPEED_RATINGS, 34855, IFD_FORMAT_USHORT),
             new ExifTag(TAG_OECF, 34856, IFD_FORMAT_UNDEFINED),
             new ExifTag(TAG_EXIF_VERSION, 36864, IFD_FORMAT_STRING),
             new ExifTag(TAG_DATETIME_ORIGINAL, 36867, IFD_FORMAT_STRING),
@@ -982,7 +1020,7 @@ public class ExifInterface {
     // Mappings from tag name to tag number and each item represents one IFD tag group.
     private static final HashMap[] sExifTagMapsForWriting = new HashMap[EXIF_TAGS.length];
     private static final HashSet<String> sTagSetForCompatibility = new HashSet<>(Arrays.asList(
-            TAG_APERTURE, TAG_DIGITAL_ZOOM_RATIO, TAG_EXPOSURE_TIME, TAG_SUBJECT_DISTANCE,
+            TAG_F_NUMBER, TAG_DIGITAL_ZOOM_RATIO, TAG_EXPOSURE_TIME, TAG_SUBJECT_DISTANCE,
             TAG_GPS_TIMESTAMP));
 
     // See JPEG File Interchange Format Version 1.02.
@@ -1017,6 +1055,8 @@ public class ExifInterface {
     private static final byte MARKER_EOI = (byte) 0xd9;
 
     static {
+        System.loadLibrary("media_jni");
+        nativeInitRaw();
         sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
         sFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -1032,6 +1072,10 @@ public class ExifInterface {
     }
 
     private final String mFilename;
+    private final FileDescriptor mSeekableFileDescriptor;
+    private final AssetManager.AssetInputStream mAssetInputStream;
+    private final boolean mIsInputStream;
+    private boolean mIsRaw;
     private final HashMap[] mAttributes = new HashMap[EXIF_TAGS.length];
     private ByteOrder mExifByteOrder = ByteOrder.BIG_ENDIAN;
     private boolean mHasThumbnail;
@@ -1054,10 +1098,81 @@ public class ExifInterface {
         if (filename == null) {
             throw new IllegalArgumentException("filename cannot be null");
         }
+        FileInputStream in = null;
+        mAssetInputStream = null;
         mFilename = filename;
-        loadAttributes();
+        mIsInputStream = false;
+        try {
+            in = new FileInputStream(filename);
+            if (isSeekableFD(in.getFD())) {
+                mSeekableFileDescriptor = in.getFD();
+            } else {
+                mSeekableFileDescriptor = null;
+            }
+            loadAttributes(in);
+        } finally {
+            IoUtils.closeQuietly(in);
+        }
     }
 
+    /**
+     * Reads Exif tags from the specified image file descriptor. Attribute mutation is supported
+     * for writable and seekable file descriptors only. This constructor will not rewind the offset
+     * of the given file descriptor. Developers should close the file descriptor after use.
+     */
+    public ExifInterface(FileDescriptor fileDescriptor) throws IOException {
+        if (fileDescriptor == null) {
+            throw new IllegalArgumentException("fileDescriptor cannot be null");
+        }
+        mAssetInputStream = null;
+        mFilename = null;
+        if (isSeekableFD(fileDescriptor)) {
+            mSeekableFileDescriptor = fileDescriptor;
+            // Keep the original file descriptor in order to save attributes when it's seekable.
+            // Otherwise, just close the given file descriptor after reading it because the save
+            // feature won't be working.
+            try {
+                fileDescriptor = Os.dup(fileDescriptor);
+            } catch (ErrnoException e) {
+                throw e.rethrowAsIOException();
+            }
+        } else {
+            mSeekableFileDescriptor = null;
+        }
+        mIsInputStream = false;
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(fileDescriptor);
+            loadAttributes(in);
+        } finally {
+            IoUtils.closeQuietly(in);
+        }
+    }
+
+    /**
+     * Reads Exif tags from the specified image input stream. Attribute mutation is not supported
+     * for input streams. The given input stream will proceed its current position. Developers
+     * should close the input stream after use.
+     */
+    public ExifInterface(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            throw new IllegalArgumentException("inputStream cannot be null");
+        }
+        mFilename = null;
+        if (inputStream instanceof AssetManager.AssetInputStream) {
+            mAssetInputStream = (AssetManager.AssetInputStream) inputStream;
+            mSeekableFileDescriptor = null;
+        } else if (inputStream instanceof FileInputStream
+                && isSeekableFD(((FileInputStream) inputStream).getFD())) {
+            mAssetInputStream = null;
+            mSeekableFileDescriptor = ((FileInputStream) inputStream).getFD();
+        } else {
+            mAssetInputStream = null;
+            mSeekableFileDescriptor = null;
+        }
+        mIsInputStream = true;
+        loadAttributes(inputStream);
+    }
 
     /**
      * Returns the EXIF attribute of the specified tag or {@code null} if there is no such tag in
@@ -1330,25 +1445,95 @@ public class ExifInterface {
      * type and the content of the input stream. In each case, it reads the first three bytes to
      * determine whether the image data format is JPEG or not.
      */
-    private void loadAttributes() throws IOException {
-        // Initialize mAttributes.
-        for (int i = 0; i < EXIF_TAGS.length; ++i) {
-            mAttributes[i] = new HashMap();
-        }
+    private void loadAttributes(@NonNull InputStream in) throws IOException {
         try {
-            InputStream in = new FileInputStream(mFilename);
+            // Initialize mAttributes.
+            for (int i = 0; i < EXIF_TAGS.length; ++i) {
+                mAttributes[i] = new HashMap();
+            }
+
+            // Process RAW input stream
+            if (mAssetInputStream != null) {
+                long asset = mAssetInputStream.getNativeAsset();
+                if (handleRawResult(nativeGetRawAttributesFromAsset(asset))) {
+                    return;
+                }
+            } else if (mSeekableFileDescriptor != null) {
+                if (handleRawResult(nativeGetRawAttributesFromFileDescriptor(
+                        mSeekableFileDescriptor))) {
+                    return;
+                }
+            } else {
+                in = new BufferedInputStream(in, JPEG_SIGNATURE_SIZE);
+                if (!isJpegInputStream((BufferedInputStream) in) && handleRawResult(
+                        nativeGetRawAttributesFromInputStream(in))) {
+                    return;
+                }
+            }
+
+            // Process JPEG input stream
             getJpegAttributes(in);
             mIsSupportedFile = true;
         } catch (IOException e) {
             // Ignore exceptions in order to keep the compatibility with the old versions of
             // ExifInterface.
             mIsSupportedFile = false;
-            Log.w(TAG, "Invalid image.", e);
+            Log.w(TAG, "Invalid image: ExifInterface got an unsupported image format file"
+                    + "(ExifInterface supports JPEG and some RAW image formats only) "
+                    + "or a corrupted JPEG file to ExifInterface.", e);
         } finally {
             addDefaultValuesForCompatibility();
+
             if (DEBUG) {
                 printAttributes();
             }
+        }
+    }
+
+    private static boolean isJpegInputStream(BufferedInputStream in) throws IOException {
+        in.mark(JPEG_SIGNATURE_SIZE);
+        byte[] signatureBytes = new byte[JPEG_SIGNATURE_SIZE];
+        if (in.read(signatureBytes) != JPEG_SIGNATURE_SIZE) {
+            throw new EOFException();
+        }
+        boolean isJpeg = Arrays.equals(JPEG_SIGNATURE, signatureBytes);
+        in.reset();
+        return isJpeg;
+    }
+
+    private boolean handleRawResult(HashMap map) {
+        if (map == null) {
+            return false;
+        }
+
+        // Mark for disabling the save feature.
+        mIsRaw = true;
+
+        String value = (String) map.remove(TAG_HAS_THUMBNAIL);
+        mHasThumbnail = value != null && value.equalsIgnoreCase("true");
+        value = (String) map.remove(TAG_THUMBNAIL_OFFSET);
+        if (value != null) {
+            mThumbnailOffset = Integer.parseInt(value);
+        }
+        value = (String) map.remove(TAG_THUMBNAIL_LENGTH);
+        if (value != null) {
+            mThumbnailLength = Integer.parseInt(value);
+        }
+        mThumbnailBytes = (byte[]) map.remove(TAG_THUMBNAIL_DATA);
+
+        for (Map.Entry entry : (Set<Map.Entry>) map.entrySet()) {
+            setAttribute((String) entry.getKey(), (String) entry.getValue());
+        }
+
+        return true;
+    }
+
+    private static boolean isSeekableFD(FileDescriptor fd) throws IOException {
+        try {
+            Os.lseek(fd, 0, OsConstants.SEEK_CUR);
+            return true;
+        } catch (ErrnoException e) {
+            return false;
         }
     }
 
@@ -1371,28 +1556,57 @@ public class ExifInterface {
      * and make a single call rather than multiple calls for each attribute.
      */
     public void saveAttributes() throws IOException {
-        if (!mIsSupportedFile) {
+        if (!mIsSupportedFile || mIsRaw) {
             throw new UnsupportedOperationException(
                     "ExifInterface only supports saving attributes on JPEG formats.");
         }
+        if (mIsInputStream || (mSeekableFileDescriptor == null && mFilename == null)) {
+            throw new UnsupportedOperationException(
+                    "ExifInterface does not support saving attributes for the current input.");
+        }
+
         // Keep the thumbnail in memory
         mThumbnailBytes = getThumbnail();
 
-        File tempFile = null;
-        // Move the original file to temporary file.
-        tempFile = new File(mFilename + ".tmp");
-        File originalFile = new File(mFilename);
-        if (!originalFile.renameTo(tempFile)) {
-            throw new IOException("Could'nt rename to " + tempFile.getAbsolutePath());
-        }
-
         FileInputStream in = null;
         FileOutputStream out = null;
+        File tempFile = null;
+        try {
+            // Move the original file to temporary file.
+            if (mFilename != null) {
+                tempFile = new File(mFilename + ".tmp");
+                File originalFile = new File(mFilename);
+                if (!originalFile.renameTo(tempFile)) {
+                    throw new IOException("Could'nt rename to " + tempFile.getAbsolutePath());
+                }
+            } else if (mSeekableFileDescriptor != null) {
+                tempFile = File.createTempFile("temp", "jpg");
+                Os.lseek(mSeekableFileDescriptor, 0, OsConstants.SEEK_SET);
+                in = new FileInputStream(mSeekableFileDescriptor);
+                out = new FileOutputStream(tempFile);
+                Streams.copy(in, out);
+            }
+        } catch (ErrnoException e) {
+            throw e.rethrowAsIOException();
+        } finally {
+            IoUtils.closeQuietly(in);
+            IoUtils.closeQuietly(out);
+        }
+
+        in = null;
+        out = null;
         try {
             // Save the new file.
             in = new FileInputStream(tempFile);
-            out = new FileOutputStream(mFilename);
+            if (mFilename != null) {
+                out = new FileOutputStream(mFilename);
+            } else if (mSeekableFileDescriptor != null) {
+                Os.lseek(mSeekableFileDescriptor, 0, OsConstants.SEEK_SET);
+                out = new FileOutputStream(mSeekableFileDescriptor);
+            }
             saveJpegAttributes(in, out);
+        } catch (ErrnoException e) {
+            throw e.rethrowAsIOException();
         } finally {
             IoUtils.closeQuietly(in);
             IoUtils.closeQuietly(out);
@@ -1426,7 +1640,20 @@ public class ExifInterface {
         // Read the thumbnail.
         FileInputStream in = null;
         try {
-            in = new FileInputStream(mFilename);
+            if (mAssetInputStream != null) {
+                return nativeGetThumbnailFromAsset(
+                        mAssetInputStream.getNativeAsset(), mThumbnailOffset, mThumbnailLength);
+            } else if (mFilename != null) {
+                in = new FileInputStream(mFilename);
+            } else if (mSeekableFileDescriptor != null) {
+                FileDescriptor fileDescriptor = Os.dup(mSeekableFileDescriptor);
+                Os.lseek(fileDescriptor, 0, OsConstants.SEEK_SET);
+                in = new FileInputStream(fileDescriptor);
+            }
+            if (in == null) {
+                // Should not be reached this.
+                throw new FileNotFoundException();
+            }
             if (in.skip(mThumbnailOffset) != mThumbnailOffset) {
                 throw new IOException("Corrupted image");
             }
@@ -1435,7 +1662,7 @@ public class ExifInterface {
                 throw new IOException("Corrupted image");
             }
             return buffer;
-        } catch (IOException e) {
+        } catch (IOException | ErrnoException e) {
             // Couldn't get a thumbnail image.
         } finally {
             IoUtils.closeQuietly(in);
@@ -1449,7 +1676,6 @@ public class ExifInterface {
      *
      * @return two-element array, the offset in the first value, and length in
      *         the second, or {@code null} if no thumbnail was found.
-     * @hide
      */
     public long[] getThumbnailRange() {
         if (!mHasThumbnail) {
@@ -1885,6 +2111,24 @@ public class ExifInterface {
                     mHasThumbnail = true;
                     mThumbnailOffset = exifOffsetFromBeginning + jpegInterchangeFormat;
                     mThumbnailLength = jpegInterchangeFormatLength;
+
+                    if (mFilename == null && mAssetInputStream == null
+                            && mSeekableFileDescriptor == null) {
+                        // Save the thumbnail in memory if the input doesn't support reading again.
+                        byte[] thumbnailBytes = new byte[jpegInterchangeFormatLength];
+                        dataInputStream.seek(jpegInterchangeFormat);
+                        dataInputStream.readFully(thumbnailBytes);
+                        mThumbnailBytes = thumbnailBytes;
+
+                        if (DEBUG) {
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(
+                                    thumbnailBytes, 0, thumbnailBytes.length);
+                            Log.d(TAG, "Thumbnail offset: " + mThumbnailOffset + ", length: "
+                                    + mThumbnailLength + ", width: " + bitmap.getWidth()
+                                    + ", height: "
+                                    + bitmap.getHeight());
+                        }
+                    }
                 }
             } catch (NumberFormatException e) {
                 // Ignored the corrupted image.
@@ -2455,11 +2699,11 @@ public class ExifInterface {
             if (mByteOrder == LITTLE_ENDIAN) {
                 return (((long) ch8 << 56) + ((long) ch7 << 48) + ((long) ch6 << 40)
                         + ((long) ch5 << 32) + ((long) ch4 << 24) + ((long) ch3 << 16)
-                        + ((long) ch2 << 8) + ch1);
+                        + ((long) ch2 << 8) + (long) ch1);
             } else if (mByteOrder == BIG_ENDIAN) {
                 return (((long) ch1 << 56) + ((long) ch2 << 48) + ((long) ch3 << 40)
                         + ((long) ch4 << 32) + ((long) ch5 << 24) + ((long) ch6 << 16)
-                        + ((long) ch7 << 8) + ch8);
+                        + ((long) ch7 << 8) + (long) ch8);
             }
             throw new IOException("Invalid byte order: " + mByteOrder);
         }
@@ -2533,4 +2777,12 @@ public class ExifInterface {
             writeInt((int) val);
         }
     }
+
+    // JNI methods for RAW formats.
+    private static native void nativeInitRaw();
+    private static native byte[] nativeGetThumbnailFromAsset(
+            long asset, int thumbnailOffset, int thumbnailLength);
+    private static native HashMap nativeGetRawAttributesFromAsset(long asset);
+    private static native HashMap nativeGetRawAttributesFromFileDescriptor(FileDescriptor fd);
+    private static native HashMap nativeGetRawAttributesFromInputStream(InputStream in);
 }

@@ -41,6 +41,7 @@
   <!-- Instructions telling the user that they entered the wrong pin while trying
          to unlock the keyguard.  Displayed in one line in a large font.  -->
   <string name="keyguard_password_wrong_pin_code">پین کۆد هەڵە بوو.</string>
+  <!-- Shown in the lock screen when there is SIM card IO error. -->
   <!-- When the lock screen is showing, the phone is plugged in and the battery is fully
          charged, say that it is charged. -->
   <string name="keyguard_charged">بارگاویی بوو</string>
@@ -83,15 +84,6 @@
   <string name="keyguard_sim_unlock_progress_dialog_message">کردنەوەی سیمکارت\u2026</string>
   <!-- Time format strings for fall-back clock widget -->
   <!-- Time format strings for fall-back clock widget -->
-  <string name="keyguard_accessibility_pattern_unlock">کردنه‌وه‌ بە کێشان.</string>
-  <!-- Accessibility description of the pin lock. [CHAR_LIMIT=none] -->
-  <string name="keyguard_accessibility_pin_unlock">کردنه‌وه‌ی پین.</string>
-  <!-- Accessibility description of the password lock. [CHAR_LIMIT=none] -->
-  <string name="keyguard_accessibility_password_unlock">کردنه‌وه‌ی تێپه‌ڕه‌وشه‌.</string>
-  <!-- Accessibility description of the unlock pattern area. [CHAR_LIMIT=none] -->
-  <string name="keyguard_accessibility_pattern_area" msgid="7679891324509597904">ناوچەی خه‌تکێشان.</string>
-  <!-- Accessibility description of the unlock slide area. [CHAR_LIMIT=none] -->
-  <string name="keyguard_accessibility_slide_area">ناوچەی لادان.</string>
   <!-- Accessibility description of the PIN password view. [CHAR_LIMIT=none] -->
   <!-- Accessibility description of the SIM PIN password view. [CHAR_LIMIT=none] -->
   <!-- Accessibility description of the SIM PUK password view. [CHAR_LIMIT=none] -->
@@ -140,23 +132,7 @@
   <!-- Message shown when the user exceeds the maximum number of pattern attempts -->
   <string name="kg_login_too_many_attempts">زۆر هه‌وڵی خه‌تکێشانت داوه‌</string>
   <!-- Message shown in dialog when max number of attempts are reached for PIN screen of keyguard -->
-  <string name="kg_too_many_failed_pin_attempts_dialog_message">
-        بە هەڵە PIN ت نوسیوە <xliff:g id="number">%d</xliff:g> جار.
-        \n\nدوبارە هەوڵبدەرەوە له‌ <xliff:g id="number">%d</xliff:g> چرکه‌دا.
-    
-    </string>
   <!-- Message shown in dialog when max number of attempts are reached for password screen of keyguard -->
-  <string name="kg_too_many_failed_password_attempts_dialog_message">
-        بەهەڵە تێپەڕە وشەت لێداوە <xliff:g id="number">%d</xliff:g> جار.
-        \n\nدوبارە هەوڵبدەرەوە له‌ <xliff:g id="number">%d</xliff:g> چرکه‌دا.
-    
-    </string>
-  <string name="kg_too_many_failed_pattern_attempts_dialog_message">
-        بە هەڵە خه‌تکێشانت لێداوه‌ <xliff:g id="number">%d</xliff:g> جار.
-        \n\nدووبارە هەوڵبدەره‌وه‌ له‌ <xliff:g id="number">%d</xliff:g> چرکه‌دا.
-    
-   
-</string>
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. [CHAR LIMIT=none] -->
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. [CHAR LIMIT=none] -->
   <!-- Message shown in dialog when user has exceeded the maximum attempts and the device will now be wiped [CHAR LIMIT=none] -->
@@ -171,29 +147,13 @@
   <!-- Message shown in dialog when user has exceeded the maximum attempts and the profile will be removed. [CHAR LIMIT=none] -->
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="tablet">
-       به‌ هه‌ڵه‌ کردنەوەی خه‌تکێشانه‌که‌ت داوە <xliff:g id="number">%d</xliff:g> times جار.
-       پاش <xliff:g id="number">%d</xliff:g> هه‌وڵی سه‌رنه‌که‌وتووی زیاتر،
-       داوات لێ ده‌کرێت تابلێته‌که‌ت بکه‌یته‌وه‌ به‌ به‌کارهێنانی هه‌ژماری ئیمه‌یڵ.\n\n
-       جارێکی تر هه‌وڵ بده‌ره‌وه‌ له‌ <xliff:g id="number">%d</xliff:g> چرکه‌دا.
-    </string>
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="default">
-       به‌ هه‌ڵه‌ کردنەوەی خه‌تکێشانه‌که‌ت لێداوە <xliff:g id="number">%d</xliff:g> times جار.
-       پاش <xliff:g id="number">%d</xliff:g> هه‌وڵی سه‌رنه‌که‌وتووی زیاتر،
-       داوات لێ ده‌کرێت ته‌له‌فۆنه‌که‌ بکه‌یته‌وه‌ به‌ به‌کارهێنانی هه‌ژماری ئیمه‌یڵ. \n\n
-       جارێکی تر هه‌وڵ بده‌ره‌وه‌ له‌ <xliff:g id="number">%d</xliff:g> چرکه‌دا.
-    </string>
   <!-- Instructions telling the user that they entered the wrong SIM PIN for the last time.
          Displayed in a dialog box.  -->
   <string name="kg_password_wrong_pin_code_pukked">PIN کۆد هه‌ڵه‌یه‌ پێویسته‌ ئێستا په‌یوه‌ندیی بکه‌یت به‌ کۆمپانیای دابینکه‌ره‌وه‌ بۆ کردنه‌وه‌ی ئامێره‌که‌ت.</string>
   <!-- Instructions telling the user that they entered the wrong SIM PIN while trying
          to unlock the keyguard.  Displayed in a dialog box.  -->
-  <plurals name="kg_password_wrong_pin_code">
-    <item quantity="one">PIN کۆدی سیم هه‌ڵه‌یه‌، <xliff:g id="number">%d</xliff:g> هه‌وڵت ماوه‌ به‌رله‌وه‌ی که‌ پێویست بکات په‌یوه‌ندیی به‌ کۆمپانیای دابینکه‌ره‌وه‌ بکه‌یت.</item>
-    <item quantity="other">کۆدی سیمکارت هەڵەیە .تۆ ته‌نیا <xliff:g id="number">%d</xliff:g> هەوڵێکت ماوە پێشی ئەوەی پەیوەندی بکەیت بە کۆمپانیاوە  بۆ کردنەوەی ئامێرەکەت .</item>
-  </plurals>
   <!-- Instructions telling the user that they have exhausted SIM PUK retries and the SIM is now unusable.
          Displayed in a dialog box.  -->
   <string name="kg_password_wrong_puk_code_dead">سیمه‌که‌ له‌کار که‌وتووه‌. په‌یوه‌ندیی بکه‌ به‌ کۆمپانیای دابینکه‌ره‌وه‌.</string>
@@ -225,8 +185,14 @@
   <!-- An explanation text that the pattern needs to be solved since profiles have just been switched. [CHAR LIMIT=80] -->
   <!-- An explanation text that the pin needs to be entered since profiles have just been switched. [CHAR LIMIT=80] -->
   <!-- An explanation text that the password needs to be entered since profiles have just been switched. [CHAR LIMIT=80] -->
+  <!-- An explanation text that the credential needs to be entered because a device admin has
+    locked the device. [CHAR LIMIT=80] -->
+  <!-- An explanation text that the credential needs to be entered because the user has clicked
+     the force lock button. [CHAR LIMIT=80] -->
   <!-- An explanation text that the pattern needs to be solved since it hasn't been solved in a while. [CHAR LIMIT=80]-->
   <!-- An explanation text that the pin needs to be entered since it hasn't been entered in a while. [CHAR LIMIT=80]-->
   <!-- An explanation text that the password needs to be entered since it hasn't been entered in a while. [CHAR LIMIT=80]-->
   <!-- Fingerprint hint message when finger was not recognized.-->
+  <!-- Instructions telling the user remaining times when enter SIM PIN view.  -->
+  <!-- Instructions telling the user remaining times when enter SIM PUK view.  -->
 </resources>

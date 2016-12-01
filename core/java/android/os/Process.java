@@ -16,9 +16,11 @@
 
 package android.os;
 
+import android.annotation.TestApi;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.system.Os;
+import android.system.OsConstants;
 import android.util.Log;
 import com.android.internal.os.Zygote;
 import dalvik.system.VMRuntime;
@@ -142,6 +144,18 @@ public class Process {
      * @hide
      */
     public static final int SHARED_RELRO_UID = 1037;
+
+    /**
+     * Defines the UID/GID for the audioserver process.
+     * @hide
+     */
+    public static final int AUDIOSERVER_UID = 1041;
+
+    /**
+     * Defines the UID/GID for the cameraserver process
+     * @hide
+     */
+    public static final int CAMERASERVER_UID = 1047;
 
     /**
      * Defines the start of a range of UIDs (and GIDs), going from this
@@ -310,6 +324,12 @@ public class Process {
      */
     public static final int SCHED_IDLE = 5;
 
+    /**
+     * Reset scheduler choice on fork.
+     * @hide
+     */
+    public static final int SCHED_RESET_ON_FORK = 0x40000000;
+
     // Keep in sync with SP_* constants of enum type SchedPolicy
     // declared in system/core/include/cutils/sched_policy.h,
     // except THREAD_GROUP_DEFAULT does not correspond to any SP_* value.
@@ -361,9 +381,18 @@ public class Process {
      **/
     public static final int THREAD_GROUP_AUDIO_SYS = 4;
 
+    /**
+     * Thread group for top foreground app.
+     * @hide
+     **/
+    public static final int THREAD_GROUP_TOP_APP = 5;
+
     public static final int SIGNAL_QUIT = 3;
     public static final int SIGNAL_KILL = 9;
     public static final int SIGNAL_USR1 = 10;
+
+    private static long sStartElapsedRealtime;
+    private static long sStartUptimeMillis;
 
     /**
      * State for communicating with the zygote process.
@@ -487,12 +516,11 @@ public class Process {
                                   String abi,
                                   String instructionSet,
                                   String appDataDir,
-                                  boolean refreshTheme,
                                   String[] zygoteArgs) {
         try {
             return startViaZygote(processClass, niceName, uid, gid, gids,
                     debugFlags, mountExternal, targetSdkVersion, seInfo,
-                    abi, instructionSet, appDataDir, refreshTheme, zygoteArgs);
+                    abi, instructionSet, appDataDir, zygoteArgs);
         } catch (ZygoteStartFailedEx ex) {
             Log.e(LOG_TAG,
                     "Starting VM process through Zygote failed");
@@ -620,7 +648,6 @@ public class Process {
                                   String abi,
                                   String instructionSet,
                                   String appDataDir,
-                                  boolean refreshTheme,
                                   String[] extraArgs)
                                   throws ZygoteStartFailedEx {
         synchronized(Process.class) {
@@ -643,11 +670,14 @@ public class Process {
             if ((debugFlags & Zygote.DEBUG_ENABLE_CHECKJNI) != 0) {
                 argsForZygote.add("--enable-checkjni");
             }
-            if ((debugFlags & Zygote.DEBUG_ENABLE_JIT) != 0) {
-                argsForZygote.add("--enable-jit");
-            }
             if ((debugFlags & Zygote.DEBUG_GENERATE_DEBUG_INFO) != 0) {
                 argsForZygote.add("--generate-debug-info");
+            }
+            if ((debugFlags & Zygote.DEBUG_ALWAYS_JIT) != 0) {
+                argsForZygote.add("--always-jit");
+            }
+            if ((debugFlags & Zygote.DEBUG_NATIVE_DEBUGGABLE) != 0) {
+                argsForZygote.add("--native-debuggable");
             }
             if ((debugFlags & Zygote.DEBUG_ENABLE_ASSERT) != 0) {
                 argsForZygote.add("--enable-assert");
@@ -658,9 +688,6 @@ public class Process {
                 argsForZygote.add("--mount-external-read");
             } else if (mountExternal == Zygote.MOUNT_EXTERNAL_WRITE) {
                 argsForZygote.add("--mount-external-write");
-            }
-            if (refreshTheme) {
-                argsForZygote.add("--refresh_theme");
             }
             argsForZygote.add("--target-sdk-version=" + targetSdkVersion);
 
@@ -765,6 +792,26 @@ public class Process {
     public static final native long getElapsedCpuTime();
 
     /**
+     * Return the {@link SystemClock#elapsedRealtime()} at which this process was started.
+     */
+    public static final long getStartElapsedRealtime() {
+        return sStartElapsedRealtime;
+    }
+
+    /**
+     * Return the {@link SystemClock#uptimeMillis()} at which this process was started.
+     */
+    public static final long getStartUptimeMillis() {
+        return sStartUptimeMillis;
+    }
+
+    /** @hide */
+    public static final void setStartTimes(long elapsedRealtime, long uptimeMillis) {
+        sStartElapsedRealtime = elapsedRealtime;
+        sStartUptimeMillis = uptimeMillis;
+    }
+
+    /**
      * Returns true if the current process is a 64-bit runtime.
      */
     public static final boolean is64Bit() {
@@ -811,8 +858,18 @@ public class Process {
      * {@link #myUid()} in that a particular user will have multiple
      * distinct apps running under it each with their own uid.
      */
-    public static final UserHandle myUserHandle() {
-        return new UserHandle(UserHandle.getUserId(myUid()));
+    public static UserHandle myUserHandle() {
+        return UserHandle.of(UserHandle.getUserId(myUid()));
+    }
+
+    /**
+     * Returns whether the given uid belongs to an application.
+     * @param uid A kernel uid.
+     * @return Whether the uid corresponds to an application sandbox running in
+     *     a specific user.
+     */
+    public static boolean isApplicationUid(int uid) {
+        return UserHandle.isApp(uid);
     }
 
     /**
@@ -924,6 +981,9 @@ public class Process {
      * priority.
      * If the thread is a thread group leader, that is it's gettid() == getpid(),
      * then the other threads in the same thread group are _not_ affected.
+     *
+     * Does not set cpuset for some historical reason, just calls
+     * libcutils::set_sched_policy().
      */
     public static final native void setThreadGroup(int tid, int group)
             throws IllegalArgumentException, SecurityException;
@@ -945,6 +1005,8 @@ public class Process {
      * priority threads alone.  group == THREAD_GROUP_BG_NONINTERACTIVE moves all
      * threads, regardless of priority, to the background scheduling group.
      * group == THREAD_GROUP_FOREGROUND is not allowed.
+     *
+     * Always sets cpusets.
      */
     public static final native void setProcessGroup(int pid, int group)
             throws IllegalArgumentException, SecurityException;
@@ -956,6 +1018,31 @@ public class Process {
      */
     public static final native int getProcessGroup(int pid)
             throws IllegalArgumentException, SecurityException;
+
+    /**
+     * On some devices, the foreground process may have one or more CPU
+     * cores exclusively reserved for it. This method can be used to
+     * retrieve which cores that are (if any), so the calling process
+     * can then use sched_setaffinity() to lock a thread to these cores.
+     * Note that the calling process must currently be running in the
+     * foreground for this method to return any cores.
+     *
+     * The CPU core(s) exclusively reserved for the foreground process will
+     * stay reserved for as long as the process stays in the foreground.
+     *
+     * As soon as a process leaves the foreground, those CPU cores will
+     * no longer be reserved for it, and will most likely be reserved for
+     * the new foreground process. It's not necessary to change the affinity
+     * of your process when it leaves the foreground (if you had previously
+     * set it to use a reserved core); the OS will automatically take care
+     * of resetting the affinity at that point.
+     *
+     * @return an array of integers, indicating the CPU cores exclusively
+     * reserved for this process. The array will have length zero if no
+     * CPU cores are exclusively reserved for this process at this point
+     * in time.
+     */
+    public static final native int[] getExclusiveCores();
 
     /**
      * Set the priority of the calling thread, based on Linux priorities.  See
@@ -991,6 +1078,24 @@ public class Process {
             throws IllegalArgumentException;
     
     /**
+     * Return the current scheduling policy of a thread, based on Linux.
+     *
+     * @param tid The identifier of the thread/process to get the scheduling policy.
+     *
+     * @throws IllegalArgumentException Throws IllegalArgumentException if
+     * <var>tid</var> does not exist, or if <var>priority</var> is out of range for the policy.
+     * @throws SecurityException Throws SecurityException if your process does
+     * not have permission to modify the given thread, or to use the given
+     * scheduling policy or priority.
+     *
+     * {@hide}
+     */
+    
+    @TestApi
+    public static final native int getThreadScheduler(int tid)
+            throws IllegalArgumentException;
+
+    /**
      * Set the scheduling policy and priority of a thread, based on Linux.
      *
      * @param tid The identifier of the thread/process to change.
@@ -1005,6 +1110,7 @@ public class Process {
      *
      * {@hide}
      */
+
     public static final native void setThreadScheduler(int tid, int policy, int priority)
             throws IllegalArgumentException;
 
@@ -1119,6 +1225,8 @@ public class Process {
     /** @hide */
     public static final int PROC_QUOTES = 0x400;
     /** @hide */
+    public static final int PROC_CHAR = 0x800;
+    /** @hide */
     public static final int PROC_OUT_STRING = 0x1000;
     /** @hide */
     public static final int PROC_OUT_LONG = 0x2000;
@@ -1176,4 +1284,26 @@ public class Process {
      * @hide
      */
     public static final native void removeAllProcessGroups();
+
+    /**
+     * Check to see if a thread belongs to a given process. This may require
+     * more permissions than apps generally have.
+     * @return true if this thread belongs to a process
+     * @hide
+     */
+    public static final boolean isThreadInProcess(int tid, int pid) {
+        StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
+        try {
+            if (Os.access("/proc/" + tid + "/task/" + pid, OsConstants.F_OK)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy);
+        }
+
+    }
 }

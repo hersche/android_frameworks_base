@@ -19,6 +19,6 @@
   <string name="app_label">بیرگەی ده‌ره‌کی</string>
   <!-- Title for documents backend that offers internal storage. [CHAR LIMIT=24] -->
   <string name="root_internal_storage">بیرگەی ناوه‌کی</string>
-  <!-- Title for documents backend that offers documents. [CHAR LIMIT=24] -->
+  <!-- Title for directory in which a user may store their own documents and files. [CHAR LIMIT=24] -->
   <string name="root_documents">به‌ڵگه‌نامه‌کان</string>
 </resources>

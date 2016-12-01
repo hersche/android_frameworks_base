@@ -154,8 +154,6 @@
   <string name="serviceNotProvisioned">Service net ageriicht.</string>
   <!-- Displayed to tell the user that they cannot change the caller ID setting. -->
   <string name="CLIRPermanent">D\'Astellung fir d\'Uruffer-ID kann net geännert ginn.</string>
-  <!-- Notification title to tell the user that restricted state is changed by access control. -->
-  <string name="RestrictedChangedTitle">Begrenzten Zougrëff geännert</string>
   <!-- Displayed to tell the user that data service is blocked by access control. -->
   <string name="RestrictedOnData">Dateservice ass gespaart.</string>
   <!-- Displayed to tell the user that emergency service is blocked by access control. -->
@@ -211,11 +209,9 @@
   <string name="roamingText12">Roaming-Banner Aus</string>
   <string name="roamingTextSearching">E Service gëtt gesicht</string>
   <!-- Displayed when WFC registration fails -->
-  <!-- WFC Operator Error Codes -->
   <!-- WFC Operator Error Messages showed as alerts -->
   <!-- WFC Operator Error Messages showed as notifications -->
   <!-- Template for showing cellular network operator name while WFC is active -->
-  <!-- Template for showing operator name for data connection while WFC is active -->
   <!-- WFC, summary for Disabled -->
   <!-- WFC, summary for Wi-Fi Preferred -->
   <!-- WFC, summary for Cellular Preferred -->
@@ -300,18 +296,14 @@
   <!-- SSL CA cert notification -->
   <!-- Shows up when there is a user SSL CA Cert installed on the
          device.  Indicates to the user that SSL traffic can be intercepted.  [CHAR LIMIT=NONE] -->
-  <string name="ssl_ca_cert_warning">D\'Netzwierk kéint iwwerwaacht sinn</string>
-  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning",
-         i.e. "Network may be monitored". This says that an unknown party is doing the monitoring.
-         [CHAR LIMIT=100]-->
+  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning".
+         This says that an unknown party is doing the monitoring. [CHAR LIMIT=100]-->
   <string name="ssl_ca_cert_noti_by_unknown">Vun engem onbekannten Drëtten</string>
-  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning",
-        i.e. "Network may be monitored". This indicates that an unspecified administrator is doing
-        the monitoring. [CHAR LIMIT=100]-->
+  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning".
+         This indicates that an unspecified administrator is doing the monitoring. [CHAR LIMIT=100]-->
   <string name="ssl_ca_cert_noti_by_administrator">Vum Administrateur vun dengem Aarbechtsprofil</string>
-  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning",
-         i.e. "Network may be monitored". This indicates who is doing the monitoring.
-         [CHAR LIMIT=100]-->
+  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning".
+         This indicates who is doing the monitoring. [CHAR LIMIT=100]-->
   <string name="ssl_ca_cert_noti_managed">Vu(n) <xliff:g id="managing_domain">%s</xliff:g></string>
   <!-- Work profile deleted notification-->
   <!-- Shows up in the notification's title when the system deletes the work profile. [CHAR LIMIT=NONE] -->
@@ -403,12 +395,20 @@
   <string name="global_action_lock">Schiermspär</string>
   <!-- label for item that turns off power in phone options dialog -->
   <string name="global_action_power_off">Ausmaachen</string>
+  <!-- label for item that restarts phone in phone options dialog -->
+  <!-- TODO: promote to separate string-->
   <!-- label for item that generates a bug report in the phone options dialog -->
   <string name="global_action_bug_report">Feelerbericht</string>
   <!-- Take bug report menu title [CHAR LIMIT=NONE] -->
   <string name="bugreport_title">Feelerbericht maachen</string>
   <!-- Message in bugreport dialog describing what it does [CHAR LIMIT=NONE] -->
+  <!-- TODO: remove if not used anymore -->
   <string name="bugreport_message">Bei dësem Feelerbericht ginn Daten iwwer den aktuelle Status vum Apparat erfaasst an als E-Mail verschéckt. Vum Start vum Bericht bis bei d\'Verschécke kann et ee Moment daueren; ee Moment Gedold.</string>
+  <!-- Title in the bugreport dialog for the interactive workflow. Should fit in one line. [CHAR LIMIT=30] -->
+  <!-- Summary in the bugreport dialog for the interactive workflow. [CHAR LIMIT=NONE] -->
+  <!-- Title in the bugreport dialog for the full workflow. Should fit in one line. [CHAR LIMIT=30] -->
+  <!-- Summary in the bugreport dialog for the full workflow. [CHAR LIMIT=NONE] -->
+  <!--  Toast message informing user in how many seconds a bugreport screenshot will be taken -->
   <!-- Format for build summary info [CHAR LIMIT=NONE] -->
   <!-- label for item that enables silent mode in phone options dialog -->
   <string name="global_action_toggle_silent_mode">Stëlle Modus</string>
@@ -434,13 +434,15 @@
          for most appropriate textual indicator of "more than X".
          [CHAR LIMIT=4] -->
   <string name="status_bar_notification_info_overflow">999+</string>
+  <!-- The divider symbol between different parts of the notification header. not translatable [CHAR LIMIT=1] -->
+  <!-- Text shown in place of notification contents when the notification is hidden on a secure lockscreen -->
+  <!-- Text shown in place of notification contents when the notification is hidden by policy on a secure lockscreen -->
   <!-- Displayed to the user to tell them that they have started up the phone in "safe mode" -->
   <string name="safeMode">Séchere Modus</string>
   <!-- Label for the Android system components when they are shown to the user. -->
   <string name="android_system_label">Android-System</string>
-  <!-- Label for the user owner in the intent forwarding app. [CHAR LIMIT=15] -->
-  <!-- Label for a corporate profile in the intent forwarding app. [CHAR LIMIT=15] -->
-  <string name="managed_profile_label">Aarbecht</string>
+  <!-- Label for the user owner in the intent forwarding app. -->
+  <!-- Label for a corporate profile in the intent forwarding app. -->
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
@@ -451,6 +453,7 @@
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permgrouplab_sms">SMS</string>
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permgroupdesc_sms">SMS</string>
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permgrouplab_storage">Späicher</string>
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
@@ -464,6 +467,7 @@
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permgrouplab_phone">Telefon</string>
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permgroupdesc_phone">Telefon</string>
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Title for the capability of an accessibility service to retrieve window content. -->
@@ -473,7 +477,6 @@
   <!-- Title for the capability of an accessibility service to request touch exploration. -->
   <string name="capability_title_canRequestTouchExploration">\"Drécken an Entdecken\" aktivéieren</string>
   <!-- Description for the capability of an accessibility service to request touch exploration. -->
-  <string name="capability_desc_canRequestTouchExploration">Beréiert Elementer gi virgelies an de Schierm ka mat Gesten entdeckt ginn.</string>
   <!-- Title for the capability of an accessibility service to request enhanced web accessibility. -->
   <string name="capability_title_canRequestEnhancedWebAccessibility">Verbessert Web-Benotzbarkeet uschalten</string>
   <!-- Description for the capability of an accessibility service to request enhanced web accessibility. -->
@@ -482,6 +485,10 @@
   <string name="capability_title_canRequestFilterKeyEvents">Text observéieren deen s du agëss</string>
   <!-- Description for the capability of an accessibility service to request to filter key events. -->
   <string name="capability_desc_canRequestFilterKeyEvents">Huet perséinlech Date wéi Kreditkaartennummeren a Passwierder als Inhalt.</string>
+  <!-- Title for the capability of an accessibility service to control display magnification. -->
+  <!-- Description for the capability of an accessibility service to control display magnification. -->
+  <!-- Title for the capability of an accessibility service to perform gestures. -->
+  <!-- Description for the capability of an accessibility service to perform gestures. -->
   <!--  Permissions -->
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permlab_statusBar">Statusläischt desaktivéieren oder änneren</string>
@@ -526,10 +533,10 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_subscribedFeedsRead">Erlaabt der App, Detailer iwwer déi momentan synchroniséiert Feeds ofzeruffen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permlab_sendSms">SMS-Messagë schécken</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_sendSms">Erlaabt der App, SMSen ze schécken. Doduerch kéinten onerwaart Käschten entstoen. Béiswëlleg Appe kéinten dech Sue kaschten andeem se Messagen ouni deng Bestätegung verschécken.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_readSms">SMSen oder MMSe liesen</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readSms" product="tablet">Erlaabt der App, SMSen ze liesen déi um Tablet oder op der SIM-Kaart gespäichert sinn. Doduerch kann d\'App all d\'SMSe liesen, onofhängeg vum Inhalt an egal wéi vertraulech se sinn.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -603,7 +610,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readContacts" product="default">Erlaabt der App, Daten iwwer d\'Kontakter déi op dengem Telefon gespäichert sinn ze liesen, inklusiv der Frequenz mat där s de spezifesch Kontakter ugeruff hues, hinnen E-Maile geschéckt hues, oder anerwäerts mat hinne kommunikéiert hues. Dës Berechtegung erméiglecht et Appen, Kontaktdaten z\'änneren, a béisaarteg Appe kéinte Kontaktdaten ouni däi Wëssen deelen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_writeContacts">Kontakter änneren</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_writeContacts" product="tablet">Erlaabt der App, Daten iwwer d\'Kontakter déi op dengem Tablet gespäichert sinn z\'änneren, inklusiv der Frequenz mat där s de spezifesch Kontakter ugeruff hues, hinnen E-Maile geschéckt hues, oder anerwäerts mat hinne kommunikéiert hues. Dës Berechtegung erméiglecht et Appen, Kontaktdaten ze läschen.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -619,7 +625,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readCallLog" product="default">Erlaabt der App, d\'Urufflëscht vum Telefon auszeliesen, inklusiv Daten iwwer erakommend an erausgoend Uriff. Dës Berechtegung erlaabt et Appen, d\'Daten aus denger Urufflëscht ze späicheren, a béisaarteg Appe kéinten dës Daten ouni däi Wëssen deelen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_writeCallLog">Urufflëscht änneren</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_writeCallLog" product="tablet">Erlaabt der App, d\'Urufflëscht vum Tablet z\'änneren, inklusiv Daten iwwer erakommend an erausgoend Uriff. Béisaarteg Appe kéinten dës Berechtegung benotze fir d\'Daten ouni däi Wëssen ze läschen oder z\'änneren.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -674,11 +679,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_vibrate">Erlaabt der App, d\'Vibratioun ze steieren.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_flashlight">Täscheluucht steieren</string>
-  <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permdesc_flashlight">Erlaabt der App, d\'Täscheluucht ze steieren.</string>
-  <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_callPhone">Telefonsnummeren direkt uruffen</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_callPhone">Erlaabt der App, Telefonsnummeren ouni deng Awierkung unzeruffen. Doduerch kéinten onerwaart Käschten oder Uriff entstoen. D\'App kann heiduerch awer keng Noutfallnummeren uruffen. Béiswëlleg Appe kéinte Käschte verursaachen andeem se Nummeren ouni deng Bestätegung uruffen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -751,7 +751,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_accessWifiState">Erlaabt der App, Informatiounen iwwer d\'WLAN-Netzwierker auszeliesen. Beispillsweis ob WLAN un ass a wéi eng Nimm déi connectéiert WLAN-Apparater hunn.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_changeWifiState">WLAN-Connectiounen hierstellen an trennen</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_changeWifiState">Erlaabt der App, Connectioune mat WLAN-Zougankspunkten hierzestellen an ze trennen a fir Ännerungen un der Konfiguratioun vun de WLAN-Netzwierker virzehuelen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -762,7 +761,6 @@
   <string name="permdesc_changeWifiMulticastState" product="tv">Erlaabt der App, Päck z\'empfänken, déi iwwer Multicast-Adressen u sämtlech Apparater an engem WLAN verschéckt ginn, net just un deng Tëlee. Dat kascht méi Leeschtung wéi den Net-Multicast-Modus.</string>
   <string name="permdesc_changeWifiMulticastState" product="default">Erlaabt der App, Päck z\'empfänken, déi iwwer Multicast-Adressen u sämtlech Apparater an engem WLAN verschéckt ginn, net just un däin Telefon. Dat kascht méi Leeschtung wéi den Net-Multicast-Modus.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_bluetoothAdmin">Op d\'Bluetooth-Astellungen zougräifen</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_bluetoothAdmin" product="tablet">Erlaabt der App, Bluetooth um Tablet ze konfiguréieren, an anerer Apparater z\'entdecken a Koppelunge mat hinnen hierzestellen.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -822,19 +820,15 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readSyncStats">Erlaabt der App, d\'Synchroniséierungs-Statistike fir ee Kont ze liesen, inklusiv dem Verlaf vun de Synchronisatiountsevenementer a wéi vill Date synchroniséiert ginn.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permlab_sdcardRead" product="nosdcard">Inhalter vun dengem USB-Späicher liesen</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permlab_sdcardRead" product="default">Inhalter vun denger SD-Kaart liesen</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permdesc_sdcardRead" product="nosdcard">Erlaabt der App, d\'Inhalter vum USB-Späicher ze liesen.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_sdcardRead" product="default">Erlaabt der App, d\'Inhalter vun der SD-Kaart ze liesen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permlab_sdcardWrite" product="nosdcard">Inhalter vum USB-Späicher änneren oder läschen</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permlab_sdcardWrite" product="default">Inhalter vun der SD-Kaart änneren oder läschen</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permdesc_sdcardWrite" product="nosdcard">Erlaabt der App, op den USB-Späicher ze schreiwen.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_sdcardWrite" product="default">Erlaabt der App, op d\'SD-Kaart ze schreiwen.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -1175,7 +1169,6 @@
   <!-- Prompt to enter New SIM PIN in Edit Text Box in unlock screen -->
   <string name="keyguard_password_enter_pin_prompt">Neie PIN-Code</string>
   <!-- Displayed as hint in passwordEntry EditText on PasswordUnlockScreen [CHAR LIMIT=30]-->
-  <string name="keyguard_password_entry_touch_hint"><font size="17">Drécke fir d\'Passwuert anzeginn</font></string>
   <!-- Instructions telling the user to enter their text password to unlock the keyguard.
          Displayed in one line in a large font.  -->
   <string name="keyguard_password_enter_password_code">Passwuert agi fir z\'entspären</string>
@@ -1193,7 +1186,6 @@
        *** touch based lock / unlock ***
                                           -->
   <!-- On the keyguard screen, it shows the carrier the phone is connected to.  This is displayed if the phone is not connected to a carrier.-->
-  <string name="lockscreen_carrier_default">Kee Service.</string>
   <!-- Shown in the lock screen to tell the user that the screen is locked. -->
   <string name="lockscreen_screen_locked">Schierm gespaart.</string>
   <!-- when pattern lock is enabled, tell them about the emergency dial -->
@@ -1211,6 +1203,7 @@
   <string name="lockscreen_pattern_wrong">Probéier nees</string>
   <!-- On the unlock password screen, shown when the user enters the wrong lock password and must try again. -->
   <string name="lockscreen_password_wrong">Probéier nees</string>
+  <!-- On the keyguard screen, this string explains that some features or data may not be available until the device is unlocked. [CHAR LIMIT=48] -->
   <!-- Shown when face unlock failed multiple times so we're just using the backup -->
   <string name="faceunlock_multiple_failures">Maximal Versich fir mam Gesiicht z\'entspären iwwerschratt</string>
   <!-- Shown in the lock screen when there is no SIM card. -->
@@ -1262,31 +1255,22 @@ Kontaktéier däi Provider fir eng aner SIM-Kaart ze kréien.</string>
   <string name="lockscreen_sim_unlock_progress_dialog_message">D\'SIM-Kaart gëtt entspaart\u2026</string>
   <!-- For the unlock screen, Information message shown in dialog when user has too many failed attempts at
          drawing the unlock pattern -->
-  <string name="lockscreen_too_many_failed_attempts_dialog_message">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gemoolt.\n\nProbéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <!-- For the unlock screen, Information message shown in dialog when user has too many failed attempts at
          entering the password -->
-  <string name="lockscreen_too_many_failed_password_attempts_dialog_message">Du hues däi Passwuert <xliff:g id="number">%d</xliff:g>-mol falsch aginn.\n\nProbéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <!-- For the unlock screen, Information message shown in dialog when user has too many failed attempts at
          entering the PIN -->
-  <string name="lockscreen_too_many_failed_pin_attempts_dialog_message">Du hues däi PIN <xliff:g id="number">%d</xliff:g>-mol falsch aginn.\n\nProbéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="lockscreen_failed_attempts_almost_glogin" product="tablet">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gezeechent. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich muss du däin Tablet mat denge Login-Date vu Google entspären.\n\nProbéier a(n) <xliff:g id="number">%d</xliff:g> Sekonnen nees.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="lockscreen_failed_attempts_almost_glogin" product="tv">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>mol- falsch gezeechent. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich muss du deng Tëlee mat denge Login-Date vu Google entspären.\n\nProbéier a(n) <xliff:g id="number">%d</xliff:g> Sekonnen nees.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="lockscreen_failed_attempts_almost_glogin" product="default">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gezeechent. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich muss du däin Telefon mat denge Login-Date vu Google entspären.\n\nProbéier a(n) <xliff:g id="number">%d</xliff:g> Sekonnen nees.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where the device will be wiped. -->
-  <string name="lockscreen_failed_attempts_almost_at_wipe" product="tablet">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Tablet z\'entspären. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëtt den Tablet op d\'Wierksastellungen zréckgesat an all d\'Benotzerdate gi verluer.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where the device will be wiped. -->
-  <string name="lockscreen_failed_attempts_almost_at_wipe" product="tv">Du hues <xliff:g id="number">%d</xliff:g> mol ouni Erfolleg versicht d\'Tëlee z\'entspären. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëtt deng Tëlee op d\'Wierksastellungen zréckgesat an all d\'Benotzerdate gi verluer.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where the device will be wiped. -->
-  <string name="lockscreen_failed_attempts_almost_at_wipe" product="default">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Telefon z\'entspären. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëtt den Tablet op d\'Wierksastellungen zréckgesat an all d\'Benotzerdate gi verluer.</string>
   <!-- For the unlock screen, informational message shown in dialog when user has exceeded the
         maximum attempts and the device will now be wiped -->
   <string name="lockscreen_failed_attempts_now_wiping" product="tablet">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Tablet z\'entspären. E gëtt elo op d\'Wierksastellungen zréckgesat.</string>
@@ -1397,10 +1381,6 @@ Kontaktéier däi Provider fir eng aner SIM-Kaart ze kréien.</string>
   <string name="granularity_label_link">Link</string>
   <!-- Label for granularity to traverse the content on an AccessibilityNodeInfo by line. Only spoken to the user. [CHAR LIMIT=NONE] -->
   <string name="granularity_label_line">Zeil</string>
-  <!-- A format string for 12-hour time of day, just the hour, not the minute, with lower-case "am" or "pm" (example: "3pm"). -->
-  <string name="hour_ampm">"<xliff:g id="hour" example="3">%-l</xliff:g><xliff:g id="ampm" example="pm">%P</xliff:g>"</string>
-  <!-- A format string for 12-hour time of day, just the hour, not the minute, with capital "AM" or "PM" (example: "3PM"). -->
-  <string name="hour_cap_ampm">"<xliff:g id="hour" example="3">%-l</xliff:g><xliff:g id="ampm" example="PM">%p</xliff:g>"</string>
   <!-- Title of the alert when something went wrong in the factory test. -->
   <string name="factorytest_failed">Wierkstest feelgeschloen</string>
   <!-- Error message displayed when a non-system application tries to start a factory test. -->
@@ -1688,6 +1668,23 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
     <item quantity="one">1 Stonn</item>
     <item quantity="other"><xliff:g id="count">%d</xliff:g> Stonnen</item>
   </plurals>
+  <!-- A string denoting the current point in time that should be as short as possible. Abbreviations are preferred to full strings as this might be shown repetitively. It is used in the header of notifications. [CHAR LIMIT=8]-->
+  <!-- Phrase describing a time duration using minutes that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using hours that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using days that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using years that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using minutes that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a time duration using hours that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a time duration using days that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a time duration using years that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a relative time using minutes in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using hours in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using days in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using years in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using minutes that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using hours that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using days that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using years that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
   <!-- Title for error alert when a video cannot be played.  it can be used by any app. -->
   <string name="VideoView_error_title">Videoproblem</string>
   <!-- Text for error alert when a video container is not valid for progressive download/playback. -->
@@ -1719,6 +1716,7 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="copy">Kopéieren</string>
   <!-- Item on EditText context menu. This action is used to paste from the clipboard into the eidt field -->
   <string name="paste">Apechen</string>
+  <!-- Item on EditText context menu. This action is used to paste from the clipboard into the eidt field without formatting -->
   <!-- Item on EditText context menu. This action is used to replace the current word by other suggested words, suggested by the IME or the spell checker -->
   <string name="replace">Ersetzen\u2026</string>
   <!-- Item on EditText pop-up window. This action is used to delete the text that the user recently added. [CHAR LIMIT=15] -->
@@ -1727,6 +1725,8 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="copyUrl">URL kopéieren</string>
   <!-- Item on EditText context menu. Added only when the context menu is not empty, it enable selection context mode. [CHAR LIMIT=20] -->
   <string name="selectTextMode">Text auswielen</string>
+  <!-- Item on EditText context menu. This action is used to undo a text edit operation. -->
+  <!-- Item on EditText context menu. This action is used to redo a text edit operation. -->
   <!-- Text selection contextual mode title, displayed in the CAB. [CHAR LIMIT=20] -->
   <string name="textSelectionCABTitle">Textauswiel</string>
   <!-- Option to add the current misspelled word to the user dictionary. [CHAR LIMIT=25] -->
@@ -1748,8 +1748,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="app_running_notification_title"><xliff:g id="app_name">%1$s</xliff:g> gëtt ausgeféiert</string>
   <!-- [CHAR LIMIT=NONE] Stub notification text for an app running a service that has provided
          a bad bad notification for itself. -->
-  <string name="app_running_notification_text">Dréck fir méi Informatiounen
-        oder fir d\'App unzehalen.</string>
   <!-- Preference framework strings. -->
   <string name="ok">OK</string>
   <!-- Preference framework strings. -->
@@ -1773,26 +1771,45 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Title of intent resolver dialog when selecting an application to run
          and a previously used application is known. -->
   <string name="whichApplicationNamed">Aktioun mat %1$s ofschléissen</string>
+  <!-- Generic label for a link to a intent resolver. -->
   <!-- Title of intent resolver dialog when selecting a viewer application to run. -->
   <string name="whichViewApplication">Opmaache mat</string>
   <!-- Title of intent resolver dialog when selecting a viewer application to run
          and a previously used application is known. -->
   <string name="whichViewApplicationNamed">Opmaache mat %1$s</string>
+  <!-- Label for a link to a intent resolver dialog to view something -->
   <!-- Title of intent resolver dialog when selecting an editor application to run. -->
   <string name="whichEditApplication">Ännere mat</string>
   <!-- Title of intent resolver dialog when selecting an editor application to run
          and a previously used application is known. -->
   <string name="whichEditApplicationNamed">Ännere mat %1$s</string>
+  <!-- Label for a link to a intent resolver dialog when selecting an editor application -->
+  <string name="whichEditApplicationLabel">Änneren</string>
   <!-- Title of intent resolver dialog when selecting a sharing application to run. -->
   <string name="whichSendApplication">Deele mat</string>
   <!-- Title of intent resolver dialog when selecting a sharing application to run
          and a previously used application is known. -->
   <string name="whichSendApplicationNamed">Deele mat %1$s</string>
+  <!-- Label for a link to a intent resolver dialog to sharing something -->
+  <string name="whichSendApplicationLabel">Deelen</string>
+  <!-- Title of intent resolver dialog when selecting an application to run to
+         send content to a specific recipient. Often used for email. -->
+  <!-- Title of intent resolver dialog when selecting an application to run to
+         send content to a specific recipient and a previously used application is known.
+         Often used for email. -->
+  <!-- Label for a link to a intent resolver dialog to send content to a specific recipient. -->
+  <string name="whichSendToApplicationLabel">Schécken</string>
   <!-- Title of intent resolver dialog when selecting a HOME application to run. -->
   <string name="whichHomeApplication">Start-App auswielen</string>
   <!-- Title of intent resolver dialog when selecting a HOME application to run
          and a previously used application is known. -->
   <string name="whichHomeApplicationNamed">%1$s als Start-App auswielen</string>
+  <!-- Label for a link to a intent resolver dialog when selecting a HOME -->
+  <!-- Option to always use the selected application resolution in the future. See the "Complete action using" dialog title-->
+  <!-- Title of intent resolver dialog when capturing an image. -->
+  <!-- Title of intent resolver dialog when capturing an image
+         and a previously used application is known. -->
+  <!-- Label for a link to a intent resolver dialog when capturing an image -->
   <!-- Option to always use the selected application resolution in the future. See the "Complete action using" dialog title-->
   <string name="alwaysUse">Standardméisseg fir dës Aktioun benotzen.</string>
   <!-- Title of the list of alternate options to complete an action shown when the
@@ -1807,20 +1824,22 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Text to display when there are no activities found to display in the
          activity chooser. See the "Select an action" title. -->
   <string name="noApplications">Dës Aktioun ka vu kenger App duerchgefouert ginn.</string>
-  <!-- Title of the alert when an application has crashed. -->
   <!-- Text of the alert that is displayed when an application has crashed. -->
-  <string name="aerr_application">Leider huet <xliff:g id="application">%1$s</xliff:g> opgehale mat Funktionéieren.</string>
-  <!-- Text of the alert that is displayed when an application has crashed. -->
-  <string name="aerr_process">Leider gouf de Prozess <xliff:g id="process">%1$s</xliff:g> gestoppt.</string>
+  <!-- Text of the alert that is displayed when a process has crashed. -->
+  <!-- Text of the alert that is displayed when an application has crashed repeatedly. -->
+  <!-- Text of the alert that is displayed when a process has crashed repeatedly. -->
+  <!-- Button that restarts a crashed application -->
+  <!-- Button that sends feedback about a crashed application -->
+  <!-- Button that closes a crashed application -->
+  <!-- Button that mutes further crashes of the crashed application. Note that this only appears on engineering builds. -->
+  <!-- Button that waits a bit more for an unresponsive app -->
+  <string name="aerr_wait">Waart</string>
+  <!-- Button that closes an unresponsive application -->
   <!-- Title of the alert when an application is not responding. -->
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_activity_application"><xliff:g id="application">%2$s</xliff:g> äntwert net.\n\nWëlls de d\'App zoumaachen?</string>
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_activity_process">D\'Aktivitéit <xliff:g id="activity">%1$s</xliff:g> äntwert net.\n\nWëlls de se zoumaachen?</string>
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_application_process"><xliff:g id="application">%1$s</xliff:g> äntwert net.\n\nWëlls de d\'App zoumaachen?</string>
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_process">De Prozess <xliff:g id="activity">%1$s</xliff:g> äntwert net.\n\nWëlls de e zoumaachen?</string>
   <!-- Button allowing the user to close an application that is not responding. This will kill the application. -->
   <string name="force_close">OK</string>
   <!-- Button allowing the user to send a bug report for application which has encountered an error. -->
@@ -1841,6 +1860,9 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="screen_compat_mode_show">Ëmmer uweisen</string>
   <!-- [CHAR LIMIT=200] Compat mode dialog: hint to re-enable compat mode dialog. -->
   <string name="screen_compat_mode_hint">Reaktivéierung ënner Astellungen &gt; Appen &gt; Erofgelueden.</string>
+  <!-- [CHAR LIMIT=200] Unsupported display size dialog: message. Refers to "Display size" setting. -->
+  <!-- [CHAR LIMIT=50] Unsupported display size dialog: check box label. -->
+  <string name="unsupported_display_size_show">Ëmmer uweisen</string>
   <!-- Text of the alert that is displayed when an application has violated StrictMode. -->
   <string name="smv_application">D\'App <xliff:g id="application">%1$s</xliff:g> (Prozess <xliff:g id="process">%2$s</xliff:g>) huet géint déi selwer operluechte StrictMode-Richtlinne verstouss.</string>
   <!-- Text of the alert that is displayed when an application has violated StrictMode. -->
@@ -1851,6 +1873,9 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="android_start_title">Android gëtt gestart\u2026</string>
   <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog when doing an fstrim. -->
   <string name="android_upgrading_fstrim">Späicher optiméieren.</string>
+  <!-- [CHAR LIMIT=40] Title of notification that is shown when finishing a system upgrade. -->
+  <!-- [CHAR LIMIT=200] Body of notification that is shown when performing a system upgrade. -->
+  <!-- [CHAR LIMIT=40] Toast that is shown when an app is still upgrading. -->
   <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog for each .apk that is optimized. -->
   <string name="android_upgrading_apk">Optiméierung vun der App <xliff:g id="number" example="123">%1$d</xliff:g> / <xliff:g id="number" example="123">%2$d</xliff:g>.</string>
   <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog for each .apk pre boot broadcast -->
@@ -1861,7 +1886,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Notification text to tell the user that a heavy-weight application is running. -->
   <string name="heavy_weight_notification"><xliff:g id="app">%1$s</xliff:g> leeft</string>
   <!-- Notification details to tell the user that a heavy-weight application is running. -->
-  <string name="heavy_weight_notification_detail">Drécke fir bei d\'App ze wiesselen</string>
   <!-- Title of dialog prompting whether user wants to switch between heavy-weight apps. -->
   <string name="heavy_weight_switcher_title">Appe wiesselen?</string>
   <!-- Descriptive text for switching to a new heavy-weight application. -->
@@ -1934,6 +1958,18 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="network_available_sign_in_detailed"><xliff:g id="network_ssid">%1$s</xliff:g></string>
   <!-- A notification is shown when the user connects to a Wi-Fi network and the system detects that that network has no Internet access. This is the notification's title. -->
   <!-- A notification is shown when the user connects to a Wi-Fi network and the system detects that that network has no Internet access. This is the notification's message. -->
+  <!-- A notification might be shown if the device switches to another network type (e.g., cellular data) because it detects that the network it was using (e.g., Wi-Fi) has lost Internet connectivity. This is the notification's title. %1$s is the network type that the device switched to, e.g., cellular data. It is one of the strings in the network_switch_type_name array. -->
+  <!-- A notification might be shown if the device switches to another network type (e.g., cellular data) because it detects that the network it was using (e.g., Wi-Fi) has lost Internet connectivity. This is the notification's message. %1$s is the network that the device switched to, e.g., cellular data. %2$s is the network type the device switched from, e.g., Wi-Fi. Both are strings in the network_switch_type_name array. -->
+  <!-- A toast might be shown if the device switches to another network type (e.g., cellular data) because it detects that the network it was using (e.g., Wi-Fi) has lost Internet connectivity. This is the text of the toast. %1$s is the network that the device switched from, e.g., Wi-Fi. %2$s is the network type the device switched from, e.g., cellular data. Both are strings in the network_switch_type_name array. -->
+  <!-- Network type names used in the network_switch_metered and network_switch_metered_detail strings. These must be kept in the sync with the values NetworkCapabilities.TRANSPORT_xxx values, and in the same order. -->
+  <string-array name="network_switch_type_name">
+    <item>cellular data</item>
+    <item>Wi-Fi</item>
+    <item>Bluetooth</item>
+    <item>Ethernet</item>
+    <item>VPN</item>
+  </string-array>
+  <!-- Network type name displayed if one of the types is not found in network_switch_type_name. -->
   <!-- A notification is shown when a user's selected SSID is later disabled due to connectivity problems.  This is the notification's title / ticker. -->
   <string name="wifi_watchdog_network_disabled">Konnt net mam WLAN connectéieren</string>
   <!-- A notification is shown when a user's selected SSID is later disabled due to connectivity problems.  The complete alert msg is: <hotspot name> + this string, i.e. "Linksys has a poor internet connection" -->
@@ -1947,7 +1983,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="wifi_p2p_turnon_message">Wi-Fi Direct starten. De WLAN-Zougankspunkt gëtt doduerch ausgeschalt.</string>
   <string name="wifi_p2p_failed_message">Konnt Wi-Fi Direct net starten.</string>
   <string name="wifi_p2p_enabled_notification_title">Wi-Fi Direct ass un</string>
-  <string name="wifi_p2p_enabled_notification_message">Dréck fir d\'Astellungen</string>
   <string name="accept">Acceptéieren</string>
   <string name="decline">Refuséieren</string>
   <string name="wifi_p2p_invitation_sent_title">Invitatioun geschéckt</string>
@@ -2002,6 +2037,9 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="sim_added_message">Start den Handy nei fir op d\'Mobilnetz zouzegräifen.</string>
   <!-- See SIM_ADDED_DIALOG.  This is the button of that dialog. -->
   <string name="sim_restart_button">Nei starten</string>
+  <!-- See Carrier_App_Dialog. This is the message of that dialog. -->
+  <!-- See Carrier_App_Dialog. This is the button of that dialog. -->
+  <!-- See carrier_app_notification. This is the headline. -->
   <!-- Date/Time picker dialogs strings -->
   <!-- The title of the time picker dialog. [CHAR LIMIT=NONE] -->
   <string name="time_picker_dialog_title">Zäit setzen</string>
@@ -2020,51 +2058,10 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="no_permissions">Keng Berechtegungen néideg</string>
   <!-- [CHAR LIMIT=NONE] Additional text in permission description for perms that can cost money. -->
   <string name="perm_costs_money">dëst kéint dech Sue kaschten</string>
-  <!-- USB storage dialog strings -->
-  <!-- This is the title for the activity's window. -->
-  <string name="usb_storage_activity_title">USB-Massespäicher</string>
-  <!-- See USB_STORAGE.  USB_STORAGE_DIALOG:  After the user selects the notification, a dialog is shown asking if he wants to mount.  This is the title. -->
-  <string name="usb_storage_title">USB connectéiert</string>
-  <!-- See USB_STORAGE.    This is the message. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_message" product="nosdcard">Du hues den Apparat iwwer USB un däi Computer ugeschloss. Dréck de Knäppchen hei drënner wann s du Fichieren tëscht dengem Computer an dem USB-Späicher vun dengem Android-Apparat wëlls kopéieren.</string>
-  <!-- See USB_STORAGE.    This is the message. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_message" product="default">Du hues den Apparat iwwer USB un däi Computer ugeschloss. Dréck de Knäppchen hei drënner wann s du Fichieren tëscht dengem Computer an der SD-Kaart vun dengem Android-Apparat wëlls kopéieren.</string>
-  <!-- See USB_STORAGE.    This is the button text to mount the phone on the computer. -->
-  <string name="usb_storage_button_mount">USB-Späicher aktivéieren</string>
-  <!-- See USB_STORAGE_DIALOG.  If there was an error mounting, this is the text. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_error_message" product="nosdcard">Beim Versuch däin USB-Späicher als USB-Massespäicher ze benotze gouf et e Problem.</string>
-  <!-- See USB_STORAGE_DIALOG.  If there was an error mounting, this is the text. -->
-  <string name="usb_storage_error_message" product="default">Beim Versuch deng SD-Kaart als USB-Massespäicher ze benotze gouf et e Problem.</string>
-  <!-- USB_STORAGE: When the user connects the phone to a computer via USB, we show a notification asking if he wants to share files across.  This is the title -->
-  <string name="usb_storage_notification_title">USB connectéiert</string>
-  <!-- See USB_STORAGE. This is the message. -->
-  <string name="usb_storage_notification_message">Dréck fir Fichiere vum/op de Computer ze kopéieren.</string>
-  <!-- USB_STORAGE_STOP: While USB storage is enabled, we show a notification dialog asking if he wants to stop. This is the title -->
-  <string name="usb_storage_stop_notification_title">USB-Späicher desaktivéieren</string>
-  <!-- See USB_STORAGE. This is the message. -->
-  <string name="usb_storage_stop_notification_message">Dréck fir den USB-Späicher auszeschalten.</string>
-  <!-- USB storage stop dialog strings -->
-  <!-- This is the label for the activity, and should never be visible to the user. -->
-  <!-- See USB_STORAGE_STOP.  USB_STORAGE_STOP_DIALOG:  After the user selects the notification, a dialog is shown asking if he wants to stop usb storage.  This is the title. -->
-  <string name="usb_storage_stop_title">USB-Späicher gëtt benotzt</string>
-  <!-- See USB_STORAGE_STOP.    This is the message. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_stop_message" product="nosdcard">Ier s de den USB-Späicher ausschalts, trenn (\"ejectéieren\") dengem Android säin USB-Späicher vum Computer.</string>
-  <!-- See USB_STORAGE_STOP.    This is the message. -->
-  <string name="usb_storage_stop_message" product="default">Ier s de den USB-Späicher ausschalts, trenn (\"ejectéieren\") dengem Android seng SD-Kaart vum Computer.</string>
-  <!-- See USB_STORAGE_STOP.    This is the button text to stop usb storage. -->
-  <string name="usb_storage_stop_button_mount">USB-Späicher desaktivéieren</string>
-  <!-- See USB_STORAGE_STOP_DIALOG.  If there was an error stopping, this is the text. -->
-  <string name="usb_storage_stop_error_message">Et gouf e Problem beim Ausschalte vum USB-Späicher. Kontrolléier datt den USB-Host getrennt gouf a probéier nees.</string>
-  <!-- USB_STORAGE_KILL_STORAGE_USERS dialog  -->
-  <string name="dlg_confirm_kill_storage_users_title">USB-Späicher aktivéieren</string>
-  <!-- USB_STORAGE_KILL_STORAGE_USERS dialog message text -->
-  <string name="dlg_confirm_kill_storage_users_text">Wann s du den USB-Späicher uschalts kéinte verschidden Appen ophale mat funktionéiere bis de den USB-Späicher nees ausschalts.</string>
-  <!-- USB_STORAGE_ERROR dialog  dialog-->
-  <string name="dlg_error_title">USB-Operatioun feelgeschloen</string>
-  <!-- USB_STORAGE_ERROR dialog  ok button-->
+  <!-- Dialog ok button-->
   <string name="dlg_ok">OK</string>
   <!-- USB_PREFERENCES: Notification for when the user connected to the charger only.  This is the title -->
-  <string name="usb_charging_notification_title">USB fir ze lueden</string>
+  <!-- USB_PREFERENCES: Notification for when the user connects the phone to supply power to attached device.  This is the title -->
   <!-- USB_PREFERENCES: Notification for when the user connects the phone to a computer via USB in MTP mode.  This is the title -->
   <!-- USB_PREFERENCES: Notification for when the user connects the phone to a computer via USB in PTP mode.  This is the title -->
   <!-- USB_PREFERENCES: Notification for when the user connects the phone to a computer via USB in MIDI mode.  This is the title -->
@@ -2074,7 +2071,12 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Title of notification shown when ADB is actively connected to the phone. -->
   <string name="adb_active_notification_title">USB-Debugging verbonnen</string>
   <!-- Message of notification shown when ADB is actively connected to the phone. -->
-  <string name="adb_active_notification_message">Dréck fir USB-Debugging auszeschalten.</string>
+  <!-- Title of notification shown to indicate that bug report is being collected. -->
+  <!-- Title of notification shown to ask for user consent for sharing a bugreport that was requested remotely by the IT administrator. -->
+  <!-- Title of notification shown to indicate that bug report is still being collected after sharing was accepted. -->
+  <!-- Message of a notification shown to ask for user consent for sharing a bugreport that was requested remotely by the IT administrator. -->
+  <!-- Acceptance label of notification shown to ask for user consent for sharing the remote bugreport. -->
+  <!-- Decline label of notification shown to ask for user consent for sharing the remote bugreport. -->
   <!-- Used to replace %s in urls retreived from the signin server with locales.  For Some        -->
   <!-- devices we don't support all the locales we ship to and need to replace the '%s' with a    -->
   <!-- locale string based on mcc values.  By default (0-length string) we don't replace the %s   -->
@@ -2082,17 +2084,12 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- DO NOT TRANSLATE -->
   <!-- Title of the pop-up dialog in which the user switches keyboard, also known as input method. -->
   <string name="select_input_method">Tastatur wiesselen</string>
-  <!-- Title of a button to open the settings to enable or disable keyboards, also known as input methods [CHAR LIMIT=30] -->
-  <string name="configure_input_methods">Tastaturen auswielen</string>
   <!-- Summary text of a toggle switch to enable/disable use of the IME while a physical
-         keyboard is connected[CHAR LIMIT=25] -->
-  <string name="show_ime">Method fir anzeginn uweisen</string>
-  <!-- Title of the physical keyboard category in the input method selector [CHAR LIMIT=10] -->
-  <string name="hardware">Hardware</string>
-  <!-- Title of the notification to prompt the user to select a keyboard layout. -->
-  <string name="select_keyboard_layout_notification_title">Tastaturlayout auswielen</string>
-  <!-- Message of the notification to prompt the user to select a keyboard layout. -->
-  <string name="select_keyboard_layout_notification_message">Dréck fir den Tastaturlayout auszewielen.</string>
+         keyboard is connected -->
+  <!-- Title of the physical keyboard category in the input method selector [CHAR LIMIT=30] -->
+  <!-- Title of the notification to prompt the user to configure physical keyboard settings. -->
+  <!-- Message of the notification to prompt the user to configure physical keyboard settings
+         where the user can associate language with physical keyboard layout. -->
   <string name="fast_scroll_alphabet">\u0020ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
   <string name="fast_scroll_numeric_alphabet">\u00200123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
   <string name="candidates_style"><u>Kandidaten</u></string>
@@ -2145,7 +2142,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Title of an application permission that lets it read install sessions. -->
   <!-- Description of an application permission that lets it read install sessions. -->
   <!-- Shown in the tutorial for tap twice for zoom control. -->
-  <string name="tutorial_double_tap_to_zoom_message_short">Zweemol drécke fir d\'Zoomastellungen</string>
   <!-- Shown in gadget hosts (e.g. the home screen) when there was an error inflating
     the gadget. -->
   <string name="gadget_host_error_inflating">Konnt de Widget net dobäisetzen.</string>
@@ -2196,17 +2192,18 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Label to show for a service that is running because it is observing
          the user's notifications. -->
   <string name="notification_listener_binding_label">Notifikatiouns-Nolauschterer</string>
+  <!-- Label to show for a service that is running because the system is in VR mode. -->
   <!-- Label to show for a service that is running because it is providing conditions. -->
   <string name="condition_provider_service_binding_label">Konditiounsubidder</string>
+  <!-- Label to show for a service that is running because it is observing and modifying the
+         importance of the user's notifications. -->
   <!-- Do Not Translate: Alternate eri.xml -->
   <!-- The title of the notification when VPN is active. -->
   <string name="vpn_title">VPN aktivéiert</string>
   <!-- The title of the notification when VPN is active with an application name. -->
   <string name="vpn_title_long">VPN ass aktivéiert vum <xliff:g id="app" example="FooVPN client">%s</xliff:g></string>
   <!-- The text of the notification when VPN is active. -->
-  <string name="vpn_text">Dréck fir d\'Netzwierk ze geréieren.</string>
   <!-- The text of the notification when VPN is active with a session name. -->
-  <string name="vpn_text_long">Verbonne mat <xliff:g id="session" example="office">%s</xliff:g>. Dréck fir d\'Netzwierk ze geréieren.</string>
   <!-- Notification title when connecting to lockdown VPN. -->
   <string name="vpn_lockdown_connecting">Permanent aktive VPN gëtt connectéiert\u2026</string>
   <!-- Notification title when connected to lockdown VPN. -->
@@ -2214,7 +2211,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Notification title when error connecting to lockdown VPN. -->
   <string name="vpn_lockdown_error">Feeler beim permanent aktive VPN</string>
   <!-- Notification body that indicates user can touch to configure lockdown VPN connection. -->
-  <string name="vpn_lockdown_config">Dréck fir anzestellen</string>
   <!-- Localized strings for WebView -->
   <!-- Label for button in a WebView that will open a chooser to choose a file to upload -->
   <string name="upload_file">Fichier auswielen</string>
@@ -2227,11 +2223,9 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Strings for car mode notification -->
   <!-- Shown when car mode is enabled -->
   <string name="car_mode_disable_notification_title">Automodus aktivéiert</string>
-  <string name="car_mode_disable_notification_message">Dréck fir den Automodus auszemaachen.</string>
   <!-- Strings for tethered notification -->
   <!-- Shown when the device is tethered -->
   <string name="tethered_notification_title">Tethering oder Zougankspunkt aktiv</string>
-  <string name="tethered_notification_message">Fir ze setzen drécken.</string>
   <!--  Strings for possible PreferenceActivity Back/Next buttons -->
   <string name="back_button_label">Zréck</string>
   <string name="next_button_label">Weider</string>
@@ -2303,7 +2297,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Description of the button to decrease the NumberPicker value. [CHAR LIMIT=NONE] -->
   <string name="number_picker_decrement_button">Erofsetzen</string>
   <!-- Description of the tap and hold action to get into scroll mode in NumberPicker. [CHAR LIMIT=NONE] -->
-  <string name="number_picker_increment_scroll_mode"><xliff:g id="value" example="3">%s</xliff:g> drécken an unhalen.</string>
   <!-- Description of the scrolling action in NumberPicker. [CHAR LIMIT=NONE] -->
   <string name="number_picker_increment_scroll_action">Eropwësche fir z\'erhéijen, erofwësche fir ze reduzéieren.</string>
   <!-- TimePicker - accessibility support -->
@@ -2385,8 +2378,7 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
          %1$s is the title. %2$s is the subtitle. %3$s is the description of what
          tapping/clicking the whole thing is going to do. -->
   <string name="action_bar_home_subtitle_description_format">%1$s, %2$s. %3$s</string>
-  <!-- Storage description for internal storage. [CHAR LIMIT=NONE] -->
-  <string name="storage_internal">Interne Späicher</string>
+  <!-- Storage description for internal shared storage. [CHAR LIMIT=NONE] -->
   <!-- Storage description for a generic SD card. [CHAR LIMIT=NONE] -->
   <string name="storage_sd_card">SD-Kaart</string>
   <!-- Storage description for a SD card from a specific manufacturer. [CHAR LIMIT=NONE] -->
@@ -2394,10 +2386,11 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Storage description for a USB drive from a specific manufacturer. [CHAR LIMIT=NONE] -->
   <!-- Storage description for USB storage. [CHAR LIMIT=NONE] -->
   <string name="storage_usb">USB-Späicher</string>
+  <!-- Button text for the edit menu in input method extract mode. [CHAR LIMIT=16] -->
+  <string name="extract_edit_menu_button">Änneren</string>
   <!-- Notification title when data usage has exceeded warning threshold. [CHAR LIMIT=32] -->
   <string name="data_usage_warning_title">Dateverbrauchswarnung</string>
   <!-- Notification body when data usage has exceeded warning threshold. [CHAR LIMIT=32] -->
-  <string name="data_usage_warning_body">Drécke fir Verbrauch an Astellungen unzeweisen.</string>
   <!-- Notification title when 2G-3G data usage has exceeded limit threshold, and has been disabled. [CHAR LIMIT=32] -->
   <string name="data_usage_3g_limit_title">2G/3G Datelimitt erreecht</string>
   <!-- Notification title when 4G data usage has exceeded limit threshold, and has been disabled. [CHAR LIMIT=32] -->
@@ -2421,7 +2414,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Notification title when background data usage is limited. [CHAR LIMIT=32] -->
   <string name="data_usage_restricted_title">Hannergronddaten ageschränkt</string>
   <!-- Notification body when background data usage is limited. [CHAR LIMIT=32] -->
-  <string name="data_usage_restricted_body">Drécke fir d\'Restriktiounen opzehiewen.</string>
   <!-- SSL Certificate dialogs -->
   <!-- Title for an SSL Certificate dialog -->
   <string name="ssl_certificate">Sécherheetszertifikat</string>
@@ -2457,8 +2449,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="activity_chooser_view_dialog_title_default">Aktivitéit auswielen</string>
   <!-- Title for a dialog showing possible activities for sharing in ShareActionProvider [CHAR LIMIT=25] -->
   <string name="share_action_provider_share_with">Deele mat</string>
-  <!-- Delimeter used between each item in a textual list; for example "Alpha, Beta". [CHAR LIMIT=3] -->
-  <string name="list_delimeter">", "</string>
   <!-- STK sending DTMF, SMS, USSD, SS -->
   <string name="sending">Gëtt geschéckt\u2026</string>
   <!-- STK launch Browser -->
@@ -2584,16 +2574,10 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Message shown while device checks username/password in account unlock screen of keyguard -->
   <string name="kg_login_checking_password">Kont gëtt iwwerpréift\u2026</string>
   <!-- Message shown in dialog when max number of attempts are reached for PIN screen of keyguard -->
-  <string name="kg_too_many_failed_pin_attempts_dialog_message">Du hues däi PIN <xliff:g id="number">%d</xliff:g>-mol falsch aginn.\n\nProbéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <!-- Message shown in dialog when max number of attempts are reached for password screen of keyguard -->
-  <string name="kg_too_many_failed_password_attempts_dialog_message">Du hues däi Passwuert <xliff:g id="number">%d</xliff:g>-mol falsch aginn.\n\nProbéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
-  <string name="kg_too_many_failed_pattern_attempts_dialog_message">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gemoolt.\n\nProbéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
-  <string name="kg_failed_attempts_almost_at_wipe" product="tablet">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Tablet z\'entspären. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëtt den Tablet op d\'Wierksastellungen zréckgesat an all d\'Benotzerdate gi verluer.</string>
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
-  <string name="kg_failed_attempts_almost_at_wipe" product="tv">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht d\'Tëlee z\'entspären. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëtt den Telefon op d\'Wierksastellungen zréckgesat an all d\'Benotzerdate gi verluer.</string>
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
-  <string name="kg_failed_attempts_almost_at_wipe" product="default">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Telefon z\'entspären. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëtt den Telefon op d\'Wierksastellungen zréckgesat an all d\'Benotzerdate gi verluer.</string>
   <!-- Message shown in dialog when user has exceeded the maximum attempts and the device will now be wiped -->
   <string name="kg_failed_attempts_now_wiping" product="tablet">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Tablet z\'entspären. E gëtt elo op d\'Wierksastellungen zréckgesat.</string>
   <!-- Message shown in dialog when user has exceeded the maximum attempts and the device will now be wiped -->
@@ -2602,13 +2586,10 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="kg_failed_attempts_now_wiping" product="default">Du hues <xliff:g id="number">%d</xliff:g>-mol ouni Erfolleg versicht den Telefon z\'entspären. E gëtt elo op d\'Wierksastellungen zréckgesat.</string>
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="tablet">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gezeechent. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëss de gefrot däin Tablet mat engem E-Mail-Kont z\'entspären.\n\nProbéier a(n) <xliff:g id="number">%d</xliff:g> Sekonnen nees.</string>
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="tv">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gemoolt. No <xliff:g id="number">%d</xliff:g> weidere feelsgeschloene Versich gëss du gefrot deng Tëlee duerch en E-Mail-Kont z\'entspären. Probéier nees a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="default">Du hues däin Entspärmuster <xliff:g id="number">%d</xliff:g>-mol falsch gezeechent. No <xliff:g id="number">%d</xliff:g> weidere feelgeschloene Versich gëss de gefrot däin Telefon mat engem E-Mail-Kont z\'entspären.\n\nProbéier a(n) <xliff:g id="number">%d</xliff:g> Sekonnen nees.</string>
   <!-- Sequence of characters used to separate message strings in keyguard. Typically just em-dash
          with spaces on either side. [CHAR LIMIT=3] -->
   <string name="kg_text_message_separator" product="default">" \u2014 "</string>
@@ -2627,6 +2608,7 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="user_switched">Aktuelle Benotzer <xliff:g id="name" example="Bob">%1$s</xliff:g>.</string>
   <!-- Message shown when switching to a user [CHAR LIMIT=none] -->
   <string name="user_switching_message">Wiesselen op de Benotzer <xliff:g id="name" example="Bob">%1$s</xliff:g>\u2026</string>
+  <!-- Message when logging out a user on a split user system -->
   <!-- Default name of the owner user [CHAR LIMIT=20] -->
   <string name="owner_name" msgid="3879126011135546571">Besëtzer</string>
   <!-- Error message title [CHAR LIMIT=35] -->
@@ -2882,9 +2864,6 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- DO NOT TRANSLATE -->
   <!-- DO NOT TRANSLATE -->
   <!-- Notify use that they are in Lock-to-app -->
-  <string name="lock_to_app_toast">Hal \"Zréck\" an \"Iwwersiicht\" matenee gedréckt fir dëse Schierm fräizeginn.</string>
-  <!-- Notify use that they are in Lock-to-app in accessibility mode -->
-  <string name="lock_to_app_toast_accessible">Hal \"Iwwersiicht\" gedréckt fir dëse Schierm fräizeginn.</string>
   <!-- Notify user that they are locked in lock-to-app mode -->
   <!-- Starting lock-to-app indication. -->
   <string name="lock_to_app_start">Schierm fixéiert</string>
@@ -2901,6 +2880,9 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Notification shown when device owner silently deletes a package [CHAR LIMIT=NONE] -->
   <!-- [CHAR_LIMIT=NONE] Battery saver: Feature description -->
   <string name="battery_saver_description">Den Energiespuermodus schount den Akku, andeem en d\'Leeschtung vum Apparat reduzéiert, d\'Vibratioun limitéiert an déi meescht Hannergronddatenaktivitéiten aschränkt. E-Mail, Messagen an aner Appen, déi op dengem Apparat synchroniséieren, gi méiglecherweis eréischt nom Opmaachen aktualiséiert.\n\nDen Energiespuermodus gëtt automatesch desaktivéiert, wann däin Apparat opgeluede gëtt.</string>
+  <!-- [CHAR_LIMIT=NONE] Data saver: Feature description -->
+  <!-- [CHAR_LIMIT=35] Data saver: Title on first-time dialog -->
+  <!-- [CHAR_LIMIT=16] Data saver: Button to turn it on on first-time dialog -->
   <!-- Zen mode condition - summary: time duration in minutes. [CHAR LIMIT=NONE] -->
   <plurals name="zen_mode_duration_minutes_summary">
     <item quantity="one">Fir eng Minutt (bis <xliff:g id="formattedTime" example="10:00 PM">%2$s</xliff:g>)</item>
@@ -2954,6 +2936,8 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <string name="stk_cc_ss_to_ussd">D\'SS-Ufro gouf an eng USSD-Ufro ëmgewandelt.</string>
   <string name="stk_cc_ss_to_ss">D\'SS-Ufro gouf an eng nei SS-Ufro ëmgewandelt.</string>
   <!-- Content description of the work profile icon in the notification. -->
+  <!-- Content description of the expand button icon in the notification.-->
+  <!-- Accessibility action description on the expand button. -->
   <!-- User visible name for USB MIDI Peripheral port -->
   <!-- Manufacturer name for USB MIDI Peripheral port -->
   <!-- Product name for USB MIDI Peripheral port -->
@@ -2961,12 +2945,53 @@ Wann \"Drécken an Endecken\" aktivéiert ass, kanns du Beschreiwunge vun Elemen
   <!-- Content description for the button that opens the floating toolbar overflow. [CHAR LIMIT=NONE] -->
   <string name="floating_toolbar_open_overflow_description">Méi Optiounen</string>
   <!-- Content description for the button that closes the floating toolbar overflow. [CHAR LIMIT=NONE] -->
+  <!-- Free style window strings -->
+  <!-- Accessibility text for the maximize window button -->
+  <!-- Accessibility text for the close window button -->
   <!-- Ellipsis character to appear in notification templates, e.g.
          notification_template_material_inbox.xml.
          DO NOT TRANSLATE -->
+  <!-- Tempalate for Notification.MessagingStyle to join a conversation name with the name of the sender of a message, to make a notification title [CHAR LIMIT=NONE] -->
   <!-- Label describing the number of selected items [CHAR LIMIT=48] -->
-  <!-- Used to replace a range of characters in text that is too wide
-         for the space allocated to it (three dots). -->
-  <!-- Used to replace a range of characters in text that is too wide
-         for the space allocated to it (two dots). -->
+  <!-- Message to user that app trying to create user for an account that already exists. [CHAR LIMIT=none] -->
+  <!-- Message to user that app is trying to create user for a specified account. [CHAR LIMIT=none] -->
+  <!-- Locale picker strings -->
+  <!-- Title for the language selection screen [CHAR LIMIT=25] -->
+  <!-- Title for the region selection screen [CHAR LIMIT=25] -->
+  <!-- Hint text in a search edit box (used to filter long language / country lists) [CHAR LIMIT=25] -->
+  <!-- List section subheader for the language picker, containing a list of suggested languages determined by the default region [CHAR LIMIT=30] -->
+  <!-- List section subheader for the language picker, containing a list of all languages available [CHAR LIMIT=30] -->
+  <!-- Menu item in the locale menu  [CHAR LIMIT=30] -->
+  <string name="locale_search_menu">Sichen</string>
+  <!-- Title for dialog displayed when work profile is turned off. [CHAR LIMIT=30] -->
+  <!-- Message displayed in dialog when work profile is turned off. [CHAR LIMIT=NONE] -->
+  <!-- Title for button to turn on work profile. [CHAR LIMIT=NONE] -->
+  <!-- Notification title shown when new SMS/MMS is received while the device is locked [CHAR LIMIT=NONE] -->
+  <!-- Notification content shown when new SMS/MMS is received while the device is locked [CHAR LIMIT=NONE] -->
+  <!-- Notification title shown when user profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification message shown when user profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification detail shown when user profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification detail shown when work profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification message shown when work profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Title of notification shown after a MTP device is connected to Android. -->
+  <!-- Description of notification shown after a MTP device is connected to Android. -->
+  <!-- Resolver target actions strings -->
+  <!-- Pin (as in to a bulletin board with a pushpin) a resolver
+         target to the front of the list. -->
+  <!-- Unpin a resolver target such that it sorts normally. -->
+  <!-- View application info for a target. -->
+  <!-- The representation of a time duration when negative. An example is -1:14. This can be used with a countdown timer for example.-->
+  <!-- Title of notification to start a new demo session when device is in retail mode [CHAR LIMIT=NONE] -->
+  <!-- Text of notification to start a new demo session when device is in retail mode [CHAR LIMIT=NONE] -->
+  <!-- Text of dialog shown when starting a demo user for the first time [CHAR LIMIT=40] -->
+  <!-- Text of dialog shown when starting a new demo user in retail demo mode [CHAR LIMIT=40] -->
+  <!-- Title of the dialog shown when user inactivity times out in retail demo mode [CHAR LIMIT=40] -->
+  <!-- Warning message shown when user inactivity times out in retail demo mode [CHAR LIMIT=none] -->
+  <!-- Text of button to allow user to abort countdown and continue current session in retail demo mode [CHAR LIMIT=40] -->
+  <string name="demo_user_inactivity_timeout_left_button">Ofbriechen</string>
+  <!-- Text of button to allow user to abort countdown and immediately start another session in retail demo mode [CHAR LIMIT=40] -->
+  <!-- Title of notification shown when device has been forced to safe mode after a security compromise. -->
+  <!-- Description of notification shown when device has been forced to safe mode after a security compromise. -->
+  <!-- Accessibilty string added to a widget that has been suspended [CHAR LIMIT=20] -->
+  <!-- Label used by Telephony code, assigned as the display name for conference calls [CHAR LIMIT=60] -->
 </resources>

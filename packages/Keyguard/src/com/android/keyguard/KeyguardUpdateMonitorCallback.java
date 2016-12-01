@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.SystemClock;
 import android.hardware.fingerprint.FingerprintManager;
+import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.view.WindowManagerPolicy;
 
@@ -121,6 +122,13 @@ public class KeyguardUpdateMonitorCallback {
      * @param simState
      */
     public void onSimStateChanged(int subId, int slotId, IccCardConstants.State simState) { }
+
+    /**
+     * Called when the sevice state changes.
+     * @param subId
+     * @param serviceState
+     */
+    public void onServiceStateChanged(int subId, ServiceState state) { }
 
     /**
      * Called when the user's info changed.
@@ -240,4 +248,9 @@ public class KeyguardUpdateMonitorCallback {
      * has changed.
      */
     public void onStrongAuthStateChanged(int userId) { }
+
+    /**
+     * Called when the state whether we have a lockscreen wallpaper has changed.
+     */
+    public void onHasLockscreenWallpaperChanged(boolean hasLockscreenWallpaper) { }
 }

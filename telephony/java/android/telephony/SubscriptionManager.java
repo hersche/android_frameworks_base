@@ -53,7 +53,6 @@ public class SubscriptionManager {
     private static final boolean VDBG = false;
 
     /** An invalid subscription identifier */
-    /** @hide */
     public static final int INVALID_SUBSCRIPTION_ID = -1;
 
     /** Base value for Dummy SUBSCRIPTION_ID's. */
@@ -75,7 +74,7 @@ public class SubscriptionManager {
 
     /**
      * Indicates the caller wants the default phone id.
-     * Used in SubscriptionController and PhoneBase but do we really need it???
+     * Used in SubscriptionController and Phone but do we really need it???
      * @hide
      */
     public static final int DEFAULT_PHONE_INDEX = Integer.MAX_VALUE;
@@ -119,39 +118,6 @@ public class SubscriptionManager {
     /** SIM is not inserted */
     /** @hide */
     public static final int SIM_NOT_INSERTED = -1;
-
-    /**
-     * The Network mode of SIM/sub.
-     * <P>Type: INTEGER (int)</P>
-     */
-    /** @hide */
-    public static final String NETWORK_MODE = "network_mode";
-
-    /**
-     * The user configured Network mode of SIM/sub.
-     * <P>Type: INTEGER (int)</P>
-     * {@hide}
-     */
-    public static final String USER_NETWORK_MODE = "user_network_mode";
-
-    /** @hide */
-    public static final int DEFAULT_NW_MODE = -1;
-
-    /**
-     * The activation state of SIM/sub.
-     * <P>Type: INTEGER (int)</P>
-     */
-    /** @hide */
-    public static final String SUB_STATE = "sub_state";
-
-    /** @hide */
-    public static final int INACTIVE = 0;
-
-    /** @hide */
-    public static final int ACTIVE = 1;
-
-    /** @hide */
-    public static final int SUB_CONFIGURATION_IN_PROGRESS = 2;
 
     /**
      * TelephonyProvider column name for user displayed name.
@@ -269,6 +235,9 @@ public class SubscriptionManager {
     /** @hide */
     public static final int DATA_ROAMING_DEFAULT = DATA_ROAMING_DISABLE;
 
+    /** @hide */
+    public static final int SIM_PROVISIONED = 0;
+
     /**
      * TelephonyProvider column name for the MCC associated with a SIM.
      * <P>Type: INTEGER (int)</P>
@@ -282,6 +251,20 @@ public class SubscriptionManager {
      * @hide
      */
     public static final String MNC = "mnc";
+
+    /**
+     * TelephonyProvider column name for the sim provisioning status associated with a SIM.
+     * <P>Type: INTEGER (int)</P>
+     * @hide
+     */
+    public static final String SIM_PROVISIONING_STATUS = "sim_provisioning_status";
+
+    /**
+     * TelephonyProvider column name for the user configured network mode associated with a SIM.
+     * <P>Type: INTEGER (int)</P>
+     * @hide
+     */
+    public static final String USER_NETWORK_MODE = "user_network_mode";
 
     /**
      *  TelephonyProvider column name for extreme threat in CB settings
@@ -342,14 +325,6 @@ public class SubscriptionManager {
      *@hide
      */
     public static final String CB_CHANNEL_50_ALERT = "enable_channel_50_alerts";
-
-
-
-    /**
-     * TelephonyProvider column name for enable channel60 alert in CB settings
-     *@hide
-     */
-    public static final String CB_CHANNEL_60_ALERT = "enable_channel_60_alerts";
 
     /**
      * TelephonyProvider column name for CMAS test alert in CB settings
@@ -496,8 +471,9 @@ public class SubscriptionManager {
     }
 
     /**
-     * Get the active SubscriptionInfo with the subId key
-     * @param subId The unique SubscriptionInfo key in database
+     * Get the active SubscriptionInfo with the input subId.
+     *
+     * @param subId The unique SubscriptionInfo key in database.
      * @return SubscriptionInfo, maybe null if its not active.
      */
     public SubscriptionInfo getActiveSubscriptionInfo(int subId) {
@@ -939,12 +915,15 @@ public class SubscriptionManager {
     }
 
     /**
-     * @return the "system" defaultSubId on a voice capable device this
-     * will be getDefaultVoiceSubId() and on a data only device it will be
-     * getDefaultDataSubId().
-     * @hide
+     * Returns the system's default subscription id.
+     *
+     * For a voice capable device, it will return getDefaultVoiceSubscriptionId.
+     * For a data only device, it will return the getDefaultDataSubscriptionId.
+     * May return an INVALID_SUBSCRIPTION_ID on error.
+     *
+     * @return the "system" default subscription id.
      */
-    public static int getDefaultSubId() {
+    public static int getDefaultSubscriptionId() {
         int subId = INVALID_SUBSCRIPTION_ID;
 
         try {
@@ -960,8 +939,14 @@ public class SubscriptionManager {
         return subId;
     }
 
-    /** @hide */
-    public static int getDefaultVoiceSubId() {
+    /**
+     * Returns the system's default voice subscription id.
+     *
+     * On a data only device or on error, will return INVALID_SUBSCRIPTION_ID.
+     *
+     * @return the default voice subscription Id.
+     */
+    public static int getDefaultVoiceSubscriptionId() {
         int subId = INVALID_SUBSCRIPTION_ID;
 
         try {
@@ -973,7 +958,7 @@ public class SubscriptionManager {
             // ignore it
         }
 
-        if (VDBG) logd("getDefaultVoiceSubId, sub id = " + subId);
+        if (VDBG) logd("getDefaultVoiceSubscriptionId, sub id = " + subId);
         return subId;
     }
 
@@ -990,23 +975,31 @@ public class SubscriptionManager {
         }
     }
 
-    /** @hide */
+    /**
+     * Return the SubscriptionInfo for default voice subscription.
+     *
+     * Will return null on data only devices, or on error.
+     *
+     * @return the SubscriptionInfo for the default voice subscription.
+     * @hide
+     */
     public SubscriptionInfo getDefaultVoiceSubscriptionInfo() {
-        return getActiveSubscriptionInfo(getDefaultVoiceSubId());
+        return getActiveSubscriptionInfo(getDefaultVoiceSubscriptionId());
     }
 
     /** @hide */
     public static int getDefaultVoicePhoneId() {
-        return getPhoneId(getDefaultVoiceSubId());
+        return getPhoneId(getDefaultVoiceSubscriptionId());
     }
 
     /**
-     * @return subId of the DefaultSms subscription or
-     * a value < 0 if an error.
+     * Returns the system's default SMS subscription id.
      *
-     * @hide
+     * On a data only device or on error, will return INVALID_SUBSCRIPTION_ID.
+     *
+     * @return the default SMS subscription Id.
      */
-    public static int getDefaultSmsSubId() {
+    public static int getDefaultSmsSubscriptionId() {
         int subId = INVALID_SUBSCRIPTION_ID;
 
         try {
@@ -1018,7 +1011,7 @@ public class SubscriptionManager {
             // ignore it
         }
 
-        if (VDBG) logd("getDefaultSmsSubId, sub id = " + subId);
+        if (VDBG) logd("getDefaultSmsSubscriptionId, sub id = " + subId);
         return subId;
     }
 
@@ -1035,18 +1028,31 @@ public class SubscriptionManager {
         }
     }
 
-    /** @hide */
+    /**
+     * Return the SubscriptionInfo for default voice subscription.
+     *
+     * Will return null on data only devices, or on error.
+     *
+     * @return the SubscriptionInfo for the default SMS subscription.
+     * @hide
+     */
     public SubscriptionInfo getDefaultSmsSubscriptionInfo() {
-        return getActiveSubscriptionInfo(getDefaultSmsSubId());
+        return getActiveSubscriptionInfo(getDefaultSmsSubscriptionId());
     }
 
     /** @hide */
     public int getDefaultSmsPhoneId() {
-        return getPhoneId(getDefaultSmsSubId());
+        return getPhoneId(getDefaultSmsSubscriptionId());
     }
 
-    /** @hide */
-    public static int getDefaultDataSubId() {
+    /**
+     * Returns the system's default data subscription id.
+     *
+     * On a voice only device or on error, will return INVALID_SUBSCRIPTION_ID.
+     *
+     * @return the default data subscription Id.
+     */
+    public static int getDefaultDataSubscriptionId() {
         int subId = INVALID_SUBSCRIPTION_ID;
 
         try {
@@ -1058,7 +1064,7 @@ public class SubscriptionManager {
             // ignore it
         }
 
-        if (VDBG) logd("getDefaultDataSubId, sub id = " + subId);
+        if (VDBG) logd("getDefaultDataSubscriptionId, sub id = " + subId);
         return subId;
     }
 
@@ -1076,13 +1082,25 @@ public class SubscriptionManager {
     }
 
     /** @hide */
+    public static int getDefaultDataSubId() {
+        return getDefaultDataSubscriptionId();
+    }
+
+    /**
+     * Return the SubscriptionInfo for default data subscription.
+     *
+     * Will return null on voice only devices, or on error.
+     *
+     * @return the SubscriptionInfo for the default data subscription.
+     * @hide
+     */
     public SubscriptionInfo getDefaultDataSubscriptionInfo() {
-        return getActiveSubscriptionInfo(getDefaultDataSubId());
+        return getActiveSubscriptionInfo(getDefaultDataSubscriptionId());
     }
 
     /** @hide */
     public int getDefaultDataPhoneId() {
-        return getPhoneId(getDefaultDataSubId());
+        return getPhoneId(getDefaultDataSubscriptionId());
     }
 
     /** @hide */
@@ -1102,13 +1120,13 @@ public class SubscriptionManager {
     //FIXME this is vulnerable to race conditions
     /** @hide */
     public boolean allDefaultsSelected() {
-        if (!isValidSubscriptionId(getDefaultDataSubId())) {
+        if (!isValidSubscriptionId(getDefaultDataSubscriptionId())) {
             return false;
         }
-        if (!isValidSubscriptionId(getDefaultSmsSubId())) {
+        if (!isValidSubscriptionId(getDefaultSmsSubscriptionId())) {
             return false;
         }
-        if (!isValidSubscriptionId(getDefaultVoiceSubId())) {
+        if (!isValidSubscriptionId(getDefaultVoiceSubscriptionId())) {
             return false;
         }
         return true;
@@ -1156,53 +1174,6 @@ public class SubscriptionManager {
     /** @hide */
     public static boolean isValidPhoneId(int phoneId) {
         return phoneId >= 0 && phoneId < TelephonyManager.getDefault().getPhoneCount();
-    }
-
-    /** @hide */
-    public static void activateSubId(int subId) {
-        logd("activateSubId sub id = " + subId);
-        try {
-            getISubInfo().activateSubId(subId);
-        } catch (RemoteException ex) {
-            return;
-        }
-    }
-
-    /** @hide */
-    public static void deactivateSubId(int subId) {
-        logd("deactivateSubId sub id = " + subId);
-        try {
-            getISubInfo().deactivateSubId(subId);
-        } catch (RemoteException ex) {
-            return;
-        }
-    }
-
-    /** @hide */
-    public static int getSubState(int subId) {
-        logd("getSubState sub id = " + subId);
-        try {
-            return getISubInfo().getSubState(subId);
-        } catch (RemoteException ex) {
-            return INACTIVE;
-        }
-    }
-
-    /** @hide */
-    public static int setSubState(int subId, int subState) {
-        logd("setSubState sub id = " + subId + " state = " + subState);
-        try {
-            return getISubInfo().setSubState(subId, subState);
-        } catch (RemoteException ex) {
-            return INACTIVE;
-        }
-    }
-
-   /**
-    @hide
-    */
-    private static ISub getISubInfo() {
-        return ISub.Stub.asInterface(ServiceManager.getService("isub"));
     }
 
     /** @hide */
@@ -1295,7 +1266,7 @@ public class SubscriptionManager {
             }
         } catch (RemoteException ex) {
         }
-        logd("getSimStateForSubscriber: simState=" + simState + " slotIdx=" + slotIdx);
+
         return simState;
     }
 
@@ -1397,7 +1368,8 @@ public class SubscriptionManager {
         newConfig.setTo(config);
         if (subInfo != null) {
             newConfig.mcc = subInfo.getMcc();
-            newConfig.mnc = subInfo.getMnc() == 0 ? Configuration.MNC_ZERO : subInfo.getMnc();
+            newConfig.mnc = subInfo.getMnc();
+            if (newConfig.mnc == 0) newConfig.mnc = Configuration.MNC_ZERO;
         }
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         DisplayMetrics newMetrics = new DisplayMetrics();

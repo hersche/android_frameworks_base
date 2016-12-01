@@ -49,7 +49,6 @@
 // AF_UNIX socket, the socket will refer to /dev/null after each
 // fork, and all operations on it will fail.
 static const char* kPathWhitelist[] = {
-  "/dev/__properties__",  /* Only on Android Lollipop and below. */
   "/dev/null",
   "/dev/socket/zygote",
   "/dev/socket/zygote_secondary",
@@ -58,9 +57,8 @@ static const char* kPathWhitelist[] = {
   "/system/framework/framework-res.apk",
   "/dev/urandom",
   "/dev/ion",
-  "@netlink@",
+  "/dev/dri/renderD129", // Fixes b/31172436
   "/system/framework/org.cyanogenmod.platform-res.apk",
-  "/proc/ged",
 #ifdef PATH_WHITELIST_EXTRA_H
 PATH_WHITELIST_EXTRA_H
 #endif
@@ -304,12 +302,6 @@ class FileDescriptorInfo {
       return false;
     }
 
-
-    if (addr->sa_family == AF_NETLINK) {
-      (*result) = "@netlink@";
-      return true;
-    }
-
     if (addr->sa_family != AF_UNIX) {
       ALOGE("Unsupported socket (fd=%d) with family %d", fd, addr->sa_family);
       return false;
@@ -361,10 +353,7 @@ class FileDescriptorInfo {
     return true;
   }
 
-
-  // DISALLOW_COPY_AND_ASSIGN(FileDescriptorInfo);
-  FileDescriptorInfo(const FileDescriptorInfo&);
-  void operator=(const FileDescriptorInfo&);
+  DISALLOW_COPY_AND_ASSIGN(FileDescriptorInfo);
 };
 
 // A FileDescriptorTable is a collection of FileDescriptorInfo objects
@@ -503,7 +492,7 @@ class FileDescriptorTable {
 
         // Finally, remove the FD from the set of open_fds. We do this last because
         // |element| will not remain valid after a call to erase.
-        open_fds.erase(*element);
+        open_fds.erase(element);
       }
     }
 
@@ -553,7 +542,5 @@ class FileDescriptorTable {
   // Invariant: All values in this unordered_map are non-NULL.
   std::unordered_map<int, FileDescriptorInfo*> open_fd_map_;
 
-  // DISALLOW_COPY_AND_ASSIGN(FileDescriptorTable);
-  FileDescriptorTable(const FileDescriptorTable&);
-  void operator=(const FileDescriptorTable&);
+  DISALLOW_COPY_AND_ASSIGN(FileDescriptorTable);
 };

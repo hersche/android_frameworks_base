@@ -48,7 +48,7 @@ static struct {
 // ----------------------------------------------------------------------------
 
 static jobject gPowerManagerServiceObj;
-static struct power_module* gPowerModule;
+struct power_module* gPowerModule;
 
 static nsecs_t gLastEventTime[USER_ACTIVITY_EVENT_LAST + 1];
 
@@ -70,7 +70,8 @@ static bool checkAndClearExceptionFromCallback(JNIEnv* env, const char* methodNa
 void android_server_PowerManagerService_userActivity(nsecs_t eventTime, int32_t eventType) {
     // Tell the power HAL when user activity occurs.
     if (gPowerModule && gPowerModule->powerHint) {
-        gPowerModule->powerHint(gPowerModule, POWER_HINT_INTERACTION, NULL);
+        int data_param = 0;
+        gPowerModule->powerHint(gPowerModule, POWER_HINT_INTERACTION, &data_param);
     }
 
     if (gPowerManagerServiceObj) {
@@ -172,7 +173,7 @@ static jint nativeGetFeature(JNIEnv *env, jclass clazz, jint featureId) {
 
 // ----------------------------------------------------------------------------
 
-static JNINativeMethod gPowerManagerServiceMethods[] = {
+static const JNINativeMethod gPowerManagerServiceMethods[] = {
     /* name, signature, funcPtr */
     { "nativeInit", "()V",
             (void*) nativeInit },

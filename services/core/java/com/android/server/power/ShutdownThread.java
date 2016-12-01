@@ -19,6 +19,7 @@
 package com.android.server.power;
 
 import android.app.ActivityManagerNative;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.IActivityManager;
@@ -34,14 +35,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.os.FileUtils;
 import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
+import android.os.RecoverySystem;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
@@ -59,25 +56,18 @@ import android.widget.ListView;
 
 import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
-import com.android.server.power.PowerManagerService;
+
 import android.util.Log;
-import android.view.IWindowManager;
 import android.view.WindowManager;
-import java.lang.reflect.Method;
 
 import cyanogenmod.providers.CMSettings;
-import dalvik.system.PathClassLoader;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
 
-import org.cyanogenmod.internal.util.ThemeUtils;
+import java.lang.reflect.Method;
 
 public final class ShutdownThread extends Thread {
     // constants
@@ -104,24 +94,24 @@ public final class ShutdownThread extends Thread {
     private static Object sIsStartedGuard = new Object();
     private static boolean sIsStarted = false;
 
-    // uncrypt status files
-    private static final String UNCRYPT_STATUS_FILE = "/cache/recovery/uncrypt_status";
-    private static final String UNCRYPT_PACKAGE_FILE = "/cache/recovery/uncrypt_file";
-
     // recovery command
     private static File RECOVERY_COMMAND_FILE = new File("/cache/recovery/command");
 
     private static boolean mReboot;
     private static boolean mRebootWipe = false;
     private static boolean mRebootSafeMode;
-    private static boolean mRebootUpdate;
-    private static String mRebootReason;
+    private static boolean mRebootHasProgressBar;
+    private static String mReason;
 
     // Provides shutdown assurance in case the system_server is killed
     public static final String SHUTDOWN_ACTION_PROPERTY = "sys.shutdown.requested";
 
     // Indicates whether we are rebooting into safe mode
     public static final String REBOOT_SAFEMODE_PROPERTY = "persist.sys.safemode";
+    public static final String RO_SAFEMODE_PROPERTY = "ro.sys.safemode";
+
+    // Indicates whether we should stay in safe mode until ro.build.date.utc is newer than this
+    public static final String AUDIT_SAFEMODE_PROPERTY = "persist.sys.audit_safemode";
 
     // static instance of this thread
     private static final ShutdownThread sInstance = new ShutdownThread();
@@ -138,20 +128,10 @@ public final class ShutdownThread extends Thread {
     private PowerManager.WakeLock mCpuWakeLock;
     private PowerManager.WakeLock mScreenWakeLock;
     private Handler mHandler;
-    private static MediaPlayer mMediaPlayer;
-    private static final String OEM_BOOTANIMATION_FILE = "/oem/media/shutdownanimation.zip";
-    private static final String SYSTEM_BOOTANIMATION_FILE = "/system/media/shutdownanimation.zip";
-    private static final String SYSTEM_ENCRYPTED_BOOTANIMATION_FILE = "/system/media/shutdownanimation-encrypted.zip";
-
-    private static final String SHUTDOWN_MUSIC_FILE = "/system/media/shutdown.wav";
-    private static final String OEM_SHUTDOWN_MUSIC_FILE = "/oem/media/shutdown.wav";
-
-    private boolean isShutdownMusicPlaying = false;
 
     private static AlertDialog sConfirmDialog;
     private ProgressDialog mProgressDialog;
 
-    private static AudioManager mAudioManager;
     private ShutdownThread() {
     }
 
@@ -161,13 +141,14 @@ public final class ShutdownThread extends Thread {
      * is shown.
      *
      * @param context Context used to display the shutdown progress dialog.
+     * @param reason code to pass to android_reboot() (e.g. "userrequested"), or null.
      * @param confirm true if user confirmation is needed before shutting down.
      */
-    public static void shutdown(final Context context, boolean confirm) {
-        final Context uiContext = getUiContext(context);
+    public static void shutdown(final Context context, String reason, boolean confirm) {
         mReboot = false;
         mRebootSafeMode = false;
-        shutdownInner(uiContext, confirm);
+        mReason = reason;
+        shutdownInner(context, confirm);
     }
 
     private static boolean isAdvancedRebootPossible(final Context context) {
@@ -203,7 +184,7 @@ public final class ShutdownThread extends Thread {
         }
 
         for (int i = 0; i < actionsArray.length; i++) {
-            if (actionsArray[i].equals("reboot")) {
+            if (actionsArray[i].equals("restart")) {
                 showRebootOption = true;
                 break;
             }
@@ -224,20 +205,19 @@ public final class ShutdownThread extends Thread {
         if (confirm) {
             final CloseDialogReceiver closer = new CloseDialogReceiver(context);
             final boolean advancedReboot = isAdvancedRebootPossible(context);
-            final Context uiContext = getUiContext(context);
 
             if (sConfirmDialog != null) {
                 sConfirmDialog.dismiss();
                 sConfirmDialog = null;
             }
-            AlertDialog.Builder confirmDialogBuilder = new AlertDialog.Builder(uiContext)
+            AlertDialog.Builder confirmDialogBuilder = new AlertDialog.Builder(context)
                     .setTitle(mRebootSafeMode
                             ? com.android.internal.R.string.reboot_safemode_title
                             : showRebootOption
                                     ? com.android.internal.R.string.reboot_title
                                     : com.android.internal.R.string.power_off);
 
-            if (!advancedReboot || mRebootSafeMode) {
+            if (!advancedReboot) {
                 confirmDialogBuilder.setMessage(resourceId);
             } else {
                 confirmDialogBuilder
@@ -249,7 +229,7 @@ public final class ShutdownThread extends Thread {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (!mRebootSafeMode && advancedReboot) {
+                            if (advancedReboot) {
                                 boolean softReboot = false;
                                 ListView reasonsList = ((AlertDialog)dialog).getListView();
                                 int selected = reasonsList.getCheckedItemPosition();
@@ -257,7 +237,7 @@ public final class ShutdownThread extends Thread {
                                     String actions[] = context.getResources().getStringArray(
                                             com.android.internal.R.array.shutdown_reboot_actions);
                                     if (selected >= 0 && selected < actions.length) {
-                                        mRebootReason = actions[selected];
+                                        mReason = actions[selected];
                                         if (actions[selected].equals(SOFT_REBOOT)) {
                                             doSoftReboot();
                                             return;
@@ -326,35 +306,13 @@ public final class ShutdownThread extends Thread {
      * @param confirm true if user confirmation is needed before shutting down.
      */
     public static void reboot(final Context context, String reason, boolean confirm) {
-        final Context uiContext = getUiContext(context);
         mReboot = true;
         mRebootSafeMode = false;
-        mRebootUpdate = false;
-        mRebootReason = reason;
-        shutdownInner(uiContext, confirm);
+        mRebootHasProgressBar = false;
+        mReason = reason;
+        shutdownInner(context, confirm);
     }
 
-    private static String getShutdownMusicFilePath() {
-        final String[] fileName = {OEM_SHUTDOWN_MUSIC_FILE, SHUTDOWN_MUSIC_FILE};
-        File checkFile = null;
-        for(String music : fileName) {
-            checkFile = new File(music);
-            if (checkFile.exists()) {
-                return music;
-            }
-        }
-        return null;
-    }
-
-    private static void lockDevice() {
-        IWindowManager wm = IWindowManager.Stub.asInterface(ServiceManager
-                .getService(Context.WINDOW_SERVICE));
-        try {
-            wm.updateRotation(false, false);
-        } catch (RemoteException e) {
-            Log.w(TAG, "boot animation can not lock device!");
-        }
-    }
     /**
      * Request a reboot into safe mode.  Must be called from a Looper thread in which its UI
      * is shown.
@@ -370,8 +328,8 @@ public final class ShutdownThread extends Thread {
 
         mReboot = true;
         mRebootSafeMode = true;
-        mRebootUpdate = false;
-        mRebootReason = null;
+        mRebootHasProgressBar = false;
+        mReason = null;
         shutdownInner(context, confirm);
     }
 
@@ -387,47 +345,59 @@ public final class ShutdownThread extends Thread {
         // Throw up a system dialog to indicate the device is rebooting / shutting down.
         ProgressDialog pd = new ProgressDialog(context);
 
-        // Path 1: Reboot to recovery and install the update
-        //   Condition: mRebootReason == REBOOT_RECOVERY and mRebootUpdate == True
-        //   (mRebootUpdate is set by checking if /cache/recovery/uncrypt_file exists.)
-        //   UI: progress bar
+        // Path 1: Reboot to recovery for update
+        //   Condition: mReason == REBOOT_RECOVERY_UPDATE
+        //
+        //  Path 1a: uncrypt needed
+        //   Condition: if /cache/recovery/uncrypt_file exists but
+        //              /cache/recovery/block.map doesn't.
+        //   UI: determinate progress bar (mRebootHasProgressBar == True)
+        //
+        // * Path 1a is expected to be removed once the GmsCore shipped on
+        //   device always calls uncrypt prior to reboot.
+        //
+        //  Path 1b: uncrypt already done
+        //   UI: spinning circle only (no progress bar)
         //
         // Path 2: Reboot to recovery for factory reset
-        //   Condition: mRebootReason == REBOOT_RECOVERY
+        //   Condition: mReason == REBOOT_RECOVERY
         //   UI: spinning circle only (no progress bar)
         //
         // Path 3: Regular reboot / shutdown
         //   Condition: Otherwise
         //   UI: spinning circle only (no progress bar)
-        if (PowerManager.REBOOT_RECOVERY.equals(mRebootReason)) {
-            mRebootUpdate = new File(UNCRYPT_PACKAGE_FILE).exists();
+        if (PowerManager.REBOOT_RECOVERY_UPDATE.equals(mReason)) {
             if (RECOVERY_COMMAND_FILE.exists()) {
                 try {
                     mRebootWipe = new String(FileUtils.readTextFile(
                             RECOVERY_COMMAND_FILE, 0, null)).contains("wipe");
-                } catch (IOException e) {
+                    } catch (IOException e) {
                 }
             }
-            if (mRebootUpdate) {
-                pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_update_title));
-                pd.setMessage(context.getText(
-                        com.android.internal.R.string.reboot_to_update_prepare));
+            // We need the progress bar if uncrypt will be invoked during the
+            // reboot, which might be time-consuming.
+            mRebootHasProgressBar = RecoverySystem.UNCRYPT_PACKAGE_FILE.exists()
+                    && !(RecoverySystem.BLOCK_MAP_FILE.exists());
+            pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_update_title));
+            if (mRebootHasProgressBar) {
                 pd.setMax(100);
-                pd.setProgressNumberFormat(null);
-                pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 pd.setProgress(0);
                 pd.setIndeterminate(false);
-            } else if (mRebootWipe) {
-                // Factory reset path. Set the dialog message accordingly.
-                pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_reset_title));
+                pd.setProgressNumberFormat(null);
+                pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 pd.setMessage(context.getText(
-                        com.android.internal.R.string.reboot_to_reset_message));
-                pd.setIndeterminate(true);
+                            com.android.internal.R.string.reboot_to_update_prepare));
             } else {
-                pd.setTitle(context.getText(com.android.internal.R.string.reboot_title));
-                pd.setMessage(context.getText(com.android.internal.R.string.reboot_progress));
                 pd.setIndeterminate(true);
+                pd.setMessage(context.getText(
+                            com.android.internal.R.string.reboot_to_update_reboot));
             }
+        } else if (PowerManager.REBOOT_RECOVERY.equals(mReason) && mRebootWipe) {
+            // Factory reset path. Set the dialog message accordingly.
+            pd.setTitle(context.getText(com.android.internal.R.string.reboot_to_reset_title));
+            pd.setMessage(context.getText(
+                        com.android.internal.R.string.reboot_to_reset_message));
+            pd.setIndeterminate(true);
         } else {
             if (mReboot) {
                 pd.setTitle(context.getText(com.android.internal.R.string.reboot_title));
@@ -436,22 +406,13 @@ public final class ShutdownThread extends Thread {
                 pd.setTitle(context.getText(com.android.internal.R.string.power_off));
                 pd.setMessage(context.getText(com.android.internal.R.string.shutdown_progress));
             }
+
             pd.setIndeterminate(true);
         }
+        pd.setCancelable(false);
+        pd.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 
-        //acquire audio focus to make the other apps to stop playing muisc
-        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        mAudioManager.requestAudioFocus(null,
-                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
-        if (!checkAnimationFileExist()) {
-            // throw up an indeterminate system dialog to indicate radio is
-            // shutting down.
-            pd.setCancelable(false);
-            pd.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-
-            pd.show();
-        }
+        pd.show();
 
         sInstance.mProgressDialog = pd;
         sInstance.mContext = context;
@@ -514,7 +475,7 @@ public final class ShutdownThread extends Thread {
          * the beginning of the SystemServer startup.
          */
         {
-            String reason = (mReboot ? "1" : "0") + (mRebootReason != null ? mRebootReason : "");
+            String reason = (mReboot ? "1" : "0") + (mReason != null ? mReason : "");
             SystemProperties.set(SHUTDOWN_ACTION_PROPERTY, reason);
         }
 
@@ -542,7 +503,7 @@ public final class ShutdownThread extends Thread {
                 if (delay <= 0) {
                     Log.w(TAG, "Shutdown broadcast timed out");
                     break;
-                } else if (mRebootUpdate) {
+                } else if (mRebootHasProgressBar) {
                     int status = (int)((MAX_BROADCAST_TIME - delay) * 1.0 *
                             BROADCAST_STOP_PERCENT / MAX_BROADCAST_TIME);
                     sInstance.setRebootProgress(status, null);
@@ -553,7 +514,7 @@ public final class ShutdownThread extends Thread {
                 }
             }
         }
-        if (mRebootUpdate) {
+        if (mRebootHasProgressBar) {
             sInstance.setRebootProgress(BROADCAST_STOP_PERCENT, null);
         }
 
@@ -567,7 +528,7 @@ public final class ShutdownThread extends Thread {
             } catch (RemoteException e) {
             }
         }
-        if (mRebootUpdate) {
+        if (mRebootHasProgressBar) {
             sInstance.setRebootProgress(ACTIVITY_MANAGER_STOP_PERCENT, null);
         }
 
@@ -578,47 +539,13 @@ public final class ShutdownThread extends Thread {
         if (pm != null) {
             pm.shutdown();
         }
-        if (mRebootUpdate) {
+        if (mRebootHasProgressBar) {
             sInstance.setRebootProgress(PACKAGE_MANAGER_STOP_PERCENT, null);
-        }
-
-        String shutDownFile = null;
-
-        //showShutdownAnimation() is called from here to sync
-        //music and animation properly
-        if(checkAnimationFileExist()) {
-            lockDevice();
-            showShutdownAnimation();
-
-            if (!isSilentMode()
-                    && (shutDownFile = getShutdownMusicFilePath()) != null) {
-                isShutdownMusicPlaying = true;
-                shutdownMusicHandler.obtainMessage(0, shutDownFile).sendToTarget();
-            }
-        }
-
-        Log.i(TAG, "wait for shutdown music");
-        final long endTimeForMusic = SystemClock.elapsedRealtime() + MAX_BROADCAST_TIME;
-        synchronized (mActionDoneSync) {
-            while (isShutdownMusicPlaying) {
-                long delay = endTimeForMusic - SystemClock.elapsedRealtime();
-                if (delay <= 0) {
-                    Log.w(TAG, "play shutdown music timeout!");
-                    break;
-                }
-                try {
-                    mActionDoneSync.wait(delay);
-                } catch (InterruptedException e) {
-                }
-            }
-            if (!isShutdownMusicPlaying) {
-                Log.i(TAG, "play shutdown music complete.");
-            }
         }
 
         // Shutdown radios.
         shutdownRadios(MAX_RADIO_WAIT_TIME);
-        if (mRebootUpdate) {
+        if (mRebootHasProgressBar) {
             sInstance.setRebootProgress(RADIO_STOP_PERCENT, null);
         }
 
@@ -629,16 +556,6 @@ public final class ShutdownThread extends Thread {
                 actionDone();
             }
         };
-
-        final String cryptoStatus = SystemProperties.get("ro.crypto.state", "unsupported");
-        final boolean isEncrypted = "encrypted".equalsIgnoreCase(cryptoStatus);
-
-        if (mRebootUpdate && isEncrypted) {
-            sInstance.setRebootProgress(MOUNT_SERVICE_STOP_PERCENT, null);
-
-            // If it's to reboot to install update, invoke uncrypt via init service.
-            uncrypt();
-        }
 
         Log.i(TAG, "Shutting down MountService");
 
@@ -662,7 +579,7 @@ public final class ShutdownThread extends Thread {
                 if (delay <= 0) {
                     Log.w(TAG, "Shutdown wait timed out");
                     break;
-                } else if (mRebootUpdate) {
+                } else if (mRebootHasProgressBar) {
                     int status = (int)((MAX_SHUTDOWN_WAIT_TIME - delay) * 1.0 *
                             (MOUNT_SERVICE_STOP_PERCENT - RADIO_STOP_PERCENT) /
                             MAX_SHUTDOWN_WAIT_TIME);
@@ -675,8 +592,30 @@ public final class ShutdownThread extends Thread {
                 }
             }
         }
+        if (mRebootHasProgressBar) {
+            sInstance.setRebootProgress(MOUNT_SERVICE_STOP_PERCENT, null);
 
-        rebootOrShutdown(mContext, mReboot, mRebootReason);
+            // If it's to reboot to install an update and uncrypt hasn't been
+            // done yet, trigger it now.
+            uncrypt();
+        }
+
+
+        // If it is alarm boot and encryption status, power off alarm status will
+        // be set to handled when device go to shutdown or reboot.
+        boolean isAlarmBoot = SystemProperties.getBoolean("ro.alarm_boot", false);
+        String cryptState = SystemProperties.get("vold.decrypt");
+
+        if (isAlarmBoot &&
+                ("trigger_restart_min_framework".equals(cryptState) ||
+                "1".equals(cryptState))) {
+            AlarmManager.writePowerOffAlarmFile(AlarmManager.POWER_OFF_ALARM_HANDLE_FILE,
+                    AlarmManager.POWER_OFF_ALARM_HANDLED);
+        }
+
+        AlarmManager.writePowerOffAlarmFile(AlarmManager.POWER_OFF_ALARM_TIMEZONE_FILE,
+                SystemProperties.get("persist.sys.timezone"));
+        rebootOrShutdown(mContext, mReboot, mReason);
     }
 
     private void setRebootProgress(final int progress, final CharSequence message) {
@@ -710,10 +649,11 @@ public final class ShutdownThread extends Thread {
                         ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
                 final IBluetoothManager bluetooth =
                         IBluetoothManager.Stub.asInterface(ServiceManager.checkService(
-                        BluetoothAdapter.BLUETOOTH_MANAGER_SERVICE));
+                                BluetoothAdapter.BLUETOOTH_MANAGER_SERVICE));
 
                 try {
-                    nfcOff = nfc == null || nfc.getState() == NfcAdapter.STATE_OFF;
+                    nfcOff = nfc == null ||
+                             nfc.getState() == NfcAdapter.STATE_OFF;
                     if (!nfcOff) {
                         Log.w(TAG, "Turning off NFC...");
                         nfc.disable(false); // Don't persist new state
@@ -724,7 +664,8 @@ public final class ShutdownThread extends Thread {
                 }
 
                 try {
-                    bluetoothOff = bluetooth == null || !bluetooth.isEnabled();
+                    bluetoothOff = bluetooth == null ||
+                            bluetooth.getState() == BluetoothAdapter.STATE_OFF;
                     if (!bluetoothOff) {
                         Log.w(TAG, "Disabling Bluetooth...");
                         bluetooth.disable(false);  // disable but don't persist new state
@@ -749,7 +690,7 @@ public final class ShutdownThread extends Thread {
 
                 long delay = endTime - SystemClock.elapsedRealtime();
                 while (delay > 0) {
-                    if (mRebootUpdate) {
+                    if (mRebootHasProgressBar) {
                         int status = (int)((timeout - delay) * 1.0 *
                                 (RADIO_STOP_PERCENT - PACKAGE_MANAGER_STOP_PERCENT) / timeout);
                         status += PACKAGE_MANAGER_STOP_PERCENT;
@@ -758,7 +699,7 @@ public final class ShutdownThread extends Thread {
 
                     if (!bluetoothOff) {
                         try {
-                            bluetoothOff = !bluetooth.isEnabled();
+                            bluetoothOff = bluetooth.getState() == BluetoothAdapter.STATE_OFF;
                         } catch (RemoteException ex) {
                             Log.e(TAG, "RemoteException during bluetooth shutdown", ex);
                             bluetoothOff = true;
@@ -813,19 +754,48 @@ public final class ShutdownThread extends Thread {
     }
 
     /**
+     * OEM shutdown handler. This function will load the oem-services jar file
+     * and call into the rebootOrShutdown method defined there if present
+     */
+    private static void deviceRebootOrShutdown(boolean reboot, String reason)
+    {
+            Class<?> cl;
+            String deviceShutdownClassName = "com.qti.server.power.ShutdownOem";
+            String deviceShutdownMethodName = "rebootOrShutdown";
+            try {
+                    cl = Class.forName(deviceShutdownClassName);
+                    Method m;
+                    try {
+                        m = cl.getMethod(deviceShutdownMethodName, new Class[] {boolean.class, String.class});
+                        m.invoke(cl.newInstance(), reboot, reason);
+                    } catch (NoSuchMethodException ex) {
+                        Log.e(TAG, "Unable to find method " + deviceShutdownMethodName + " in class " + deviceShutdownClassName);
+                    } catch (Exception ex) {
+                        Log.e(TAG, "Unknown exception while trying to invoke " + deviceShutdownMethodName);
+                    }
+            } catch (ClassNotFoundException e) {
+                Log.e(TAG, "Unable to find class " + deviceShutdownClassName);
+            } catch (Exception e) {
+                Log.e(TAG, "Unknown exception while loading class " + deviceShutdownClassName);
+            }
+    }
+
+    /**
      * Do not call this directly. Use {@link #reboot(Context, String, boolean)}
      * or {@link #shutdown(Context, boolean)} instead.
      *
      * @param context Context used to vibrate or null without vibration
      * @param reboot true to reboot or false to shutdown
-     * @param reason reason for reboot
+     * @param reason reason for reboot/shutdown
      */
     public static void rebootOrShutdown(final Context context, boolean reboot, String reason) {
+        // Call oem shutdown handler
         deviceRebootOrShutdown(reboot, reason);
         if (reboot) {
             Log.i(TAG, "Rebooting, reason: " + reason);
             PowerManagerService.lowLevelReboot(reason);
             Log.e(TAG, "Reboot failed, will attempt shutdown instead");
+            reason = null;
         } else if (SHUTDOWN_VIBRATE_MS > 0 && context != null) {
             // vibrate before shutting down
             Vibrator vibrator = new SystemVibrator(context);
@@ -845,72 +815,46 @@ public final class ShutdownThread extends Thread {
 
         // Shutdown power
         Log.i(TAG, "Performing low-level shutdown...");
-        PowerManagerService.lowLevelShutdown();
+        PowerManagerService.lowLevelShutdown(reason);
     }
 
     private void uncrypt() {
         Log.i(TAG, "Calling uncrypt and monitoring the progress...");
+
+        final RecoverySystem.ProgressListener progressListener =
+                new RecoverySystem.ProgressListener() {
+            @Override
+            public void onProgress(int status) {
+                if (status >= 0 && status < 100) {
+                    // Scale down to [MOUNT_SERVICE_STOP_PERCENT, 100).
+                    status = (int)(status * (100.0 - MOUNT_SERVICE_STOP_PERCENT) / 100);
+                    status += MOUNT_SERVICE_STOP_PERCENT;
+                    CharSequence msg = mContext.getText(
+                            com.android.internal.R.string.reboot_to_update_package);
+                    sInstance.setRebootProgress(status, msg);
+                } else if (status == 100) {
+                    CharSequence msg = mContext.getText(
+                            com.android.internal.R.string.reboot_to_update_reboot);
+                    sInstance.setRebootProgress(status, msg);
+                } else {
+                    // Ignored
+                }
+            }
+        };
 
         final boolean[] done = new boolean[1];
         done[0] = false;
         Thread t = new Thread() {
             @Override
             public void run() {
-                // Create the status pipe file to communicate with /system/bin/uncrypt.
-                new File(UNCRYPT_STATUS_FILE).delete();
+                RecoverySystem rs = (RecoverySystem) mContext.getSystemService(
+                        Context.RECOVERY_SERVICE);
+                String filename = null;
                 try {
-                    Os.mkfifo(UNCRYPT_STATUS_FILE, 0600);
-                } catch (ErrnoException e) {
-                    Log.w(TAG, "ErrnoException when creating named pipe \"" + UNCRYPT_STATUS_FILE +
-                            "\": " + e.getMessage());
-                }
-
-                SystemProperties.set("ctl.start", "uncrypt");
-
-                // Read the status from the pipe.
-                try (BufferedReader reader = new BufferedReader(
-                        new FileReader(UNCRYPT_STATUS_FILE))) {
-
-                    int lastStatus = Integer.MIN_VALUE;
-                    while (true) {
-                        String str = reader.readLine();
-                        try {
-                            int status = Integer.parseInt(str);
-
-                            // Avoid flooding the log with the same message.
-                            if (status == lastStatus && lastStatus != Integer.MIN_VALUE) {
-                                continue;
-                            }
-                            lastStatus = status;
-
-                            if (status >= 0 && status < 100) {
-                                // Update status
-                                Log.d(TAG, "uncrypt read status: " + status);
-                                // Scale down to [MOUNT_SERVICE_STOP_PERCENT, 100).
-                                status = (int)(status * (100.0 - MOUNT_SERVICE_STOP_PERCENT) / 100);
-                                status += MOUNT_SERVICE_STOP_PERCENT;
-                                CharSequence msg = mContext.getText(
-                                        com.android.internal.R.string.reboot_to_update_package);
-                                sInstance.setRebootProgress(status, msg);
-                            } else if (status == 100) {
-                                Log.d(TAG, "uncrypt successfully finished.");
-                                CharSequence msg = mContext.getText(
-                                        com.android.internal.R.string.reboot_to_update_reboot);
-                                sInstance.setRebootProgress(status, msg);
-                                break;
-                            } else {
-                                // Error in /system/bin/uncrypt. Or it's rebooting to recovery
-                                // to perform other operations (e.g. factory reset).
-                                Log.d(TAG, "uncrypt failed with status: " + status);
-                                break;
-                            }
-                        } catch (NumberFormatException unused) {
-                            Log.d(TAG, "uncrypt invalid status received: " + str);
-                            break;
-                        }
-                    }
-                } catch (IOException unused) {
-                    Log.w(TAG, "IOException when reading \"" + UNCRYPT_STATUS_FILE + "\".");
+                    filename = FileUtils.readTextFile(RecoverySystem.UNCRYPT_PACKAGE_FILE, 0, null);
+                    rs.processPackage(mContext, new File(filename), progressListener);
+                } catch (IOException e) {
+                    Log.e(TAG, "Error uncrypting file", e);
                 }
                 done[0] = true;
             }
@@ -924,91 +868,5 @@ public final class ShutdownThread extends Thread {
         if (!done[0]) {
             Log.w(TAG, "Timed out waiting for uncrypt.");
         }
-    }
-
-    private static void deviceRebootOrShutdown(boolean reboot, String reason) {
-        Class<?> cl;
-        String deviceShutdownClassName = "com.qti.server.power.ShutdownOem";
-        try {
-            cl = Class.forName(deviceShutdownClassName);
-            Method m;
-                try {
-                    m = cl.getMethod("rebootOrShutdown", new Class[] {boolean.class, String.class});
-                    m.invoke(cl.newInstance(), reboot, reason);
-                } catch (NoSuchMethodException ex) {
-                    Log.e(TAG, "rebootOrShutdown method not found in class " + deviceShutdownClassName);
-                } catch (Exception ex) {
-                    Log.e(TAG, "Unknown exception hit while trying to invode rebootOrShutdown");
-                }
-        } catch (ClassNotFoundException e) {
-            Log.e(TAG, "Unable to find class " + deviceShutdownClassName);
-        } catch (Exception e) {
-            Log.e(TAG, "Unknown exception while trying to invoke rebootOrShutdown");
-        }
-    }
-
-    private static boolean checkAnimationFileExist() {
-        if (new File(OEM_BOOTANIMATION_FILE).exists()
-                || new File(SYSTEM_BOOTANIMATION_FILE).exists()
-                || new File(SYSTEM_ENCRYPTED_BOOTANIMATION_FILE).exists())
-            return true;
-        else
-            return false;
-    }
-
-    private static boolean isSilentMode() {
-        return mAudioManager.isSilentMode();
-    }
-
-    private static void showShutdownAnimation() {
-        /*
-         * When boot completed, "service.bootanim.exit" property is set to 1.
-         * Bootanimation checks this property to stop showing the boot animation.
-         * Since we use the same code for shutdown animation, we
-         * need to reset this property to 0. If this is not set to 0 then shutdown
-         * will stop and exit after displaying the first frame of the animation
-         */
-        SystemProperties.set("service.bootanim.exit", "0");
-
-        SystemProperties.set("ctl.start", "bootanim");
-    }
-
-    private Handler shutdownMusicHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            String path = (String) msg.obj;
-            mMediaPlayer = new MediaPlayer();
-            try
-            {
-                mMediaPlayer.reset();
-                mMediaPlayer.setDataSource(path);
-                mMediaPlayer.prepare();
-                mMediaPlayer.start();
-                mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        synchronized (mActionDoneSync) {
-                            isShutdownMusicPlaying = false;
-                            mActionDoneSync.notifyAll();
-                        }
-                    }
-                });
-            } catch (IOException e) {
-                Log.d(TAG, "play shutdown music error:" + e);
-            }
-        }
-    };
-
-    private static Context getUiContext(Context context) {
-        Context uiContext = null;
-        if (context != null) {
-            uiContext = ThemeUtils.createUiContext(context);
-            if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEVISION)) {
-                uiContext.setTheme(com.android.internal.R.style.Theme_Leanback_Dialog_Alert);
-            } else  {
-                uiContext.setTheme(com.android.internal.R.style.Theme_Power_Dialog);
-            }
-        }
-        return uiContext != null ? uiContext : context;
     }
 }

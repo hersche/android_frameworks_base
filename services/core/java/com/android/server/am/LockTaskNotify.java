@@ -23,7 +23,6 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.view.WindowManager;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import com.android.internal.R;
@@ -38,13 +37,10 @@ public class LockTaskNotify {
 
     private final Context mContext;
     private final H mHandler;
-    private AccessibilityManager mAccessibilityManager;
     private Toast mLastToast;
 
     public LockTaskNotify(Context context) {
         mContext = context;
-        mAccessibilityManager = (AccessibilityManager)
-                mContext.getSystemService(Context.ACCESSIBILITY_SERVICE);
         mHandler = new H();
     }
 
@@ -63,12 +59,11 @@ public class LockTaskNotify {
         final int textResId;
         if (lockTaskModeState == ActivityManager.LOCK_TASK_MODE_LOCKED) {
             textResId = R.string.lock_to_app_toast_locked;
-        } else if (lockTaskModeState == ActivityManager.LOCK_TASK_MODE_PINNED &&
-                mAccessibilityManager.isEnabled() && hasNavigationBar()) {
-            textResId = R.string.lock_to_app_toast_accessible;
+        } else if (lockTaskModeState == ActivityManager.LOCK_TASK_MODE_PINNED) {
+            textResId = R.string.lock_to_app_toast;
         } else {
-            textResId = hasNavigationBar()
-                    ? R.string.lock_to_app_toast : R.string.lock_to_app_toast_no_navbar;
+            textResId = hasNavigationBar() ? 
+                    R.string.lock_to_app_toast : R.string.lock_to_app_toast_no_navbar;
         }
         if (mLastToast != null) {
             mLastToast.cancel();

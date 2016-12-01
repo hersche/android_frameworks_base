@@ -3,6 +3,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
     android_media_AmrInputStream.cpp \
+    android_media_ExifInterface.cpp \
     android_media_ImageWriter.cpp \
     android_media_ImageReader.cpp \
     android_media_MediaCrypto.cpp \
@@ -32,6 +33,7 @@ LOCAL_SHARED_LIBRARIES := \
     libutils \
     libbinder \
     libmedia \
+    libmediadrm \
     libskia \
     libui \
     liblog \
@@ -43,6 +45,7 @@ LOCAL_SHARED_LIBRARIES := \
     libmtp \
     libusbhost \
     libexif \
+    libpiex \
     libstagefright_amrnb_common
 
 LOCAL_STATIC_LIBRARIES := \
@@ -50,6 +53,7 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_C_INCLUDES += \
     external/libexif/ \
+    external/piex/ \
     external/tremor/Tremor \
     frameworks/base/core/jni \
     frameworks/base/libs/hwui \
@@ -61,7 +65,6 @@ LOCAL_C_INCLUDES += \
     frameworks/av/media/mtp \
     frameworks/native/include/media/openmax \
     $(call include-path-for, libhardware)/hardware \
-    system/media/camera/include \
     $(PV_INCLUDES) \
     $(JNI_H_INCLUDE)
 

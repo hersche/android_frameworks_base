@@ -4,16 +4,16 @@
 /**
  * Copyright (c) 2009, The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0 
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 -->
@@ -119,7 +119,6 @@
   <!-- Title of notification shown when trying to enable USB debugging but a secondary user is the current foreground user. -->
   <string name="usb_debugging_secondary_user_title">Depuración USB non permitida</string>
   <!-- Message of notification shown when trying to enable USB debugging but a secondary user is the current foreground user. -->
-  <string name="usb_debugging_secondary_user_message">L\'usuariu coneutáu agora con esti preséu nun pue activar la depuración por USB. Pa usar esta función, has camudar al usuariu principal \u201C<xliff:g id="name" example="John Doe">%s</xliff:g>\u201D.</string>
   <!-- Checkbox label for application compatibility mode ON (zooming app to look like it's running
          on a phone).  [CHAR LIMIT=25] -->
   <string name="compat_mode_on">Zoom p\'axustar</string>
@@ -135,11 +134,11 @@
   <!-- Notification title displayed when a screenshot is saved to the Gallery. [CHAR LIMIT=50] -->
   <string name="screenshot_saved_title">Captura guardada</string>
   <!-- Notification text displayed when a screenshot is saved to the Gallery. [CHAR LIMIT=100] -->
-  <string name="screenshot_saved_text">Toca pa ver la captura de pantalla</string>
   <!-- Notification title displayed when we fail to take a screenshot. [CHAR LIMIT=50] -->
   <string name="screenshot_failed_title">Nun pudo guardase la captura de pantalla.</string>
+  <!-- Notification text displayed when we fail to save a screenshot for unknown reasons. [CHAR LIMIT=100] -->
+  <!-- Notification text displayed when we fail to save a screenshot. [CHAR LIMIT=100] -->
   <!-- Notification text displayed when we fail to take a screenshot. [CHAR LIMIT=100] -->
-  <string name="screenshot_failed_text">Nun pue facese captura de pantalla porque nun hai espaciu, o nun hai permisu pa esta app.</string>
   <!-- Title for the USB function chooser in UsbPreferenceActivity. [CHAR LIMIT=30] -->
   <string name="usb_preference_title">Opciones de tresferencia de ficheros por USB</string>
   <!-- Label for the MTP USB function in UsbPreferenceActivity. [CHAR LIMIT=50] -->
@@ -224,6 +223,7 @@
   <string name="accessibility_wifi_name">Coneutáu a <xliff:g id="wifi" example="Home Network">%s</xliff:g>.</string>
   <!-- Content description of the bluetooth label showing what we are connected to. [CHAR LIMIT=NONE] -->
   <string name="accessibility_bluetooth_name">Coneutáu a <xliff:g id="bluetooth" example="Car Audio">%s</xliff:g>.</string>
+  <!-- Content description of the cast label showing what we are connected to. [CHAR LIMIT=NONE] -->
   <!-- Content description of the WiMAX signal when no signal for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_no_wimax">Ensin conexón WiMAX</string>
   <!-- Content description of the WiMAX signal when it is one bar for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -272,8 +272,10 @@
   <string name="accessibility_data_connection_3.5g">3.5 G</string>
   <!-- Content description of the data connection type 4G for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_data_connection_4g">4G</string>
+  <!-- Content description of the data connection type 4G for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the data connection type LTE for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_data_connection_lte">LTE</string>
+  <!-- Content description of the data connection type LTE+ for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the data connection type CDMA for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_data_connection_cdma">CDMA</string>
   <!-- Content description of the roaming data connection type for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -284,6 +286,9 @@
   <string name="accessibility_data_connection_wifi">Wi-Fi</string>
   <!-- Content description of the data connection with no SIM for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_no_sim">Ensin tarxeta SIM</string>
+  <!-- Content description of the cell data. [CHAR LIMIT=NONE] -->
+  <!-- Content description of the cell data being enabled. [CHAR LIMIT=NONE] -->
+  <!-- Content description of the cell data being disabled. [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth tethering icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_bluetooth_tether">Anclaxe de Bluetooth</string>
   <!-- Content description of the airplane mode icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -292,8 +297,10 @@
   <string name="accessibility_no_sims">Ensin tarxeta SIM.</string>
   <!-- Content description of the carrier network changing icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_carrier_network_change_mode">Cambéu de fornidor de rede.</string>
+  <!-- Content description of button to open battery details icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the battery level icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_battery_level"><xliff:g id="NUMBER">%d</xliff:g> por cientu de batería</string>
+  <!-- Content description of the battery level icon for accessibility while the device is charging (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the button for showing a settings panel in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_settings_button">Axustes del sistema</string>
   <!-- Content description of the button for showing a notifications panel in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -311,12 +318,14 @@
   <!-- Content description of the ringer silent icon in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_ringer_silent">Mou silenciu</string>
   <!-- Content description of the cast icon in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the work mode icon in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description to tell the user that this button will remove an application from recents -->
   <string name="accessibility_recents_item_will_be_dismissed">Descartar <xliff:g id="app" example="Calendar">%s</xliff:g>.</string>
   <!-- Content description to tell the user an application has been removed from recents -->
   <string name="accessibility_recents_item_dismissed">Desanicióse <xliff:g id="APP">%s</xliff:g>.</string>
   <!-- Content description to tell the user all applications has been removed from recents -->
   <string name="accessibility_recents_all_items_dismissed">Descartáronse toles aplicaciones recientes.</string>
+  <!-- Content description to tell the user that this button will open application info for an application in recents -->
   <!-- Content description to tell the user an application has been launched from recents -->
   <string name="accessibility_recents_item_launched">Aniciando <xliff:g id="app" example="Calendar">%s</xliff:g>.</string>
   <!-- Content description of individual recents task. -->
@@ -361,12 +370,14 @@
   <string name="accessibility_quick_settings_dnd_none_on">Nun molestar activáu, silenciu total.</string>
   <!-- Content description of the do not disturb tile in quick settings when on in alarms only (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_dnd_alarms_on">Nun molestar activáu, namái alarmes.</string>
+  <!-- Content description of the do not disturb tile in quick settings (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the do not disturb tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_dnd_off">Nun molestar desactiváu.</string>
   <!-- Announcement made when do not disturb changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_dnd_changed_off">Nun molestar desactiváu.</string>
   <!-- Announcement made when do not disturb changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_dnd_changed_on">Nun molestar activáu.</string>
+  <!-- Content description of the bluetooth tile in quick settings (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_bluetooth_off">Bluetooth desactiváu.</string>
   <!-- Content description of the bluetooth tile in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -397,6 +408,7 @@
   <string name="accessibility_quick_settings_less_time">Menos tiempu.</string>
   <!-- Content description of the flashlight tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_flashlight_off">Llinterna apagada.</string>
+  <!-- Content description of the flashlight tile in quick settings when unavailable (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the flashlight tile in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_quick_settings_flashlight_on">Llinterna prendida.</string>
   <!-- Announcement made when the flashlight state changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -413,6 +425,12 @@
   <string name="accessibility_quick_settings_hotspot_changed_on">Puntu d\'accesu móvil prendíu</string>
   <!-- Announcement made when the screen stopped casting (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_casting_turned_off">Pantalla d\'emisión parada.</string>
+  <!-- Content description of the work mode title in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the work mode title in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the work mode changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the work mode changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the Data Saver changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the Data Saver changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the display brightness slider (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_brightness">Amosar brillu</string>
   <!-- Title of dialog shown when 2G-3G data usage has exceeded limit and has been disabled. [CHAR LIMIT=48] -->
@@ -443,6 +461,8 @@
   <string name="accessibility_location_active">Solicitúes de llocalización actives</string>
   <!-- Content description of the clear button in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_clear_all">Llimpiar toles notificaciones</string>
+  <!-- The overflow indicator shown when a group has more notification inside the group than the visible ones. An example is "+ 3" [CHAR LIMIT=5] -->
+  <!-- Content description describing how many more notifications are in a group [CHAR LIMIT=NONE] -->
   <!-- Content description of button in notification inspector for system settings relating to
          notifications from this application [CHAR LIMIT=NONE] -->
   <string name="status_bar_notification_inspect_item_title">Axustes de notificaciones</string>
@@ -464,7 +484,6 @@
   <!-- Name of the K-release easter egg: a display case for all our tastiest desserts. [CHAR LIMIT=30] -->
   <string name="dessert_case">Caxa para postres</string>
   <!-- Name of the launcher shortcut icon that allows dreams to be started immediately [CHAR LIMIT=20] -->
-  <string name="start_dreams">Curiapantalles</string>
   <!-- Textual description of Ethernet connections -->
   <string name="ethernet_label">Ethernet</string>
   <!-- QuickSettings: Do not disturb [CHAR LIMIT=NONE] -->
@@ -487,6 +506,9 @@
   <string name="quick_settings_brightness_label">Brillu</string>
   <!-- QuickSettings: Rotation Unlocked [CHAR LIMIT=NONE] -->
   <string name="quick_settings_rotation_unlocked_label">Xiru-auto</string>
+  <!-- Accessibility label for Auto-ratate QuickSettings tile [CHAR LIMIT=NONE] -->
+  <string name="accessibility_quick_settings_rotation">Xirar pantalla automáticamente</string>
+  <!-- Accessibility label for value of Auto-ratate QuickSettings tile [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Rotation Locked [CHAR LIMIT=NONE] -->
   <string name="quick_settings_rotation_locked_label">Xiru bloquiáu</string>
   <!-- QuickSettings: Locked to Portrait [CHAR LIMIT=NONE] -->
@@ -523,6 +545,7 @@
   <string name="quick_settings_wifi_no_network">Nun hai rede.</string>
   <!-- QuickSettings: Wifi (Off) [CHAR LIMIT=NONE] -->
   <string name="quick_settings_wifi_off_label">Wi-Fi desactiváu</string>
+  <!-- QuickSettings: Wifi (On) [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Wifi detail panel, text when there are no items [CHAR LIMIT=NONE] -->
   <string name="quick_settings_wifi_detail_empty_text">Nun hai redes Wi-Fi disponibles</string>
   <!-- QuickSettings: Cast title [CHAR LIMIT=NONE] -->
@@ -572,8 +595,12 @@
   <string name="quick_settings_cellular_detail_data_limit">Llende <xliff:g id="data_limit" example="2.0 GB">%s</xliff:g></string>
   <!-- QuickSettings: Cellular detail panel, data warning format string [CHAR LIMIT=NONE] -->
   <string name="quick_settings_cellular_detail_data_warning">Avisu <xliff:g id="data_limit" example="2.0 GB">%s</xliff:g></string>
+  <!-- QuickSettings: Work mode [CHAR LIMIT=NONE] -->
+  <!-- QuickSettings: Label for the toggle to activate Night display (renamed "Night Light" with title caps). [CHAR LIMIT=20] -->
+  <!-- QuickSettings: Summary for the toggle to deactivate Night display when it's on (renamed "Night Light" with title caps). [CHAR LIMIT=NONE] -->
+  <!-- QuickSettings: Label for the toggle to activate Night display when it's off (renamed "Night Light" with title caps). [CHAR LIMIT=NONE] -->
   <!-- Recents: The empty recents string. [CHAR LIMIT=NONE] -->
-  <string name="recents_empty_message">Les tos pantalles recientes apaecen equí</string>
+  <!-- Recents: The empty recents string after dismissing all tasks. [CHAR LIMIT=NONE] -->
   <!-- Recents: The info panel app info button string. [CHAR LIMIT=NONE] -->
   <string name="recents_app_info_button_label">Info d\'aplicación</string>
   <!-- Recents: The screen pinning button. [CHAR LIMIT=NONE] -->
@@ -581,14 +608,18 @@
   <string name="recents_search_bar_label">guetar</string>
   <!-- Recents: Launch error string. [CHAR LIMIT=NONE] -->
   <string name="recents_launch_error_message">Nun pudo aniciase <xliff:g id="app" example="Calendar">%s</xliff:g>.</string>
-  <!-- Recents: Dismiss all button. [CHAR LIMIT=NONE] -->
-  <string name="recents_dismiss_all_message">Descartar toles apps</string>
+  <!-- Recents: Launch disabled string. [CHAR LIMIT=NONE] -->
+  <!-- Recents: Stack action button string. [CHAR LIMIT=NONE] -->
+  <string name="recents_stack_action_button_label">Llimpiar too</string>
+  <!-- Recents: Incompatible task message. [CHAR LIMIT=NONE] -->
+  <!-- Recents: Hint text that shows on the drop targets to start multiwindow. [CHAR LIMIT=NONE] -->
   <!-- Recents: MultiStack add stack split horizontal radio button. [CHAR LIMIT=NONE] -->
   <string name="recents_multistack_add_stack_dialog_split_horizontal">División horizontal</string>
   <!-- Recents: MultiStack add stack split vertical radio button. [CHAR LIMIT=NONE] -->
   <string name="recents_multistack_add_stack_dialog_split_vertical">División vertical</string>
   <!-- Recents: MultiStack add stack split custom radio button. [CHAR LIMIT=NONE] -->
   <string name="recents_multistack_add_stack_dialog_split_custom">División personalizada</string>
+  <!-- Fully qualified activity class names to be blacklisted in Recents, add package names into overlay as needed -->
   <!-- Expanded Status Bar Header: Battery Charged [CHAR LIMIT=40] -->
   <string name="expanded_header_battery_charged">Cargada</string>
   <!-- Expanded Status Bar Header: Charging, no known time [CHAR LIMIT=40] -->
@@ -623,7 +654,6 @@
   <!-- An explanation for the visual speed bump in the notifications, which will appear when you click on it. [CHAR LIMIT=50] -->
   <string name="speed_bump_explanation">Notificaciones menos urxentes, debaxo</string>
   <!-- Shows to explain the double tap interaction with notifications: After tapping a notification on Keyguard, this will explain users to tap again to launch a notification. [CHAR LIMIT=60] -->
-  <string name="notification_tap_again">Toca otra vuelta p\'abrir</string>
   <!-- Shows when people have pressed the unlock icon to explain how to unlock. [CHAR LIMIT=60] -->
   <string name="keyguard_unlock">Eslizar arriba pa desbloquiar</string>
   <!-- Shows when people have clicked on the phone icon [CHAR LIMIT=60] -->
@@ -691,18 +721,23 @@
   <string name="guest_notification_text">Pa desaniciar aplicaciones y datos, desanicia l\'usuariu convidáu</string>
   <!-- Remove action in the notification shown to a new guest user [CHAR LIMIT=30] -->
   <string name="guest_notification_remove_action">DESANICIAR CONVIDÁU</string>
+  <!-- Title of the notification shown to logout the current user [CHAR LIMIT=60] -->
+  <!-- Text of the notification shown to logout the current user [CHAR LIMIT=60] -->
+  <!-- Logout action in the notification shown to logout the current user [CHAR LIMIT=30] -->
   <!-- Title for add user confirmation dialog [CHAR LIMIT=30] -->
   <string name="user_add_user_title" msgid="2108112641783146007">Amestar usuariu nuevu?</string>
   <!-- Message for add user confirmation dialog - short version. [CHAR LIMIT=none] -->
   <string name="user_add_user_message_short" msgid="1511354412249044381">Cuando amiestes un usuariu nuevu, esi usuariu necesita configurar el so espaciu\n\nCualquier usuariu pue anovar apps pa otros usuarios. </string>
+  <!-- Title of the confirmation dialog for deleting a user [CHAR LIMIT=NONE] -->
+  <!-- Message of the confirmation dialog for deleting a user [CHAR LIMIT=NONE] -->
+  <!-- Label for button in confirmation dialog when exiting guest session [CHAR LIMIT=35] -->
+  <string name="user_remove_user_remove">Desaniciar</string>
   <!-- Battery saver notification title. [CHAR LIMIT=60]-->
   <string name="battery_saver_notification_title">L\'aforrador de batería ta activáu</string>
   <!-- Battery saver notification text. [CHAR LIMIT=60] -->
   <string name="battery_saver_notification_text">Amenorga los datos de rindimientu y de fondu</string>
   <!-- Battery saver notification action text. [CHAR LIMIT=60] -->
   <string name="battery_saver_notification_action_text">Prender l\'aforrador d\'enerxía</string>
-  <!-- Text shown in place of notification contents when the notification is hidden on a secure lockscreen -->
-  <string name="notification_hidden_text">Conteníos anubríos</string>
   <!-- Media projection permission dialog warning text. [CHAR LIMIT=NONE] -->
   <string name="media_projection_dialog_text"><xliff:g id="app_seeking_permission" example="Hangouts">%s</xliff:g> va empezar a capturar tolo que s\'amuese na pantalla.</string>
   <!-- Media projection permission dialog permanent grant check box. [CHAR LIMIT=NONE] -->
@@ -759,10 +794,6 @@
   <string name="hidden_notifications_cancel">Non, gracies</string>
   <!-- continue action for notification educating the user about enabling notifications on the lockscreen. [CHAR LIMIT=20] -->
   <string name="hidden_notifications_setup">Configurar</string>
-  <!-- Text for the button to expand the notifications to show notification children [CHAR LIMIT=20] -->
-  <string name="notification_expand_button_text">Ver toes</string>
-  <!-- Text for the button to expand the notifications to hide notification children [CHAR LIMIT=20] -->
-  <string name="notification_collapse_button_text">Anubrir toes</string>
   <!-- Accessibility string for current zen mode and selected exit condition. A template that simply concatenates existing mode string and the current condition description. [CHAR LIMIT=20] -->
   <string name="zen_mode_and_condition"><xliff:g id="zen_mode" example="Priority interruptions only">%1$s</xliff:g>. <xliff:g id="exit_condition" example="For one hour">%2$s</xliff:g></string>
   <!-- Button label for ending zen mode in the volume dialog -->
@@ -773,7 +804,6 @@
   <string name="accessibility_volume_collapse">Contrayer</string>
   <!-- Screen pinning dialog title. -->
   <!-- Screen pinning dialog description. -->
-  <!-- Screen pinning dialog description when in accessibility mode. -->
   <!-- Screen pinning positive response. -->
   <!-- Screen pinning negative response. -->
   <!-- Hide quick settings tile confirmation title -->
@@ -788,9 +818,30 @@
   <!-- VolumeUI restoration notification: title -->
   <string name="volumeui_notification_title"><xliff:g id="app_name" example="Volume Prototype 1">%1$s</xliff:g> ye\'l diálogu de volume</string>
   <!-- VolumeUI restoration notification: text -->
-  <string name="volumeui_notification_text">Toca pa restaurar l\'orixinal.</string>
   <!-- Toast shown when user unlocks screen and managed profile activity is in the foreground -->
   <string name="managed_profile_foreground_toast">Tas usando\'l to perfil de trabayu</string>
+  <string-array name="volume_stream_titles">
+    <item>Call</item>
+    <!-- STREAM_VOICE_CALL -->
+    <item>System</item>
+    <!-- STREAM_SYSTEM -->
+    <item>Ring</item>
+    <!-- STREAM_RING -->
+    <item>Media</item>
+    <!-- STREAM_MUSIC -->
+    <item>Alarma</item>
+    <!-- STREAM_ALARM -->
+    <item/>
+    <!-- STREAM_NOTIFICATION -->
+    <item>Bluetooth</item>
+    <!-- STREAM_BLUETOOTH_SCO -->
+    <item/>
+    <!-- STREAM_SYSTEM_ENFORCED -->
+    <item/>
+    <!-- STREAM_DTMF -->
+    <item/>
+    <!-- STREAM_TTS -->
+  </string-array>
   <!-- Name of special SystemUI debug settings -->
   <string name="system_ui_tuner">Sintonizador de IU del sistema</string>
   <!-- Preference to show/hide embedded battery percentage [CHAR LIMIT=50] -->
@@ -801,6 +852,8 @@
   <string name="quick_settings">Axustes rápidos</string>
   <!-- Name of status bar -->
   <string name="status_bar">Barra d\'estáu</string>
+  <!-- Name of overview -->
+  <string name="overview">Perspeutiva</string>
   <!-- Name of demo mode (mode with preset icons for screenshots) -->
   <string name="demo_mode">Mou desmostración</string>
   <!-- Enable demo mode -->
@@ -850,6 +903,16 @@
   <string name="remove_from_settings">Quitar de Axustes</string>
   <!-- Dialog asking if the tuner should really be removed from settings [CHAR LIMIT=NONE]-->
   <string name="remove_from_settings_prompt">¿Quies quitar el sintonizador de IU del sistema de Axustes y dexar d\'usar toles sos funciones?</string>
+  <!-- Displayed when user launches an app that was uninstalled  [CHAR LIMIT=NONE] -->
+  <!-- Name of setting to show clock seconds [CHAR LIMIT=40] -->
+  <!-- Description of setting to show clock seconds [CHAR LIMIT=NONE] -->
+  <!-- Button that leads to page to rearrange quick settings tiles [CHAR LIMIT=60] -->
+  <!-- Option to show brightness bar in quick settings [CHAR LIMIT=60] -->
+  <!-- Option to use new paging layout in quick settings [CHAR LIMIT=60] -->
+  <!-- Toggle to enable the gesture to enter split-screen by swiping up from the Overview button. [CHAR LIMIT=60]-->
+  <!-- Description for the toggle to enable the gesture to enter split-screen by swiping up from the Overview button. [CHAR LIMIT=NONE]-->
+  <!-- Category in the System UI Tuner settings, where new/experimental
+         settings are -->
   <!-- Dialog title asking if Bluetooth should be enabled [CHAR LIMIT=NONE] -->
   <string name="enable_bluetooth_title">¿Prender Bluetooth?</string>
   <!-- Dialog message explaining why Bluetooth should be enabled when a packaged keyboard is
@@ -857,4 +920,155 @@
   <string name="enable_bluetooth_message">Pa coneutar el tecláu cola tablet, primero tienes d\'activar Bluetooth.</string>
   <!-- Bluetooth enablement ok text [CHAR LIMIT=40] -->
   <string name="enable_bluetooth_confirmation_ok">Activar</string>
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=NONE] Importance Tuner setting title -->
+  <!-- Notification importance title, user unspecified status-->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: blocked importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: blocked importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: min importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: low importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: normal importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: high importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: max importance level description -->
+  <!-- Notification: Control panel: Label for button that launches notification settings. [CHAR LIMIT=NONE] -->
+  <string name="notification_more_settings">Más axustes</string>
+  <!-- Notification: Control panel: Label for button that dismisses control panel. [CHAR LIMIT=NONE] -->
+  <string name="notification_done">Fecho</string>
+  <!-- Notification: Gear: Content description for the gear. [CHAR LIMIT=NONE] -->
+  <!-- Title of the battery settings detail panel [CHAR LIMIT=20] -->
+  <!-- Summary of battery saver not available [CHAR LIMIT=NONE] -->
+  <!-- Title of switch for battery saver [CHAR LIMIT=NONE] -->
+  <!-- Summary of switch for battery saver [CHAR LIMIT=NONE] -->
+  <string name="battery_detail_switch_summary">Amenorga los datos de rindimientu y de fondu</string>
+  <!-- Name used for certain Keyboard keys on gamepads, e.g. "Button L1". -->
+  <!-- Name used to refer to the "Home" key on the keyboard. -->
+  <string name="keyboard_key_home">Aniciu</string>
+  <!-- Name used to refer to the "Back" key on the keyboard. -->
+  <string name="keyboard_key_back">Atrás</string>
+  <!-- Name used to refer to the "Up" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Down" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Left" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Right" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Center" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Tab" key on the keyboard. -->
+  <!-- Name used to refer to the "Space" key on the keyboard. -->
+  <!-- Name used to refer to the "Enter" key on the keyboard. -->
+  <!-- Name used to refer to the "Backspace" key on the keyboard. -->
+  <!-- Name used to refer to the "Play/Pause" media key on the keyboard. -->
+  <!-- Name used to refer to the "Stop" media key on the keyboard. -->
+  <!-- Name used to refer to the "Next" media key on the keyboard. -->
+  <!-- Name used to refer to the "Previous" media key on the keyboard. -->
+  <!-- Name used to refer to the "Rewind" media key on the keyboard. -->
+  <!-- Name used to refer to the "Fast Forward" media key on the keyboard. -->
+  <!-- Name used to refer to the "Page Up" key on the keyboard. -->
+  <!-- Name used to refer to the "Page Down" key on the keyboard. -->
+  <!-- Name used to refer to the "Delete" key on the keyboard. -->
+  <!-- Name used to refer to the "Home" move key on the keyboard. -->
+  <string name="keyboard_key_move_home">Aniciu</string>
+  <!-- Name used to refer to the "End" move key on the keyboard. -->
+  <!-- Name used to refer to the "Insert" key on the keyboard. -->
+  <!-- Name used to refer to the "Num Lock" key on the keyboard. -->
+  <!-- Name used to refer to keys on the numeric pad of the keyboard, e.g. "Numpad 9". -->
+  <!-- User visible title for the system-wide keyboard shortcuts list. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the home screen. -->
+  <string name="keyboard_shortcut_group_system_home">Aniciu</string>
+  <!-- User visible title for the the keyboard shortcut that takes the user to the recents screen. -->
+  <!-- User visible title for the the keyboard shortcut that triggers the back action. -->
+  <string name="keyboard_shortcut_group_system_back">Atrás</string>
+  <!-- User visible title for the the keyboard shortcut that triggers the notification shade. -->
+  <string name="keyboard_shortcut_group_system_notifications">Notificaciones</string>
+  <!-- User visible title for the the keyboard shortcut that triggers the keyboard shortcuts helper. -->
+  <!-- User visible title for the the keyboard shortcut that switches input methods. -->
+  <!-- User visible title for the system-wide applications keyboard shortcuts list. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the assist app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the browser app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the contacts app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the email app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the instant messaging app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the music app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the YouTube app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the calendar app. -->
+  <!-- SysUI Tuner: Option to show full do not disturb panel in volume [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Label for screen about do not disturb settings [CHAR LIMIT=60] -->
+  <string name="volume_and_do_not_disturb">Nun molestar</string>
+  <!-- SysUI Tuner: Switch to control whether volume buttons enter/exit do
+         not disturb [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Switch to control volume up behavior [CHAR LIMIT=60] -->
+  <!-- Name of the battery icon in status bar [CHAR LIMIT=30] -->
+  <!-- Name of the clock in status bar [CHAR LIMIT=30] -->
+  <!-- Name of the headset in status bar [CHAR LIMIT=30] -->
+  <!-- Accessibility description of headphones icon [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of headset icon [CHAR LIMIT=NONE] -->
+  <!-- Label for quick settings tile for data saver [CHAR LIMIT=30] -->
+  <!-- Accessibility description for data saver being on [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description for data saver being off [CHAR LIMIT=NONE] -->
+  <!-- Label for feature switch [CHAR LIMIT=30] -->
+  <!-- Label for feature switch [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Button that leads to the navigation bar customization screen [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Group of buttons that show on the start of the screen [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Group of buttons that show on the center of the screen [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Group of buttons that show on the end of the screen [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Name of space used in custom navigation bar layouts [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Name of Combination Menu / Keyboard Switcher button [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Title for dialog to add a button [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Button to add a button [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Save the current settings [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Reset to default settings [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Title of no home warning dialog [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Message of no home warning dialog [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Adjust button width dialog title [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Nav bar button that holds the clipboard [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Description of nav bar button that holds the clipboard [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Accessibility description for custom nav key [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Nav bar button that emulates a keycode [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Description of nav bar button that emulates a keycode [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Title of dialog to select which key to emulate [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Label for preview area in navigation bar tuner [CHAR LIMIT=NONE] -->
+  <!-- Label for area where tiles can be dragged out of [CHAR LIMIT=60] -->
+  <!-- Label for area where tiles can be dragged in to [CHAR LIMIT=60] -->
+  <!-- Button to edit the tile ordering of quick settings [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Options for how clock is displayed [CHAR LIMIT=NONE] -->
+  <string name="tuner_time">Hora</string>
+  <!-- SysUI Tuner: Options for how clock is displayed [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Options for how battery is displayed [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Other section -->
+  <!-- Accessibility label for the divider that separates the windows in split-screen mode [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen 70% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen 50% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen 30% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the right screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen 70% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen 50% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen 30% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the bottom screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of a QS tile while editing positions [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of a QS tile while editing positions [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of a place to drop a tile while editing positions [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of option to move QS tile [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of option to remove QS tile [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action when QS tile is added [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action when QS tile is removed [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action when QS tile is moved [CHAR LIMIT=NONE] -->
+  <!-- Accessibility label for window when QS editing is happening [CHAR LIMIT=NONE] -->
+  <!-- Accessibility label for the notification icons in the collapsed status bar. Not shown on screen [CHAR LIMIT=NONE] -->
+  <!-- Label for button that reports a touch that was wrongly rejected by the lockscreen. For debugging only. [CHAR LIMIT=NONE] -->
+  <!-- Multi-Window strings -->
+  <!-- Text that gets shown on top of current activity to inform the user that the system force-resized the current activity and that things might crash/not work properly [CHAR LIMIT=NONE] -->
+  <!-- Warning message when we try to dock a non-resizeble tasks and launch it in fullscreen instead. -->
+  <!-- accessibility label for button to open settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to expand quick settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to collapse quick settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for alarm icon [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to select user [CHAR LIMIT=NONE] -->
+  <string name="accessibility_quick_settings_user">Usuariu <xliff:g id="USER">%s</xliff:g></string>
+  <!-- accessibility label for no internet [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for quick settings items that open a details page [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for quick settings items that open a details page [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to edit quick settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for paging indicator in quick settings [CHAR LIMITi=NONE] -->
 </resources>

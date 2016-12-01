@@ -1,7 +1,4 @@
 /*
- * Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
- * Not a Contribution.
- *
  * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +18,6 @@ package com.android.keyguard;
 
 import android.app.ActivityManager;
 import android.app.AlarmManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -132,6 +128,11 @@ public class KeyguardStatusView extends GridLayout {
         super.onConfigurationChanged(newConfig);
         mClockView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimensionPixelSize(R.dimen.widget_big_font_size));
+        // Some layouts like burmese have a different margin for the clock
+        MarginLayoutParams layoutParams = (MarginLayoutParams) mClockView.getLayoutParams();
+        layoutParams.bottomMargin = getResources().getDimensionPixelSize(
+                R.dimen.bottom_text_spacing_digital);
+        mClockView.setLayoutParams(layoutParams);
         mDateView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimensionPixelSize(R.dimen.widget_label_font_size));
         mOwnerInfo.setTextSize(TypedValue.COMPLEX_UNIT_PX,
@@ -202,12 +203,18 @@ public class KeyguardStatusView extends GridLayout {
     }
 
     private String getOwnerInfo() {
-        ContentResolver res = getContext().getContentResolver();
         String info = null;
-        final boolean ownerInfoEnabled = mLockPatternUtils.isOwnerInfoEnabled(
-                KeyguardUpdateMonitor.getCurrentUser());
-        if (ownerInfoEnabled) {
-            info = mLockPatternUtils.getOwnerInfo(KeyguardUpdateMonitor.getCurrentUser());
+        if (mLockPatternUtils.isDeviceOwnerInfoEnabled()) {
+            // Use the device owner information set by device policy client via
+            // device policy manager.
+            info = mLockPatternUtils.getDeviceOwnerInfo();
+        } else {
+            // Use the current user owner information if enabled.
+            final boolean ownerInfoEnabled = mLockPatternUtils.isOwnerInfoEnabled(
+                    KeyguardUpdateMonitor.getCurrentUser());
+            if (ownerInfoEnabled) {
+                info = mLockPatternUtils.getOwnerInfo(KeyguardUpdateMonitor.getCurrentUser());
+            }
         }
         return info;
     }
@@ -233,26 +240,23 @@ public class KeyguardStatusView extends GridLayout {
                     : R.string.abbrev_wday_month_day_no_year);
             final String clockView12Skel = res.getString(R.string.clock_12hr_format);
             final String clockView24Skel = res.getString(R.string.clock_24hr_format);
-
-            if (res.getBoolean(com.android.internal.R.bool.def_custom_dateformat)) {
+            final String key = locale.toString() + dateViewSkel + clockView12Skel + clockView24Skel;
+            if (key.equals(cacheKey)) return;
+            if (res.getBoolean(com.android.internal.R.bool.config_dateformat)) {
                 final String dateformat = Settings.System.getString(context.getContentResolver(),
                         Settings.System.DATE_FORMAT);
-                dateView = dateformat.equals(dateView) ? dateView : dateformat;
+                dateView = dateformat;
             } else {
-                final String key = locale.toString() + dateViewSkel + clockView12Skel
-                        + clockView24Skel;
-                if (key.equals(cacheKey)) {
-                    return;
-                }
                 dateView = DateFormat.getBestDateTimePattern(locale, dateViewSkel);
-                cacheKey = key;
             }
 
             clockView12 = DateFormat.getBestDateTimePattern(locale, clockView12Skel);
-            // CLDR insists on adding an AM/PM indicator even though it wasn't in the skeleton
-            // format.  The following code removes the AM/PM indicator if we didn't want it.
-            if (!clockView12Skel.contains("a")) {
-                clockView12 = clockView12.replaceAll("a", "").trim();
+            if(!context.getResources().getBoolean(R.bool.config_showAmpm)){
+                // CLDR insists on adding an AM/PM indicator even though it wasn't in the skeleton
+                // format.  The following code removes the AM/PM indicator if we didn't want it.
+                if (!clockView12Skel.contains("a")) {
+                    clockView12 = clockView12.replaceAll("a", "").trim();
+                }
             }
 
             clockView24 = DateFormat.getBestDateTimePattern(locale, clockView24Skel);
@@ -261,6 +265,7 @@ public class KeyguardStatusView extends GridLayout {
             clockView24 = clockView24.replace(':', '\uee01');
             clockView12 = clockView12.replace(':', '\uee01');
 
+            cacheKey = key;
         }
     }
 }

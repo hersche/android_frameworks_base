@@ -25,6 +25,7 @@ import android.os.Parcelable;
  * @hide
  */
 public class ImsReasonInfo implements Parcelable {
+
     /**
      * Specific code of each types
      */
@@ -217,6 +218,11 @@ public class ImsReasonInfo implements Parcelable {
     public static final int CODE_ECBM_NOT_SUPPORTED = 901;
 
     /**
+     * Fail code used to indicate that Multi-endpoint is not supported by the Ims framework.
+     */
+    public static final int CODE_MULTIENDPOINT_NOT_SUPPORTED = 902;
+
+    /**
      * Ims Registration error code
      */
     public static final int CODE_REGISTRATION_ERROR = 1000;
@@ -241,12 +247,12 @@ public class ImsReasonInfo implements Parcelable {
     public static final int CODE_ANSWERED_ELSEWHERE = 1014;
 
     /**
-     * For VICE - Call Pull request has failed
+     * For MultiEndpoint - Call Pull request has failed
      */
     public static final int CODE_CALL_PULL_OUT_OF_SYNC = 1015;
 
     /**
-     * For VICE - Call has been pulled from primary to secondary
+     * For MultiEndpoint - Call has been pulled from primary to secondary
      */
     public static final int CODE_CALL_END_CAUSE_CALL_PULL = 1016;
 
@@ -259,11 +265,55 @@ public class ImsReasonInfo implements Parcelable {
     public static final int CODE_SUPP_SVC_REINVITE_COLLISION = 1203;
 
     /**
+     * DPD Procedure received no response or send failed
+     */
+    public static final int CODE_IWLAN_DPD_FAILURE = 1300;
+
+    /**
+     * Establishment of the ePDG Tunnel Failed
+     */
+    public static final int CODE_EPDG_TUNNEL_ESTABLISH_FAILURE = 1400;
+
+    /**
+     * Re-keying of the ePDG Tunnel Failed; may not always result in teardown
+     */
+    public static final int CODE_EPDG_TUNNEL_REKEY_FAILURE = 1401;
+
+    /**
+     * Connection to the packet gateway is lost
+     */
+    public static final int CODE_EPDG_TUNNEL_LOST_CONNECTION = 1402;
+
+    /**
+     * The maximum number of calls allowed has been reached.  Used in a multi-endpoint scenario
+     * where the number of calls across all connected devices has reached the maximum.
+     */
+    public static final int CODE_MAXIMUM_NUMBER_OF_CALLS_REACHED = 1403;
+
+    /**
+     * Similar to {@link #CODE_LOCAL_CALL_DECLINE}, except indicates that a remote device has
+     * declined the call.  Used in a multi-endpoint scenario where a remote device declined an
+     * incoming call.
+     */
+    public static final int CODE_REMOTE_CALL_DECLINE = 1404;
+
+    /**
+     * Indicates the call was disconnected due to the user reaching their data limit.
+     */
+    public static final int CODE_DATA_LIMIT_REACHED = 1405;
+
+    /**
+     * Indicates the call was disconnected due to the user disabling cellular data.
+     */
+    public static final int CODE_DATA_DISABLED = 1406;
+
+    /**
      * Network string error messages.
      * mExtraMessage may have these values.
      */
     public static final String EXTRA_MSG_SERVICE_NOT_AUTHORIZED
             = "Forbidden. Not Authorized for Service";
+
 
     // For main reason code
     public int mCode;

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2016 The CyanogenMod Project
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,47 +18,58 @@ package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.systemui.BatteryLevelTextView;
 import com.android.systemui.BatteryMeterView;
-import com.android.systemui.DockBatteryMeterView;
+import com.android.systemui.Interpolators;
 import com.android.systemui.R;
+import com.android.systemui.qs.QSPanel;
 import com.android.systemui.statusbar.policy.BatteryController;
-import com.android.systemui.statusbar.policy.DockBatteryController;
 import com.android.systemui.statusbar.policy.KeyguardUserSwitcher;
 import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
+import com.android.systemui.tuner.TunerService;
+
+import cyanogenmod.providers.CMSettings;
+
+import java.text.NumberFormat;
 
 /**
  * The header group on Keyguard.
  */
-public class KeyguardStatusBarView extends RelativeLayout {
+public class KeyguardStatusBarView extends RelativeLayout
+        implements BatteryController.BatteryStateChangeCallback, TunerService.Tunable {
 
+    private static final String STATUS_BAR_SHOW_BATTERY_PERCENT =
+            "cmsystem:" + CMSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT;
+
+    private boolean mBatteryCharging;
     private boolean mKeyguardUserSwitcherShowing;
+    private boolean mBatteryListening;
 
     private TextView mCarrierLabel;
     private View mSystemIconsSuperContainer;
     private MultiUserSwitch mMultiUserSwitch;
     private ImageView mMultiUserAvatar;
-    private BatteryLevelTextView mBatteryLevel;
-    private BatteryLevelTextView mDockBatteryLevel;
+    private TextView mBatteryLevel;
 
+    private BatteryController mBatteryController;
     private KeyguardUserSwitcher mKeyguardUserSwitcher;
+    private UserSwitcherController mUserSwitcherController;
 
     private int mSystemIconsSwitcherHiddenExpandedMargin;
-    private Interpolator mFastOutSlowInInterpolator;
+    private int mSystemIconsBaseMargin;
+    private View mSystemIconsContainer;
 
-    private UserInfoController mUserInfoController;
+    private boolean mShowBatteryText;
 
     public KeyguardStatusBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -68,39 +79,79 @@ public class KeyguardStatusBarView extends RelativeLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mSystemIconsSuperContainer = findViewById(R.id.system_icons_super_container);
+        mSystemIconsContainer = findViewById(R.id.system_icons_container);
         mMultiUserSwitch = (MultiUserSwitch) findViewById(R.id.multi_user_switch);
         mMultiUserAvatar = (ImageView) findViewById(R.id.multi_user_avatar);
-        mBatteryLevel = (BatteryLevelTextView) findViewById(R.id.battery_level_text);
-        mDockBatteryLevel = (BatteryLevelTextView) findViewById(R.id.dock_battery_level_text);
+        mBatteryLevel = (TextView) findViewById(R.id.battery_level);
         mCarrierLabel = (TextView) findViewById(R.id.keyguard_carrier_text);
         loadDimens();
-        mFastOutSlowInInterpolator = AnimationUtils.loadInterpolator(getContext(),
-                android.R.interpolator.fast_out_slow_in);
         updateUserSwitcher();
-        updateVisibilities();
     }
 
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
+        MarginLayoutParams lp = (MarginLayoutParams) mMultiUserAvatar.getLayoutParams();
+        lp.width = lp.height = getResources().getDimensionPixelSize(
+                R.dimen.multi_user_avatar_keyguard_size);
+        mMultiUserAvatar.setLayoutParams(lp);
+
+        lp = (MarginLayoutParams) mMultiUserSwitch.getLayoutParams();
+        lp.width = getResources().getDimensionPixelSize(
+                R.dimen.multi_user_switch_width_keyguard);
+        lp.setMarginEnd(getResources().getDimensionPixelSize(
+                R.dimen.multi_user_switch_keyguard_margin));
+        mMultiUserSwitch.setLayoutParams(lp);
+
+        lp = (MarginLayoutParams) mSystemIconsSuperContainer.getLayoutParams();
+        lp.height = getResources().getDimensionPixelSize(
+                R.dimen.status_bar_header_height);
+        lp.setMarginStart(getResources().getDimensionPixelSize(
+                R.dimen.system_icons_super_container_margin_start));
+        mSystemIconsSuperContainer.setLayoutParams(lp);
+        mSystemIconsSuperContainer.setPaddingRelative(mSystemIconsSuperContainer.getPaddingStart(),
+                mSystemIconsSuperContainer.getPaddingTop(),
+                getResources().getDimensionPixelSize(R.dimen.system_icons_keyguard_padding_end),
+                mSystemIconsSuperContainer.getPaddingBottom());
+
+        lp = (MarginLayoutParams) mSystemIconsContainer.getLayoutParams();
+        lp.height = getResources().getDimensionPixelSize(
+                R.dimen.status_bar_height);
+        mSystemIconsContainer.setLayoutParams(lp);
+
+        lp = (MarginLayoutParams) mBatteryLevel.getLayoutParams();
+        lp.setMarginStart(
+                getResources().getDimensionPixelSize(R.dimen.header_battery_margin_keyguard));
+        mBatteryLevel.setLayoutParams(lp);
+        mBatteryLevel.setPaddingRelative(mBatteryLevel.getPaddingStart(),
+                mBatteryLevel.getPaddingTop(),
+                getResources().getDimensionPixelSize(R.dimen.battery_level_padding_end),
+                mBatteryLevel.getPaddingBottom());
+        mBatteryLevel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                getResources().getDimensionPixelSize(R.dimen.battery_level_text_size));
+
         // Respect font size setting.
         mCarrierLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimensionPixelSize(
                         com.android.internal.R.dimen.text_size_small_material));
-    }
+        lp = (MarginLayoutParams) mCarrierLabel.getLayoutParams();
+        lp.setMarginStart(
+                getResources().getDimensionPixelSize(R.dimen.keyguard_carrier_text_margin));
+        mCarrierLabel.setLayoutParams(lp);
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        if (mUserInfoController != null) {
-            mUserInfoController.removeListener(mUserInfoChangedListener);
-        }
+        lp = (MarginLayoutParams) getLayoutParams();
+        lp.height =  getResources().getDimensionPixelSize(
+                R.dimen.status_bar_header_height_keyguard);
+        setLayoutParams(lp);
     }
 
     private void loadDimens() {
-        mSystemIconsSwitcherHiddenExpandedMargin = getResources().getDimensionPixelSize(
+        Resources res = getResources();
+        mSystemIconsSwitcherHiddenExpandedMargin = res.getDimensionPixelSize(
                 R.dimen.system_icons_switcher_hidden_expanded_margin);
+        mSystemIconsBaseMargin = res.getDimensionPixelSize(
+                R.dimen.system_icons_super_container_avatarless_margin_end);
     }
 
     private void updateVisibilities() {
@@ -112,19 +163,47 @@ public class KeyguardStatusBarView extends RelativeLayout {
         } else if (mMultiUserSwitch.getParent() == this && mKeyguardUserSwitcherShowing) {
             removeView(mMultiUserSwitch);
         }
-        mBatteryLevel.setVisibility(View.VISIBLE);
-        if (mDockBatteryLevel != null) {
-            mDockBatteryLevel.setVisibility(View.VISIBLE);
+        if (mKeyguardUserSwitcher == null) {
+            // If we have no keyguard switcher, the screen width is under 600dp. In this case,
+            // we don't show the multi-user avatar unless there is more than 1 user on the device.
+            if (mUserSwitcherController != null
+                    && mUserSwitcherController.getSwitchableUserCount() > 1) {
+                mMultiUserSwitch.setVisibility(View.VISIBLE);
+            } else {
+                mMultiUserSwitch.setVisibility(View.GONE);
+            }
         }
+        mBatteryLevel.setVisibility(
+                mBatteryCharging || mShowBatteryText ? View.VISIBLE : View.GONE);
     }
 
     private void updateSystemIconsLayoutParams() {
         RelativeLayout.LayoutParams lp =
                 (LayoutParams) mSystemIconsSuperContainer.getLayoutParams();
-        int marginEnd = mKeyguardUserSwitcherShowing ? mSystemIconsSwitcherHiddenExpandedMargin : 0;
+        // If the avatar icon is gone, we need to have some end margin to display the system icons
+        // correctly.
+        int baseMarginEnd = mMultiUserSwitch.getVisibility() == View.GONE
+                ? mSystemIconsBaseMargin
+                : 0;
+        int marginEnd = mKeyguardUserSwitcherShowing ? mSystemIconsSwitcherHiddenExpandedMargin :
+                baseMarginEnd;
         if (marginEnd != lp.getMarginEnd()) {
             lp.setMarginEnd(marginEnd);
             mSystemIconsSuperContainer.setLayoutParams(lp);
+        }
+    }
+
+    public void setListening(boolean listening) {
+        if (listening == mBatteryListening) {
+            return;
+        }
+        mBatteryListening = listening;
+        if (mBatteryListening) {
+            TunerService.get(getContext()).addTunable(this, STATUS_BAR_SHOW_BATTERY_PERCENT);
+            mBatteryController.addStateChangedCallback(this);
+        } else {
+            mBatteryController.removeStateChangedCallback(this);
+            TunerService.get(getContext()).removeTunable(this);
         }
     }
 
@@ -136,43 +215,42 @@ public class KeyguardStatusBarView extends RelativeLayout {
     }
 
     public void setBatteryController(BatteryController batteryController) {
-        BatteryMeterView v = ((BatteryMeterView) findViewById(R.id.battery));
-        v.setBatteryStateRegistar(batteryController);
-        v.setBatteryController(batteryController);
-        mBatteryLevel.setBatteryStateRegistar(batteryController);
-    }
-
-    public void setDockBatteryController(DockBatteryController dockBatteryController) {
-        DockBatteryMeterView v = ((DockBatteryMeterView) findViewById(R.id.dock_battery));
-        if (dockBatteryController != null) {
-            v.setBatteryStateRegistar(dockBatteryController);
-            mDockBatteryLevel.setBatteryStateRegistar(dockBatteryController);
-        } else {
-            if (v != null ) {
-                removeView(v);
-            }
-            if (mDockBatteryLevel != null) {
-                removeView(mDockBatteryLevel);
-                mDockBatteryLevel = null;
-            }
-        }
+        mBatteryController = batteryController;
+        ((BatteryMeterView) findViewById(R.id.battery)).setBatteryController(batteryController);
     }
 
     public void setUserSwitcherController(UserSwitcherController controller) {
+        mUserSwitcherController = controller;
         mMultiUserSwitch.setUserSwitcherController(controller);
     }
 
-    private UserInfoController.OnUserInfoChangedListener mUserInfoChangedListener =
-            new UserInfoController.OnUserInfoChangedListener() {
-        @Override
-        public void onUserInfoChanged(String name, Drawable picture) {
-            mMultiUserAvatar.setImageDrawable(picture);
-        }
-    };
-
     public void setUserInfoController(UserInfoController userInfoController) {
-        mUserInfoController = userInfoController;
-        userInfoController.addListener(mUserInfoChangedListener);
+        userInfoController.addListener(new UserInfoController.OnUserInfoChangedListener() {
+            @Override
+            public void onUserInfoChanged(String name, Drawable picture) {
+                mMultiUserAvatar.setImageDrawable(picture);
+            }
+        });
+    }
+
+    public void setQSPanel(QSPanel qsp) {
+        mMultiUserSwitch.setQsPanel(qsp);
+    }
+
+    @Override
+    public void onBatteryLevelChanged(int level, boolean pluggedIn, boolean charging) {
+        String percentage = NumberFormat.getPercentInstance().format((double) level / 100.0);
+        mBatteryLevel.setText(percentage);
+        boolean changed = mBatteryCharging != charging;
+        mBatteryCharging = charging;
+        if (changed) {
+            updateVisibilities();
+        }
+    }
+
+    @Override
+    public void onPowerSaveChanged(boolean isPowerSave) {
+        // could not care less
     }
 
     public void setKeyguardUserSwitcher(KeyguardUserSwitcher keyguardUserSwitcher) {
@@ -204,7 +282,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
                         .translationX(0)
                         .setDuration(400)
                         .setStartDelay(userSwitcherHiding ? 300 : 0)
-                        .setInterpolator(mFastOutSlowInInterpolator)
+                        .setInterpolator(Interpolators.FAST_OUT_SLOW_IN)
                         .start();
                 if (userSwitcherHiding) {
                     getOverlay().add(mMultiUserSwitch);
@@ -212,7 +290,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
                             .alpha(0f)
                             .setDuration(300)
                             .setStartDelay(0)
-                            .setInterpolator(PhoneStatusBar.ALPHA_OUT)
+                            .setInterpolator(Interpolators.ALPHA_OUT)
                             .withEndAction(new Runnable() {
                                 @Override
                                 public void run() {
@@ -228,7 +306,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
                             .alpha(1f)
                             .setDuration(300)
                             .setStartDelay(200)
-                            .setInterpolator(PhoneStatusBar.ALPHA_IN);
+                            .setInterpolator(Interpolators.ALPHA_IN);
                 }
                 return true;
             }
@@ -243,11 +321,22 @@ public class KeyguardStatusBarView extends RelativeLayout {
             mSystemIconsSuperContainer.animate().cancel();
             mMultiUserSwitch.animate().cancel();
             mMultiUserSwitch.setAlpha(1f);
+        } else {
+            updateVisibilities();
+            updateSystemIconsLayoutParams();
         }
     }
 
     @Override
     public boolean hasOverlappingRendering() {
         return false;
+    }
+
+    @Override
+    public void onTuningChanged(String key, String newValue) {
+        if (key.equals(STATUS_BAR_SHOW_BATTERY_PERCENT)) {
+            mShowBatteryText = newValue == null ? false : Integer.parseInt(newValue) == 2;
+            updateVisibilities();
+        }
     }
 }

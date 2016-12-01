@@ -32,7 +32,6 @@ import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbPort;
 import android.hardware.usb.UsbPortStatus;
-import android.os.Binder;
 import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Looper;
@@ -50,17 +49,10 @@ import android.util.Pair;
 import android.util.Slog;
 
 import com.android.internal.annotations.GuardedBy;
+import com.android.internal.os.SomeArgs;
 import com.android.internal.util.IndentingPrintWriter;
 import com.android.server.FgThread;
-
 import cyanogenmod.providers.CMSettings;
-
-import cyanogenmod.app.CMStatusBarManager;
-import cyanogenmod.app.CustomTile;
-
-import org.cyanogenmod.internal.util.QSUtils;
-import org.cyanogenmod.internal.util.QSUtils.OnQSChanged;
-import org.cyanogenmod.internal.util.QSConstants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,6 +63,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * UsbDeviceManager manages USB state in device mode.
@@ -158,6 +151,7 @@ public class UsbDeviceManager {
     private String[] mAccessoryStrings;
     private UsbDebuggingManager mDebuggingManager;
     private final UsbAlsaManager mUsbAlsaManager;
+    private Intent mBroadcastedIntent;
 
     private class AdbSettingsObserver extends ContentObserver {
         public AdbSettingsObserver() {
@@ -170,13 +164,6 @@ public class UsbDeviceManager {
             mHandler.sendMessage(MSG_ENABLE_ADB, enable);
         }
     }
-
-    private final OnQSChanged mQSListener = new OnQSChanged() {
-        @Override
-        public void onQSChanged() {
-            mHandler.processQSChangedLocked();
-        }
-    };
 
     /*
      * Listens for uevent messages from the kernel to monitor the USB state
@@ -334,6 +321,8 @@ public class UsbDeviceManager {
         // current USB state
         private boolean mConnected;
         private boolean mHostConnected;
+        private boolean mSourcePower;
+        private boolean mSinkPower;
         private boolean mConfigured;
         private boolean mUsbDataUnlocked;
         private String mCurrentFunctions;
@@ -357,7 +346,14 @@ public class UsbDeviceManager {
                 mAdbEnabled = UsbManager.containsFunction(getDefaultFunctions(),
                         UsbManager.USB_FUNCTION_ADB);
                 setEnabledFunctions(null, false);
-
+                if (mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.config_usb_data_unlock)) {
+                    boolean mtpEnable = UsbManager.containsFunction(getDefaultFunctions(),
+                            UsbManager.USB_FUNCTION_MTP);
+                    boolean ptpEnable = UsbManager.containsFunction(getDefaultFunctions(),
+                            UsbManager.USB_FUNCTION_PTP);
+                    if (mtpEnable || ptpEnable) mUsbDataUnlocked = true;
+                }
                 String state = FileUtils.readTextFile(new File(STATE_PATH), 0, null).trim();
                 updateState(state);
 
@@ -374,17 +370,15 @@ public class UsbDeviceManager {
                 };
 
                 mContentResolver.registerContentObserver(
-                        CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_PORT),
+                        CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_NOTIFY),
                                 false, adbNotificationObserver);
                 mContentResolver.registerContentObserver(
-                        CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_NOTIFY),
-                        false, adbNotificationObserver);
+                        CMSettings.Secure.getUriFor(CMSettings.Secure.ADB_PORT),
+                                false, adbNotificationObserver);
 
                 // Watch for USB configuration changes
                 mUEventObserver.startObserving(USB_STATE_MATCH);
                 mUEventObserver.startObserving(ACCESSORY_START_MATCH);
-
-                QSUtils.registerObserverForQSChanges(mContext, mQSListener);
             } catch (Exception e) {
                 Slog.e(TAG, "Error initializing UsbHandler", e);
             }
@@ -430,7 +424,19 @@ public class UsbDeviceManager {
 
         public void updateHostState(UsbPort port, UsbPortStatus status) {
             boolean hostConnected = status.getCurrentDataRole() == UsbPort.DATA_ROLE_HOST;
-            obtainMessage(MSG_UPDATE_HOST_STATE, hostConnected ? 1 :0, 0).sendToTarget();
+            boolean sourcePower = status.getCurrentPowerRole() == UsbPort.POWER_ROLE_SOURCE;
+            boolean sinkPower = status.getCurrentPowerRole() == UsbPort.POWER_ROLE_SINK;
+
+            if (DEBUG) {
+                Slog.i(TAG, "updateHostState " + port + " status=" + status);
+            }
+
+            SomeArgs args = SomeArgs.obtain();
+            args.argi1 = hostConnected ? 1 :0;
+            args.argi2 = sourcePower ? 1 :0;
+            args.argi3 = sinkPower ? 1 :0;
+
+            obtainMessage(MSG_UPDATE_HOST_STATE, args).sendToTarget();
         }
 
         private boolean waitForState(String state) {
@@ -460,7 +466,7 @@ public class UsbDeviceManager {
             if (DEBUG) Slog.d(TAG, "setUsbDataUnlocked: " + enable);
             mUsbDataUnlocked = enable;
             updateUsbNotification();
-            updateUsbStateBroadcast();
+            updateUsbStateBroadcastIfNeeded();
             setEnabledFunctions(mCurrentFunctions, true);
         }
 
@@ -613,25 +619,64 @@ public class UsbDeviceManager {
             }
         }
 
-        private void updateUsbStateBroadcast() {
+        private boolean isUsbStateChanged(Intent intent) {
+            final Set<String> keySet = intent.getExtras().keySet();
+            if (mBroadcastedIntent == null) {
+                for (String key : keySet) {
+                    if (intent.getBooleanExtra(key, false)) {
+                        // MTP function is enabled by default.
+                        if (UsbManager.USB_FUNCTION_MTP.equals(key)) {
+                            continue;
+                        }
+                        return true;
+                    }
+                }
+            } else {
+                if (!keySet.equals(mBroadcastedIntent.getExtras().keySet())) {
+                    return true;
+                }
+                for (String key : keySet) {
+                    if (intent.getBooleanExtra(key, false) !=
+                        mBroadcastedIntent.getBooleanExtra(key, false)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void updateUsbStateBroadcastIfNeeded() {
             // send a sticky broadcast containing current USB state
             Intent intent = new Intent(UsbManager.ACTION_USB_STATE);
             intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING
                     | Intent.FLAG_RECEIVER_FOREGROUND);
             intent.putExtra(UsbManager.USB_CONNECTED, mConnected);
+            intent.putExtra(UsbManager.USB_HOST_CONNECTED, mHostConnected);
             intent.putExtra(UsbManager.USB_CONFIGURED, mConfigured);
             intent.putExtra(UsbManager.USB_DATA_UNLOCKED, isUsbTransferAllowed() && mUsbDataUnlocked);
 
             if (mCurrentFunctions != null) {
                 String[] functions = mCurrentFunctions.split(",");
                 for (int i = 0; i < functions.length; i++) {
-                    intent.putExtra(functions[i], true);
+                    final String function = functions[i];
+                    if (UsbManager.USB_FUNCTION_NONE.equals(function)) {
+                        continue;
+                    }
+                    intent.putExtra(function, true);
                 }
             }
 
-            if (DEBUG) Slog.d(TAG, "broadcasting " + intent + " connected: " + mConnected
-                                    + " configured: " + mConfigured);
+            // send broadcast intent only if the USB state has changed
+            if (!isUsbStateChanged(intent)) {
+                if (DEBUG) {
+                    Slog.d(TAG, "skip broadcasting " + intent + " extras: " + intent.getExtras());
+                }
+                return;
+            }
+
+            if (DEBUG) Slog.d(TAG, "broadcasting " + intent + " extras: " + intent.getExtras());
             mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
+            mBroadcastedIntent = intent;
         }
 
         private void updateUsbFunctions() {
@@ -709,13 +754,20 @@ public class UsbDeviceManager {
                         setEnabledFunctions(null, false);
                     }
                     if (mBootCompleted) {
-                        updateUsbStateBroadcast();
+                        updateUsbStateBroadcastIfNeeded();
                         updateUsbFunctions();
                     }
                     break;
                 case MSG_UPDATE_HOST_STATE:
-                    mHostConnected = (msg.arg1 == 1);
+                    SomeArgs args = (SomeArgs) msg.obj;
+                    mHostConnected = (args.argi1 == 1);
+                    mSourcePower = (args.argi2 == 1);
+                    mSinkPower = (args.argi3 == 1);
+                    args.recycle();
                     updateUsbNotification();
+                    if (mBootCompleted) {
+                        updateUsbStateBroadcastIfNeeded();
+                    }
                     break;
                 case MSG_ENABLE_ADB:
                     setAdbEnabled(msg.arg1 == 1);
@@ -733,7 +785,7 @@ public class UsbDeviceManager {
                 case MSG_SYSTEM_READY:
                     updateUsbNotification();
                     updateAdbNotification();
-                    updateUsbStateBroadcast();
+                    updateUsbStateBroadcastIfNeeded();
                     updateUsbFunctions();
                     break;
                 case MSG_BOOT_COMPLETED:
@@ -752,7 +804,7 @@ public class UsbDeviceManager {
                                         UsbManager.USB_FUNCTION_MTP)
                                 || UsbManager.containsFunction(mCurrentFunctions,
                                         UsbManager.USB_FUNCTION_PTP);
-                        if (active && mCurrentUser != UserHandle.USER_NULL) {
+                        if (mUsbDataUnlocked && active && mCurrentUser != UserHandle.USER_NULL) {
                             Slog.v(TAG, "Current user switched to " + mCurrentUser
                                     + "; resetting USB host stack for MTP or PTP");
                             // avoid leaking sensitive data from previous user
@@ -771,12 +823,17 @@ public class UsbDeviceManager {
         }
 
         private void updateUsbNotification() {
-            if (mNotificationManager == null || !mUseUsbNotification) return;
+            if (mNotificationManager == null || !mUseUsbNotification
+                    || ("0".equals(SystemProperties.get("persist.charging.notify")))) return;
             int id = 0;
             Resources r = mContext.getResources();
-            if (mConnected || mHostConnected) {
+            if (mConnected) {
                 if (!mUsbDataUnlocked) {
-                    id = com.android.internal.R.string.usb_charging_notification_title;
+                    if (mSourcePower) {
+                        id = com.android.internal.R.string.usb_supplying_notification_title;
+                    } else {
+                        id = com.android.internal.R.string.usb_charging_notification_title;
+                    }
                 } else if (UsbManager.containsFunction(mCurrentFunctions,
                         UsbManager.USB_FUNCTION_MTP)) {
                     id = com.android.internal.R.string.usb_mtp_notification_title;
@@ -789,9 +846,15 @@ public class UsbDeviceManager {
                 } else if (UsbManager.containsFunction(mCurrentFunctions,
                         UsbManager.USB_FUNCTION_ACCESSORY)) {
                     id = com.android.internal.R.string.usb_accessory_notification_title;
+                } else if (mSourcePower) {
+                    id = com.android.internal.R.string.usb_supplying_notification_title;
                 } else {
                     id = com.android.internal.R.string.usb_charging_notification_title;
                 }
+            } else if (mSourcePower) {
+                id = com.android.internal.R.string.usb_supplying_notification_title;
+            } else if (mHostConnected && mSinkPower) {
+                id = com.android.internal.R.string.usb_charging_notification_title;
             }
             if (id != mUsbNotificationId) {
                 // clear notification if title needs changing
@@ -890,18 +953,11 @@ public class UsbDeviceManager {
                 }
                 mAdbNotificationId = id;
             }
-
-            if (id > 0) {
-                publishAdbCustomTile();
-            } else {
-                unpublishAdbCustomTile();
-            }
         }
 
         private String getDefaultFunctions() {
             String func = SystemProperties.get(USB_PERSISTENT_CONFIG_PROPERTY,
                     UsbManager.USB_FUNCTION_NONE);
-            func = UsbManager.removeFunction(func, "charging");
             if (UsbManager.USB_FUNCTION_NONE.equals(func)) {
                 func = UsbManager.USB_FUNCTION_MTP;
             }
@@ -916,6 +972,9 @@ public class UsbDeviceManager {
             pw.println("  mConfigured: " + mConfigured);
             pw.println("  mUsbDataUnlocked: " + mUsbDataUnlocked);
             pw.println("  mCurrentAccessory: " + mCurrentAccessory);
+            pw.println("  mHostConnected: " + mHostConnected);
+            pw.println("  mSourcePower: " + mSourcePower);
+            pw.println("  mSinkPower: " + mSinkPower);
             try {
                 pw.println("  Kernel state: "
                         + FileUtils.readTextFile(new File(STATE_PATH), 0, null).trim());
@@ -923,88 +982,6 @@ public class UsbDeviceManager {
                         + FileUtils.readTextFile(new File(FUNCTIONS_PATH), 0, null).trim());
             } catch (IOException e) {
                 pw.println("IOException: " + e);
-            }
-        }
-
-        private void publishAdbCustomTile() {
-            // This action should be performed as system
-            final int userId = UserHandle.myUserId();
-            long token = Binder.clearCallingIdentity();
-            try {
-                final UserHandle user = new UserHandle(userId);
-                final int icon = QSUtils.getDynamicQSTileResIconId(mContext, userId,
-                        QSConstants.DYNAMIC_TILE_ADB);
-                final String contentDesc = QSUtils.getDynamicQSTileLabel(mContext, userId,
-                        QSConstants.DYNAMIC_TILE_ADB);
-                final Context resourceContext = QSUtils.getQSTileContext(mContext, userId);
-
-                CMStatusBarManager statusBarManager = CMStatusBarManager.getInstance(mContext);
-                CustomTile tile = new CustomTile.Builder(resourceContext)
-                        .setLabel(getAdbCustomTileLabel())
-                        .setContentDescription(contentDesc)
-                        .setIcon(icon)
-                        .setOnClickIntent(getCustomTilePendingIntent())
-                        .build();
-                statusBarManager.publishTileAsUser(QSConstants.DYNAMIC_TILE_ADB,
-                        UsbDeviceManager.class.hashCode(), tile, user);
-            } finally {
-                Binder.restoreCallingIdentity(token);
-            }
-        }
-
-        private void unpublishAdbCustomTile() {
-            // This action should be performed as system
-            final int userId = UserHandle.myUserId();
-            long token = Binder.clearCallingIdentity();
-            try {
-                CMStatusBarManager statusBarManager = CMStatusBarManager.getInstance(mContext);
-                statusBarManager.removeTileAsUser(QSConstants.DYNAMIC_TILE_ADB,
-                        UsbDeviceManager.class.hashCode(), new UserHandle(userId));
-            } finally {
-                Binder.restoreCallingIdentity(token);
-            }
-        }
-
-        private PendingIntent getCustomTilePendingIntent() {
-            Intent i = new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            return PendingIntent.getActivity(mContext, 0, i, PendingIntent.FLAG_UPDATE_CURRENT, null);
-        }
-
-        private String getAdbCustomTileLabel() {
-            boolean usbAdbActive = mAdbEnabled && mConnected;
-            boolean netAdbActive = mAdbEnabled &&
-                    CMSettings.Secure.getInt(mContentResolver, CMSettings.Secure.ADB_PORT, -1) > 0;
-
-            int id = 0;
-            if (usbAdbActive && netAdbActive) {
-                id = com.android.internal.R.string.adb_active_custom_tile_both;
-            } else if (usbAdbActive) {
-                id = com.android.internal.R.string.adb_active_custom_tile_usb;
-            } else if (netAdbActive) {
-                id = com.android.internal.R.string.adb_active_custom_tile_net;
-            }
-
-            Resources res = mContext.getResources();
-            return res.getString(
-                    com.android.internal.R.string.adb_active_custom_tile,
-                    res.getString(id));
-        }
-
-        private void processQSChangedLocked() {
-            final int userId = UserHandle.myUserId();
-            boolean usbAdbActive = mAdbEnabled && mConnected;
-            boolean netAdbActive = mAdbEnabled &&
-                    CMSettings.Secure.getInt(mContentResolver, CMSettings.Secure.ADB_PORT, -1) > 0;
-            boolean notifEnabled = "1".equals(SystemProperties.get("persist.adb.notify"))
-                    || CMSettings.Secure.getInt(mContext.getContentResolver(),
-                            CMSettings.Secure.ADB_NOTIFY, 1) == 1;
-            boolean isActive = notifEnabled && (usbAdbActive || netAdbActive);
-            boolean enabled = (userId == UserHandle.USER_OWNER) && isActive;
-            if (enabled) {
-                publishAdbCustomTile();
-            } else {
-                unpublishAdbCustomTile();
             }
         }
     }

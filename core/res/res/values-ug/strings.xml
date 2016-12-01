@@ -98,6 +98,9 @@
   <!-- Displayed when user attempts to change SIM PIN1 without enabling PIN1. -->
   <string name="enablePin">مۇۋەپپەقىيەتلىك بولمىدى. SIM/RUIM قۇلۇپى قوزغىتىلدى.</string>
   <!-- Displayed when a SIM PIN/PUK is entered incorrectly. -->
+  <plurals name="pinpuk_attempts">
+    <item quantity="other">سىزنىڭ SIM كارتىڭىز قۇلۇپلىنىشتىن ئىلگىرى يەنە <xliff:g id="number">%d</xliff:g> قېتىملىق سىناش پۇرسىتىڭىز قالدى.</item>
+  </plurals>
   <!-- Title for the dialog used to display the user's IMEI number [CHAR LIMIT=10] -->
   <string name="imei">IMEI</string>
   <!-- Title for the dialog used to display the user's MEID number on CDMA network
@@ -137,8 +140,6 @@
   <string name="serviceNotProvisioned">مۇلازىمەت تەمىنلەنمىگەن</string>
   <!-- Displayed to tell the user that they cannot change the caller ID setting. -->
   <string name="CLIRPermanent">چاقىرغۇچى كىملىك تەڭشىكىنى ئۆزگەرتەلمەيسىز</string>
-  <!-- Notification title to tell the user that restricted state is changed by access control. -->
-  <string name="RestrictedChangedTitle">زىيارەت چەكلىمىسى ئۆزگەردى</string>
   <!-- Displayed to tell the user that data service is blocked by access control. -->
   <string name="RestrictedOnData">سانلىق مەلۇمات مۇلازىمىتى چەكلەندى.</string>
   <!-- Displayed to tell the user that emergency service is blocked by access control. -->
@@ -190,11 +191,9 @@
   <string name="roamingText12">كەزمە لەۋھە تاقاق</string>
   <string name="roamingTextSearching">مۇلازىمەت ئىزدەۋاتىدۇ</string>
   <!-- Displayed when WFC registration fails -->
-  <!-- WFC Operator Error Codes -->
   <!-- WFC Operator Error Messages showed as alerts -->
   <!-- WFC Operator Error Messages showed as notifications -->
   <!-- Template for showing cellular network operator name while WFC is active -->
-  <!-- Template for showing operator name for data connection while WFC is active -->
   <!-- WFC, summary for Disabled -->
   <!-- WFC, summary for Wi-Fi Preferred -->
   <!-- WFC, summary for Cellular Preferred -->
@@ -277,17 +276,13 @@
   <!-- SSL CA cert notification -->
   <!-- Shows up when there is a user SSL CA Cert installed on the
          device.  Indicates to the user that SSL traffic can be intercepted.  [CHAR LIMIT=NONE] -->
-  <string name="ssl_ca_cert_warning">تور نازارەت قىلىنغان بولۇشى مۇمكىن</string>
-  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning",
-         i.e. "Network may be monitored". This says that an unknown party is doing the monitoring.
-         [CHAR LIMIT=100]-->
+  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning".
+         This says that an unknown party is doing the monitoring. [CHAR LIMIT=100]-->
   <string name="ssl_ca_cert_noti_by_unknown">يوچۇن ئۈچىنچى تەرەپنىڭ نازارىتىدە</string>
-  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning",
-        i.e. "Network may be monitored". This indicates that an unspecified administrator is doing
-        the monitoring. [CHAR LIMIT=100]-->
-  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning",
-         i.e. "Network may be monitored". This indicates who is doing the monitoring.
-         [CHAR LIMIT=100]-->
+  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning".
+         This indicates that an unspecified administrator is doing the monitoring. [CHAR LIMIT=100]-->
+  <!-- Content text for a notification. The Title of the notification is "ssl_ca_cert_warning".
+         This indicates who is doing the monitoring. [CHAR LIMIT=100]-->
   <string name="ssl_ca_cert_noti_managed"><xliff:g id="MANAGING_DOMAIN">%s</xliff:g> نازارىتىدە</string>
   <!-- Work profile deleted notification-->
   <!-- Shows up in the notification's title when the system deletes the work profile. [CHAR LIMIT=NONE] -->
@@ -370,12 +365,20 @@
   <string name="global_action_lock">ئېكران قۇلۇپلا</string>
   <!-- label for item that turns off power in phone options dialog -->
   <string name="global_action_power_off">تاقا</string>
+  <!-- label for item that restarts phone in phone options dialog -->
+  <!-- TODO: promote to separate string-->
   <!-- label for item that generates a bug report in the phone options dialog -->
   <string name="global_action_bug_report">خاتالىق دوكلاتى</string>
   <!-- Take bug report menu title [CHAR LIMIT=NONE] -->
   <string name="bugreport_title">خاتالىق دوكلاتى يوللاش</string>
   <!-- Message in bugreport dialog describing what it does [CHAR LIMIT=NONE] -->
+  <!-- TODO: remove if not used anymore -->
   <string name="bugreport_message">نۆۋەتتىكى ئۈسكۈنىڭىزنىڭ ھالىتىگە ئائىت ئۇچۇرلارنى توپلاپ، تورخەت ئۇچۇرى يوللايدۇ. يوللاشقا لازىملىق خاتالىق دوكلاتىنى قوزغىتىپ تەييارلاشقا بىر ئاز ۋاقىت كېتىشى مۇمكىن. سەۋرىچانلىق بىلەن كۈتۈڭ.</string>
+  <!-- Title in the bugreport dialog for the interactive workflow. Should fit in one line. [CHAR LIMIT=30] -->
+  <!-- Summary in the bugreport dialog for the interactive workflow. [CHAR LIMIT=NONE] -->
+  <!-- Title in the bugreport dialog for the full workflow. Should fit in one line. [CHAR LIMIT=30] -->
+  <!-- Summary in the bugreport dialog for the full workflow. [CHAR LIMIT=NONE] -->
+  <!--  Toast message informing user in how many seconds a bugreport screenshot will be taken -->
   <!-- Format for build summary info [CHAR LIMIT=NONE] -->
   <!-- label for item that enables silent mode in phone options dialog -->
   <string name="global_action_toggle_silent_mode">ئۈنسىز ھالەت</string>
@@ -399,12 +402,15 @@
          for most appropriate textual indicator of "more than X".
          [CHAR LIMIT=4] -->
   <string name="status_bar_notification_info_overflow">999+</string>
+  <!-- The divider symbol between different parts of the notification header. not translatable [CHAR LIMIT=1] -->
+  <!-- Text shown in place of notification contents when the notification is hidden on a secure lockscreen -->
+  <!-- Text shown in place of notification contents when the notification is hidden by policy on a secure lockscreen -->
   <!-- Displayed to the user to tell them that they have started up the phone in "safe mode" -->
   <string name="safeMode">بىخەتەر ھالەت</string>
   <!-- Label for the Android system components when they are shown to the user. -->
   <string name="android_system_label">Android سىستېما</string>
-  <!-- Label for the user owner in the intent forwarding app. [CHAR LIMIT=15] -->
-  <!-- Label for a corporate profile in the intent forwarding app. [CHAR LIMIT=15] -->
+  <!-- Label for the user owner in the intent forwarding app. -->
+  <!-- Label for a corporate profile in the intent forwarding app. -->
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
@@ -415,6 +421,7 @@
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permgrouplab_sms">قىسقا ئۇچۇر</string>
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permgroupdesc_sms">قىسقا ئۇچۇر</string>
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permgrouplab_storage">ساقلىغۇچ</string>
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
@@ -428,6 +435,7 @@
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permgrouplab_phone">تېلېفون</string>
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permgroupdesc_phone">تېلېفون</string>
   <!-- Title of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Description of a category of application permissions, listed so the user can choose whether they want to allow the application to do this. -->
   <!-- Title for the capability of an accessibility service to retrieve window content. -->
@@ -437,7 +445,6 @@
   <!-- Title for the capability of an accessibility service to request touch exploration. -->
   <string name="capability_title_canRequestTouchExploration">چېكىلگەندىكى كۆرگۈنى قوزغىتىدۇ</string>
   <!-- Description for the capability of an accessibility service to request touch exploration. -->
-  <string name="capability_desc_canRequestTouchExploration">ئۈسكۈنە ئىشلەتكۈچى چەككەندىكى مەزمۇننى ئۈنلۈك ئوقۇيالايدۇ، ئىشلەتكۈچى قول ئىشارىتى ئارقىلىق ئېكرانغا كۆز يۈگۈرتەلەيدۇ.</string>
   <!-- Title for the capability of an accessibility service to request enhanced web accessibility. -->
   <string name="capability_title_canRequestEnhancedWebAccessibility">تور بەت قوشۇمچە كۈچەيتىلگەن ئىقتىدارنى ئاچ</string>
   <!-- Description for the capability of an accessibility service to request enhanced web accessibility. -->
@@ -446,6 +453,10 @@
   <string name="capability_title_canRequestFilterKeyEvents">كىرگۈزگەن تېكىستىڭىزنى كۆزىتىدۇ</string>
   <!-- Description for the capability of an accessibility service to request to filter key events. -->
   <string name="capability_desc_canRequestFilterKeyEvents">ئىناۋەتلىك كارتا نومۇرى ۋە ئىمغا ئوخشاش شەخسىي ئۇچۇرلارنىمۇ ئۆز ئىچىگە ئالىدۇ.</string>
+  <!-- Title for the capability of an accessibility service to control display magnification. -->
+  <!-- Description for the capability of an accessibility service to control display magnification. -->
+  <!-- Title for the capability of an accessibility service to perform gestures. -->
+  <!-- Description for the capability of an accessibility service to perform gestures. -->
   <!--  Permissions -->
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permlab_statusBar">ھالەت بالداقنى چەكلەش ياكى ئۆزگەرتىش.</string>
@@ -490,10 +501,10 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_subscribedFeedsRead">ئەپنىڭ نۆۋەتتە قەدەمداشلانغان خەۋەر بېتىگە مۇناسىۋەتلىك تەپسىلىي ئۇچۇرىنى ئوقۇشىغا يول قويىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+  <string name="permlab_sendSms">قىسقا ئۇچۇر يوللايدۇ</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_sendSms">ئەپنىڭ  ئۇچۇر يوللىشىغا يول قويىدۇ. زەھەرخەندە ئەپلەر رۇخسىتىڭىزسىز ئۇچۇر يوللاپ، سىزنى چىقىم قىلدۇرىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_readSms">تېكىست ئۇچۇرىڭىزنى ئوقۇيدۇ (قىسقا ئۇچۇر ياكى كۆپ ۋاستە ئۇچۇر)</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readSms" product="tablet">ئەپنىڭ  تاختا كومپيۇتېر ياكى SIM كارتىدىكى ئۇچۇرلارنى ئۇقۇشىغا يول قويىدۇ. بۇ ھوقۇق ئارقىلىق ئەپ بارلىق قىسقا ئۇچۇرلارنى ئوقۇۋالالايدۇ، قىسقا ئۇچۇر مەزمۇنى ياكى مەخپىيەتلىكنى ئويلاشمايدۇ.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -562,7 +573,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readContacts" product="default">ئەپنىڭ تېلېفوندا ساقلانغان ئالاقەداشلىرىڭىزنىڭ مۇناسىۋەتلىك ئۇچۇرلىرىنى ئوقۇشىغا يول قويىدۇ، تېلېفون، تورخەت ياكى باشقا ئۇسۇلدا مەلۇم كىشى بىلەن ئالاقە قىلىش چاستوتىڭىزنىمۇ ئۆز ئىچىگە ئالىدۇ. بۇ ھوقۇق ئارقىلىق ئەپلەر ئالاقەداشلىرىڭىزنىڭ سانلىق مەلۇماتىنى ساقلىيالايدۇ، زەھەرخەندە ئەپلەر سىز بىخەۋەر ھالدا ئالاقەداش سانلىق مەلۇماتلىرىڭىزنى ھەمبەھىر قىلىۋېتىشى مۇمكىن.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_writeContacts">ئالاقەداشلىرىڭىزنى تەھرىرلەيدۇ</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_writeContacts" product="tablet">ئەپنىڭ تاختا كومپيۇتېردا ساقلانغان ئالاقەداشلىرىڭىزنىڭ مۇناسىۋەتلىك ئۇچۇرلىرىنى ئۆزگەرتىشىگە يول قويىدۇ، تېلېفون، تورخەت ياكى باشقا ئۇسۇلدا مەلۇم كىشى بىلەن ئالاقە قىلىش چاستوتىڭىزنىمۇ ئۆز ئىچىگە ئالىدۇ. بۇ ھوقۇق ئارقىلىق ئەپلەر ئالاقەداشلىرىڭىزنىڭ سانلىق مەلۇماتىنى ئۆچۈرۈۋېتەلەيدۇ.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -576,7 +586,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readCallLog" product="default">ئەپنىڭ تېلېفوندا ساقلانغان چاقىرىش خاتىرىسىنى ئوقۇشىغا يول قويىدۇ، چاقىرغان ۋە چاقىرىلغان تېلېفون ئۇچۇرلىرىنىمۇ ئۆز ئىچىگە ئالىدۇ. بۇ ھوقۇق ئارقىلىق ئەپلەر چاقىرىش خاتىرىسى سانلىق مەلۇماتىنى ساقلىيالايدۇ، زەھەرخەندە ئەپلەر سىز بىخەۋەر ھالدا چاقىرىش خاتىرە سانلىق مەلۇماتلىرىڭىزنى ھەمبەھىر قىلىۋېتىشى مۇمكىن.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_writeCallLog">چاقىرىش خاتىرىسىنى يازىدۇ</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_writeCallLog" product="tablet">ئەپنىڭ تاختا كومپيۇتېردا ساقلانغان چاقىرىش خاتىرىسىنى ئۆزگەرتىشىگە يول قويىدۇ، چاقىرغان ۋە چاقىرىلغان تېلېفون ئۇچۇرلىرىنىمۇ ئۆز ئىچىگە ئالىدۇ. زەھەرخەندە ئەپلەر سىز بىخەۋەر ھالدا چاقىرىش خاتىرە سانلىق مەلۇماتلىرىڭىزنى ئۆزگەرتىۋېتىشى مۇمكىن.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -624,11 +633,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_vibrate">ئەپنىڭ تىترەتكۈچنى باشقۇرۇشىغا يول قويىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_flashlight">چاقماق چىراغ باشقۇرۇش</string>
-  <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permdesc_flashlight">ئەپنىڭ چاقماق چىراغ باشقۇرۇشىغا يول قويىدۇ.</string>
-  <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_callPhone">تېلېفون نۇمۇرىنى بىۋاستە بۇرايدۇ</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_callPhone">ئەپنىڭ سىزنىڭ ۋاسىتىڭىزسىز تېلېفون ئۇرۇشىغا يول قويىدۇ. بۇ ھوقۇق ئارقىلىق ئەپ تېلېفون ئۇرۇشى ياكى تېلېفون ھەققىڭىزنى ئاشۇرۇۋېتىشى مۇمكىن. دىققەت: بۇ ھوقۇق پىروگراممىنىڭ جىددى قۇتقۇزۇش تېلېفۇنى ئۇرۇشىغا رۇخسەت قىلمايدۇ. زەھەرخەندە ئەپلەر سىز جەزملىمەي تۇرۇپمۇ تېلېفون ئۇرۇش ئارقىلىق مۇناسىپ ھەق كەلتۈرۈپ چىقىرىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -696,7 +700,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_accessWifiState">ئەپنىڭ Wi-FI ئۈسكۈنە ئاتى ۋە Wi-FI قوزغالغان ياكى قوزغالمىغانلىقىغا ئوخشاش Wi-FI تورىغا ئائىت ئۇچۇرلىرىنى كۆرۈشىگە يول قويىدۇ. </string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_changeWifiState">بۇ WiFi غا باغلاپ ۋە ئۈزىدۇ</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_changeWifiState">ئەپنىڭ Wi-Fi ئېغىزىنى ئۇلاش ياكى ئۈزۈش ھەمدە Wi-Fi تورىنىڭ ئۈسكۈنە سەپلىمىسىنى ئۆزگەرتىشىگە يول قويىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -706,7 +709,6 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_changeWifiMulticastState" product="default">ئەپنىڭ كۆپ قاناللىق ئاڭلىتىش ئارقىلىق Wi-FI تورىدىكى تېلېفونىڭىزلا ئەمەس بەلكى ھەممە ئۈسكۈنىلەرنىڭ سانلىق مەلۇمات بوغچىسىنى قوبۇللاپ ۋە يوللاشقا يول قويىدۇ. بۇ مەشغۇلاتنىڭ توك سەرپىياتى كۆپ قاناللىق بولمىغان ئاڭلىتىشنىڭكىدىن يۇقىرى.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
-  <string name="permlab_bluetoothAdmin">كۆكچىش تەڭشەك زىيارىتى</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_bluetoothAdmin" product="tablet">ئەپنىڭ تاختا كومپيۇتېر كۆكچىشنى سەپلىشىگە، قوشنا ئۈسكۈنىلەرنى بايقىشىغا ۋە يىراق مۇساپىلىق پەرلەشكە يول قويىدۇ.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -763,19 +765,15 @@
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_readSyncStats">ئەپنىڭ مەلۇم بىر ھېساباتنىڭ قەدەمداش سىتاتىستىكا ئۇچۇرىنى ئوقۇشىغا يول قويىدۇ، ھەرىكەتچان تارىخ خاتىرىسى ۋە قەدەمداش سانلىق مەلۇمات مىقدارىنى قەدەمداشلاشنى ئۆز ئىچىگە ئالىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permlab_sdcardRead" product="nosdcard">سىزنىڭ USB ساقلىغۇچىڭىزدىكى مەزمۇنلارنى ئوقۇيدۇ</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permlab_sdcardRead" product="default">سىزنىڭ SD كارتىڭىزدىكى مەزمۇنلارنى ئوقۇيدۇ</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permdesc_sdcardRead" product="nosdcard">ئەپنىڭ USB ساقلىغۇچىڭىزدىكى مەزمۇنلارنى ئوقۇشىغا يول قويىدۇ.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_sdcardRead" product="default">ئەپنىڭ SD كارتىڭىزدىكى مەزمۇنلارنى ئوقۇشىغا يول قويىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permlab_sdcardWrite" product="nosdcard">USB ساقلىغۇچىڭىزدىكى مەزمۇنلارنى ئۆزگەرتىدۇ ياكى ئۆچۈرىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permlab_sdcardWrite" product="default">SD كارتىڭىزدىكى مەزمۇنلارنى ئۆزگەرتىدۇ ياكى ئۆچۈرىدۇ.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. [CHAR LIMIT=30] -->
-  <string name="permdesc_sdcardWrite" product="nosdcard">ئەپنىڭ USB ساقلىغۇچقا يېزىشىغا يول قويىدۇ.</string>
   <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
   <string name="permdesc_sdcardWrite" product="default">ئەپنىڭ SD كارتىغا يېزىشىغا يول قويىدۇ.</string>
   <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
@@ -1087,7 +1085,6 @@
   <!-- Prompt to enter New SIM PIN in Edit Text Box in unlock screen -->
   <string name="keyguard_password_enter_pin_prompt">يېڭى PIN كودى</string>
   <!-- Displayed as hint in passwordEntry EditText on PasswordUnlockScreen [CHAR LIMIT=30]-->
-  <string name="keyguard_password_entry_touch_hint"><font size="17">\"بۇ جاينى چېكىپ ئىم كىرگۈزۈڭ\"</font></string>
   <!-- Instructions telling the user to enter their text password to unlock the keyguard.
          Displayed in one line in a large font.  -->
   <string name="keyguard_password_enter_password_code">قۇلۇپ ئېچىش ئۈچۈن ئىم كىرگۈزۈڭ</string>
@@ -1105,7 +1102,6 @@
        *** touch based lock / unlock ***
                                           -->
   <!-- On the keyguard screen, it shows the carrier the phone is connected to.  This is displayed if the phone is not connected to a carrier.-->
-  <string name="lockscreen_carrier_default">مۇلازىمەت يوق</string>
   <!-- Shown in the lock screen to tell the user that the screen is locked. -->
   <string name="lockscreen_screen_locked">ئىكران قۇلۇپلانغان.</string>
   <!-- when pattern lock is enabled, tell them about the emergency dial -->
@@ -1123,6 +1119,7 @@
   <string name="lockscreen_pattern_wrong">قايتا سىنا</string>
   <!-- On the unlock password screen, shown when the user enters the wrong lock password and must try again. -->
   <string name="lockscreen_password_wrong">قايتا سىنا</string>
+  <!-- On the keyguard screen, this string explains that some features or data may not be available until the device is unlocked. [CHAR LIMIT=48] -->
   <!-- Shown when face unlock failed multiple times so we're just using the backup -->
   <string name="faceunlock_multiple_failures">چىرايدا قۇلۇپ ئاچقۇچنى سىناش قېتىم سانىنىڭ يۇقىرى چېكىدىن ئېشىپ كەتتى</string>
   <!-- Shown in the lock screen when there is no SIM card. -->
@@ -1164,29 +1161,22 @@
   <string name="lockscreen_sim_unlock_progress_dialog_message">SIM كارتا قۇلۇپىنى ئېچىۋاتىدۇ…</string>
   <!-- For the unlock screen, Information message shown in dialog when user has too many failed attempts at
          drawing the unlock pattern -->
-  <string name="lockscreen_too_many_failed_attempts_dialog_message">سىز قۇلۇپ ئېچىش ئەندىزىسىنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىزدىڭىز.\n\n <xliff:g id="NUMBER_1">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
   <!-- For the unlock screen, Information message shown in dialog when user has too many failed attempts at
          entering the password -->
-  <string name="lockscreen_too_many_failed_password_attempts_dialog_message">سىز قۇلۇپ ئېچىش ئىمنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا كىرگۈزدىڭىز.\n\n <xliff:g id="NUMBER_1">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
   <!-- For the unlock screen, Information message shown in dialog when user has too many failed attempts at
          entering the PIN -->
-  <string name="lockscreen_too_many_failed_pin_attempts_dialog_message">سىز PIN نى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا كىرگۈزدىڭىز.\n\n <xliff:g id="NUMBER_1">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
-  <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
-         where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="lockscreen_failed_attempts_almost_glogin" product="tablet">سىز قۇلۇپ ئېچىش ئەندىزىسىنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىزدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، سىستېما Google ھېساباتىڭىزدىكى تىزىمغا كىرىش ئۇچۇرى بىلەن تاختا كومپيۇتېر قۇلۇپىنى ئېچىشنى تەلەپ قىلىدۇ. "\n\n "يەنە <xliff:g id="NUMBER_2">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="lockscreen_failed_attempts_almost_glogin" product="default">سىز قۇلۇپ ئېچىش ئەندىزىسىنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىزدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، سىستېما Google ھېساباتىڭىزدىكى تىزىمغا كىرىش ئۇچۇرى بىلەن تېلېفون قۇلۇپىنى ئېچىشنى تەلەپ قىلىدۇ."\n\n" يەنە <xliff:g id="NUMBER_2">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
+  <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
+         where they will be locked out and may have to enter an alternate username/password to unlock the phone -->
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where the device will be wiped. -->
-  <string name="lockscreen_failed_attempts_almost_at_wipe" product="tablet">سىز تاختا كومپيۇتېر قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، تاختا كومپيۇتېرنى زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتۇرىدۇ، ھەممە ئىشلەتكۈچى سانلىق مەلۇماتلىرى يوقىلىدۇ.</string>
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where the device will be wiped. -->
   <!-- For the unlock screen, informational message shown in dialog when user is almost at the limit
          where the device will be wiped. -->
-  <string name="lockscreen_failed_attempts_almost_at_wipe" product="default">سىز تېلېفون قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، تېلېفوننى زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتۇرىدۇ، ھەممە ئىشلەتكۈچى سانلىق مەلۇماتلىرى يوقىلىدۇ.</string>
   <!-- For the unlock screen, informational message shown in dialog when user has exceeded the
         maximum attempts and the device will now be wiped -->
   <string name="lockscreen_failed_attempts_now_wiping" product="tablet">سىز تاختا كومپيۇتېر قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. تاختا كومپيۇتېر زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتىدۇ، </string>
@@ -1296,10 +1286,6 @@
   <string name="granularity_label_link">ئۇلانما</string>
   <!-- Label for granularity to traverse the content on an AccessibilityNodeInfo by line. Only spoken to the user. [CHAR LIMIT=NONE] -->
   <string name="granularity_label_line">سىزىق</string>
-  <!-- A format string for 12-hour time of day, just the hour, not the minute, with lower-case "am" or "pm" (example: "3pm"). -->
-  <string name="hour_ampm">"<xliff:g id="AMPM">%P</xliff:g> <xliff:g id="HOUR">%-l</xliff:g>"</string>
-  <!-- A format string for 12-hour time of day, just the hour, not the minute, with capital "AM" or "PM" (example: "3PM"). -->
-  <string name="hour_cap_ampm">"<xliff:g id="AMPM">%p</xliff:g> <xliff:g id="HOUR">%-l</xliff:g>"</string>
   <!-- Title of the alert when something went wrong in the factory test. -->
   <string name="factorytest_failed">زاۋۇتتىن چىقىش سىنىقى مەغلۇب بولدى.</string>
   <!-- Error message displayed when a non-system application tries to start a factory test. -->
@@ -1579,6 +1565,23 @@
   <plurals name="duration_hours">
     <item quantity="other">1 سائەت</item>
   </plurals>
+  <!-- A string denoting the current point in time that should be as short as possible. Abbreviations are preferred to full strings as this might be shown repetitively. It is used in the header of notifications. [CHAR LIMIT=8]-->
+  <!-- Phrase describing a time duration using minutes that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using hours that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using days that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using years that is as short as possible, preferrably one character. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=6] -->
+  <!-- Phrase describing a time duration using minutes that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a time duration using hours that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a time duration using days that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a time duration using years that is as short as possible, preferrably one character. This version should be a future point in time. If the language needs a space in between the integer and the unit, please also integrate it in the string, but preferably it should not have a space in between.[CHAR LIMIT=14] -->
+  <!-- Phrase describing a relative time using minutes in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using hours in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using days in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using years in the past that is not shown on the screen but used for accessibility. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using minutes that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using hours that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using days that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
+  <!-- Phrase describing a relative time using years that is not shown on the screen but used for accessibility. This version should be a future point in time. [CHAR LIMIT=NONE] -->
   <!-- Title for error alert when a video cannot be played.  it can be used by any app. -->
   <string name="VideoView_error_title">سىن مەسىلىسى</string>
   <!-- Text for error alert when a video container is not valid for progressive download/playback. -->
@@ -1610,6 +1613,7 @@
   <string name="copy">كۆچۈر</string>
   <!-- Item on EditText context menu. This action is used to paste from the clipboard into the eidt field -->
   <string name="paste">چاپلا</string>
+  <!-- Item on EditText context menu. This action is used to paste from the clipboard into the eidt field without formatting -->
   <!-- Item on EditText context menu. This action is used to replace the current word by other suggested words, suggested by the IME or the spell checker -->
   <string name="replace">ئالماشتۇر…</string>
   <!-- Item on EditText pop-up window. This action is used to delete the text that the user recently added. [CHAR LIMIT=15] -->
@@ -1618,6 +1622,8 @@
   <string name="copyUrl">تور ئادرېس كۆچۈر</string>
   <!-- Item on EditText context menu. Added only when the context menu is not empty, it enable selection context mode. [CHAR LIMIT=20] -->
   <string name="selectTextMode">تېكىست تاللا</string>
+  <!-- Item on EditText context menu. This action is used to undo a text edit operation. -->
+  <!-- Item on EditText context menu. This action is used to redo a text edit operation. -->
   <!-- Text selection contextual mode title, displayed in the CAB. [CHAR LIMIT=20] -->
   <string name="textSelectionCABTitle">تېكىست تاللاش</string>
   <!-- Option to add the current misspelled word to the user dictionary. [CHAR LIMIT=25] -->
@@ -1638,7 +1644,6 @@
   <string name="app_running_notification_title"><xliff:g id="APP_NAME">%1$s</xliff:g> ئىجرا قىلىنىۋاتىدۇ.</string>
   <!-- [CHAR LIMIT=NONE] Stub notification text for an app running a service that has provided
          a bad bad notification for itself. -->
-  <string name="app_running_notification_text">چېكىلسە تەپسىلاتىنى بىلگىلى بولىدۇ ياكى ئەپنى توختىتىدۇ.</string>
   <!-- Preference framework strings. -->
   <string name="ok">جەزملە</string>
   <!-- Preference framework strings. -->
@@ -1661,18 +1666,37 @@
   <string name="whichApplication">ئىشلىتىدىغان ئەپنى تاللاڭ</string>
   <!-- Title of intent resolver dialog when selecting an application to run
          and a previously used application is known. -->
+  <!-- Generic label for a link to a intent resolver. -->
   <!-- Title of intent resolver dialog when selecting a viewer application to run. -->
   <!-- Title of intent resolver dialog when selecting a viewer application to run
          and a previously used application is known. -->
+  <!-- Label for a link to a intent resolver dialog to view something -->
   <!-- Title of intent resolver dialog when selecting an editor application to run. -->
   <!-- Title of intent resolver dialog when selecting an editor application to run
          and a previously used application is known. -->
+  <!-- Label for a link to a intent resolver dialog when selecting an editor application -->
+  <string name="whichEditApplicationLabel">تەھرىر</string>
   <!-- Title of intent resolver dialog when selecting a sharing application to run. -->
   <!-- Title of intent resolver dialog when selecting a sharing application to run
          and a previously used application is known. -->
+  <!-- Label for a link to a intent resolver dialog to sharing something -->
+  <string name="whichSendApplicationLabel">ھەمبەھىر</string>
+  <!-- Title of intent resolver dialog when selecting an application to run to
+         send content to a specific recipient. Often used for email. -->
+  <!-- Title of intent resolver dialog when selecting an application to run to
+         send content to a specific recipient and a previously used application is known.
+         Often used for email. -->
+  <!-- Label for a link to a intent resolver dialog to send content to a specific recipient. -->
+  <string name="whichSendToApplicationLabel">يوللا</string>
   <!-- Title of intent resolver dialog when selecting a HOME application to run. -->
   <!-- Title of intent resolver dialog when selecting a HOME application to run
          and a previously used application is known. -->
+  <!-- Label for a link to a intent resolver dialog when selecting a HOME -->
+  <!-- Option to always use the selected application resolution in the future. See the "Complete action using" dialog title-->
+  <!-- Title of intent resolver dialog when capturing an image. -->
+  <!-- Title of intent resolver dialog when capturing an image
+         and a previously used application is known. -->
+  <!-- Label for a link to a intent resolver dialog when capturing an image -->
   <!-- Option to always use the selected application resolution in the future. See the "Complete action using" dialog title-->
   <string name="alwaysUse">كۆڭۈلدىكى ئەھۋالدا مۇشۇ خىل ئۇسۇلنى ئىشلىتىدۇ.</string>
   <!-- Title of the list of alternate options to complete an action shown when the
@@ -1686,20 +1710,22 @@
   <!-- Text to display when there are no activities found to display in the
          activity chooser. See the "Select an action" title. -->
   <string name="noApplications">بۇ مەشغۇلاتنى ئىجرا قىلىدىغان ئەپ يوق.</string>
-  <!-- Title of the alert when an application has crashed. -->
   <!-- Text of the alert that is displayed when an application has crashed. -->
-  <string name="aerr_application">ناھايىتى ئەپسۇس، <xliff:g id="APPLICATION">%1$s</xliff:g> توختىدى.</string>
-  <!-- Text of the alert that is displayed when an application has crashed. -->
-  <string name="aerr_process">ناھايىتى ئەپسۇس، <xliff:g id="PROCESS">%1$s</xliff:g> جەريان توختىدى.</string>
+  <!-- Text of the alert that is displayed when a process has crashed. -->
+  <!-- Text of the alert that is displayed when an application has crashed repeatedly. -->
+  <!-- Text of the alert that is displayed when a process has crashed repeatedly. -->
+  <!-- Button that restarts a crashed application -->
+  <!-- Button that sends feedback about a crashed application -->
+  <!-- Button that closes a crashed application -->
+  <!-- Button that mutes further crashes of the crashed application. Note that this only appears on engineering builds. -->
+  <!-- Button that waits a bit more for an unresponsive app -->
+  <string name="aerr_wait">كۈت</string>
+  <!-- Button that closes an unresponsive application -->
   <!-- Title of the alert when an application is not responding. -->
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_activity_application"><xliff:g id="APPLICATION">%2$s</xliff:g> ئىنكاس يوق.\n\nئۇنى تاقامسىز؟</string>
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_activity_process"><xliff:g id="ACTIVITY">%1$s</xliff:g> پائالىيەتتە ئىنكاس يوق.\n\nئۇنى تاقامسىز؟</string>
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_application_process"><xliff:g id="APPLICATION">%1$s</xliff:g> ئىنكاس يوق. ئۇنى تاقامسىز؟</string>
   <!-- Text of the alert that is displayed when an application is not responding. -->
-  <string name="anr_process"><xliff:g id="PROCESS">%1$s</xliff:g> جەرياندا ئىنكاس يوق.\n\nئۇنى تاقامسىز؟</string>
   <!-- Button allowing the user to close an application that is not responding. This will kill the application. -->
   <string name="force_close">جەزملە</string>
   <!-- Button allowing the user to send a bug report for application which has encountered an error. -->
@@ -1720,6 +1746,9 @@
   <string name="screen_compat_mode_show">ھەمىشە كۆرسەت</string>
   <!-- [CHAR LIMIT=200] Compat mode dialog: hint to re-enable compat mode dialog. -->
   <string name="screen_compat_mode_hint">سىستېما تەڭشەكلەر &gt; ئەپلەر &gt; چۈشۈرگەنلەردىن بۇ ھالەتنى قايتا قوزغىتىدۇ.</string>
+  <!-- [CHAR LIMIT=200] Unsupported display size dialog: message. Refers to "Display size" setting. -->
+  <!-- [CHAR LIMIT=50] Unsupported display size dialog: check box label. -->
+  <string name="unsupported_display_size_show">ھەمىشە كۆرسەت</string>
   <!-- Text of the alert that is displayed when an application has violated StrictMode. -->
   <string name="smv_application"><xliff:g id="APPLICATION">%1$s</xliff:g> ئەپ (جەريان: <xliff:g id="PROCESS">%2$s</xliff:g>) ئۆزلۈكىدىن ئىجرا قىلىدىغان مەجبۇرىي ھالەت تەدبىرىگە خىلاپلىق قىلدى.</string>
   <!-- Text of the alert that is displayed when an application has violated StrictMode. -->
@@ -1728,6 +1757,9 @@
   <string name="android_upgrading_title">Android يۈكسىلىۋاتىدۇ…</string>
   <!-- [CHAR LIMIT=40] Title of dialog that is shown when system is starting. -->
   <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog when doing an fstrim. -->
+  <!-- [CHAR LIMIT=40] Title of notification that is shown when finishing a system upgrade. -->
+  <!-- [CHAR LIMIT=200] Body of notification that is shown when performing a system upgrade. -->
+  <!-- [CHAR LIMIT=40] Toast that is shown when an app is still upgrading. -->
   <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog for each .apk that is optimized. -->
   <string name="android_upgrading_apk"><xliff:g id="NUMBER_1">%2$d</xliff:g> ئەپتىن <xliff:g id="NUMBER_0">%1$d</xliff:g> نى ئەلالاشتۇرۇۋاتىدۇ.</string>
   <!-- [CHAR LIMIT=NONE] Message shown in upgrading dialog for each .apk pre boot broadcast -->
@@ -1738,7 +1770,6 @@
   <!-- Notification text to tell the user that a heavy-weight application is running. -->
   <string name="heavy_weight_notification"><xliff:g id="APP">%1$s</xliff:g> ئىجرا قىلىنىۋاتىدۇ</string>
   <!-- Notification details to tell the user that a heavy-weight application is running. -->
-  <string name="heavy_weight_notification_detail">چېكىلسە ئەپكە ئالمىشىدۇ</string>
   <!-- Title of dialog prompting whether user wants to switch between heavy-weight apps. -->
   <string name="heavy_weight_switcher_title">ئەپ ئالماشتۇرامدۇ؟</string>
   <!-- Descriptive text for switching to a new heavy-weight application. -->
@@ -1809,6 +1840,18 @@
   <string name="network_available_sign_in_detailed"><xliff:g id="network_ssid">%1$s</xliff:g></string>
   <!-- A notification is shown when the user connects to a Wi-Fi network and the system detects that that network has no Internet access. This is the notification's title. -->
   <!-- A notification is shown when the user connects to a Wi-Fi network and the system detects that that network has no Internet access. This is the notification's message. -->
+  <!-- A notification might be shown if the device switches to another network type (e.g., cellular data) because it detects that the network it was using (e.g., Wi-Fi) has lost Internet connectivity. This is the notification's title. %1$s is the network type that the device switched to, e.g., cellular data. It is one of the strings in the network_switch_type_name array. -->
+  <!-- A notification might be shown if the device switches to another network type (e.g., cellular data) because it detects that the network it was using (e.g., Wi-Fi) has lost Internet connectivity. This is the notification's message. %1$s is the network that the device switched to, e.g., cellular data. %2$s is the network type the device switched from, e.g., Wi-Fi. Both are strings in the network_switch_type_name array. -->
+  <!-- A toast might be shown if the device switches to another network type (e.g., cellular data) because it detects that the network it was using (e.g., Wi-Fi) has lost Internet connectivity. This is the text of the toast. %1$s is the network that the device switched from, e.g., Wi-Fi. %2$s is the network type the device switched from, e.g., cellular data. Both are strings in the network_switch_type_name array. -->
+  <!-- Network type names used in the network_switch_metered and network_switch_metered_detail strings. These must be kept in the sync with the values NetworkCapabilities.TRANSPORT_xxx values, and in the same order. -->
+  <string-array name="network_switch_type_name">
+    <item>cellular data</item>
+    <item>Wi-Fi</item>
+    <item>كۆكچىش</item>
+    <item>Ethernet</item>
+    <item>VPN</item>
+  </string-array>
+  <!-- Network type name displayed if one of the types is not found in network_switch_type_name. -->
   <!-- A notification is shown when a user's selected SSID is later disabled due to connectivity problems.  This is the notification's title / ticker. -->
   <string name="wifi_watchdog_network_disabled">Wi-Fi تورىغا باغلىنالمايدۇ</string>
   <!-- A notification is shown when a user's selected SSID is later disabled due to connectivity problems.  The complete alert msg is: <hotspot name> + this string, i.e. "Linksys has a poor internet connection" -->
@@ -1822,7 +1865,6 @@
   <string name="wifi_p2p_turnon_message">Wi-Fi Direct مەشغۇلاتىنى قوزغات. بۇ مەشغۇلات Wi-Fi خېرىدارى/قىزىق نۇقتا مەشغۇلاتىنى تاقايدۇ.</string>
   <string name="wifi_p2p_failed_message">Wi-Fi Direct نى قوزغىتالمايدۇ</string>
   <string name="wifi_p2p_enabled_notification_title">Wi-Fi Direct ئوچۇق</string>
-  <string name="wifi_p2p_enabled_notification_message">چېكىلسە تەڭشەيدۇ</string>
   <string name="accept">قوشۇل</string>
   <string name="decline">قوشۇلما</string>
   <string name="wifi_p2p_invitation_sent_title">تەكلىپ يوللاندى</string>
@@ -1872,6 +1914,9 @@
   <!-- See SIM_ADDED_DIALOG.  This is the message of that dialog. -->
   <!-- See SIM_ADDED_DIALOG.  This is the button of that dialog. -->
   <string name="sim_restart_button">قايتا قوزغات</string>
+  <!-- See Carrier_App_Dialog. This is the message of that dialog. -->
+  <!-- See Carrier_App_Dialog. This is the button of that dialog. -->
+  <!-- See carrier_app_notification. This is the headline. -->
   <!-- Date/Time picker dialogs strings -->
   <!-- The title of the time picker dialog. [CHAR LIMIT=NONE] -->
   <string name="time_picker_dialog_title">ۋاقىت تەڭشەك</string>
@@ -1890,50 +1935,10 @@
   <string name="no_permissions">ھىچقانداق ھوقۇق كېرەك ئەمەس</string>
   <!-- [CHAR LIMIT=NONE] Additional text in permission description for perms that can cost money. -->
   <string name="perm_costs_money">بۇنىڭغا چىقىم پەيدا بولۇشى مۇمكىن</string>
-  <!-- USB storage dialog strings -->
-  <!-- This is the title for the activity's window. -->
-  <string name="usb_storage_activity_title">يۇقىرى سىغىملىق USB ساقلىغۇچ</string>
-  <!-- See USB_STORAGE.  USB_STORAGE_DIALOG:  After the user selects the notification, a dialog is shown asking if he wants to mount.  This is the title. -->
-  <string name="usb_storage_title">USB ئۇلاندى</string>
-  <!-- See USB_STORAGE.    This is the message. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_message" product="nosdcard">سىز USB ئارقىلىق كومپيۇتېرنى ئۇلىدىڭىز. كومپيۇتېر بىلەن ئاندىرويىد USB ساقلىغۇچ ئارىسىدا ھۆججەت كۆچۈرمەكچى بولسىڭىز، تۆۋەندىكى توپچىنى بېسىڭ.</string>
-  <!-- See USB_STORAGE.    This is the message. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_message" product="default">سىز USB ئارقىلىق كومپيۇتېرنى ئۇلىدىڭىز. كومپيۇتېر بىلەن ئاندىرويىد SD كارتا ئارىسىدا ھۆججەت كۆچۈرمەكچى بولسىڭىز، تۆۋەندىكى توپچىنى بېسىڭ.</string>
-  <!-- See USB_STORAGE.    This is the button text to mount the phone on the computer. -->
-  <string name="usb_storage_button_mount">USB ساقلىغۇچنى ئاچ</string>
-  <!-- See USB_STORAGE_DIALOG.  If there was an error mounting, this is the text. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_error_message" product="nosdcard">USB ساقلىغۇچنى USB ساقلىغۇچ سۈپىتىدە ئاچقاندا مەسىلە كۆرۈلدى.</string>
-  <!-- See USB_STORAGE_DIALOG.  If there was an error mounting, this is the text. -->
-  <string name="usb_storage_error_message" product="default">SD كارتىڭىزنى USB ساقلىغۇچ سۈپىتىدە ئاچقاندا مەسىلە كۆرۈلدى.</string>
-  <!-- USB_STORAGE: When the user connects the phone to a computer via USB, we show a notification asking if he wants to share files across.  This is the title -->
-  <string name="usb_storage_notification_title">USB ئۇلاندى</string>
-  <!-- See USB_STORAGE. This is the message. -->
-  <string name="usb_storage_notification_message">ھۆججەتنى كومپيۇتېرغا كۆچۈرۈش ياكى كومپيۇتېردىن ساقلىغۇچقا كۆچۈرۈشنى تاللاڭ.</string>
-  <!-- USB_STORAGE_STOP: While USB storage is enabled, we show a notification dialog asking if he wants to stop. This is the title -->
-  <string name="usb_storage_stop_notification_title">USB ساقلىغۇچنى تاقا</string>
-  <!-- See USB_STORAGE. This is the message. -->
-  <string name="usb_storage_stop_notification_message">چېكىسلە USB ساقلىغۇچنى تاقايدۇ.</string>
-  <!-- USB storage stop dialog strings -->
-  <!-- This is the label for the activity, and should never be visible to the user. -->
-  <!-- See USB_STORAGE_STOP.  USB_STORAGE_STOP_DIALOG:  After the user selects the notification, a dialog is shown asking if he wants to stop usb storage.  This is the title. -->
-  <string name="usb_storage_stop_title">USB ساقلىغۇچ ئىشلىتىلىۋاتىدۇ </string>
-  <!-- See USB_STORAGE_STOP.    This is the message. [CHAR LIMIT=NONE] -->
-  <string name="usb_storage_stop_message" product="nosdcard">USB ساقلىغۇچنى تاقاشتىن ئىلگىرى، كومپيۇتېردىن Android نىڭ USB ساقلىغۇچنى ئېگەرسىزلەپ (\"قاڭقىت\")قانلىقىڭىزنى تەكشۈرۈڭ.</string>
-  <!-- See USB_STORAGE_STOP.    This is the message. -->
-  <string name="usb_storage_stop_message" product="default">USB ساقلىغۇچنى تاقاشتىن ئىلگىرى، كومپيۇتېردىن Android نىڭ SD ساقلىغۇچىسىنى ئېگەرسىزلەپ (\"قاڭقىت\")قانلىقىڭىزنى تەكشۈرۈڭ.</string>
-  <!-- See USB_STORAGE_STOP.    This is the button text to stop usb storage. -->
-  <string name="usb_storage_stop_button_mount">USB ساقلىغۇچنى تاقا</string>
-  <!-- See USB_STORAGE_STOP_DIALOG.  If there was an error stopping, this is the text. -->
-  <string name="usb_storage_stop_error_message">USB ساقلىغۇچنى تاقاشتا مەسىلە كۆرۈلدى. USB نى چىقىرىۋەتكەنلىكىڭىزنى تەكشۈرۈپ، قايتا سىناڭ.</string>
-  <!-- USB_STORAGE_KILL_STORAGE_USERS dialog  -->
-  <string name="dlg_confirm_kill_storage_users_title">USB ساقلىغۇچنى تاقا</string>
-  <!-- USB_STORAGE_KILL_STORAGE_USERS dialog message text -->
-  <string name="dlg_confirm_kill_storage_users_text">ئەگەر سىز USB ساقلىغۇچنى ئاچسىڭىز، ئىشلىتىلىۋاتقان پىروگراممىلار ئىشتىن توختايدۇ ھەم USB نى تاقىغاندىن كېيىن ئاندىن قايتا ئىشلەيدۇ.</string>
-  <!-- USB_STORAGE_ERROR dialog  dialog-->
-  <string name="dlg_error_title">USB مەشغۇلاتى مەغلۇب بولدى.</string>
-  <!-- USB_STORAGE_ERROR dialog  ok button-->
+  <!-- Dialog ok button-->
   <string name="dlg_ok">جەزملە</string>
   <!-- USB_PREFERENCES: Notification for when the user connected to the charger only.  This is the title -->
+  <!-- USB_PREFERENCES: Notification for when the user connects the phone to supply power to attached device.  This is the title -->
   <!-- USB_PREFERENCES: Notification for when the user connects the phone to a computer via USB in MTP mode.  This is the title -->
   <!-- USB_PREFERENCES: Notification for when the user connects the phone to a computer via USB in PTP mode.  This is the title -->
   <!-- USB_PREFERENCES: Notification for when the user connects the phone to a computer via USB in MIDI mode.  This is the title -->
@@ -1943,22 +1948,24 @@
   <!-- Title of notification shown when ADB is actively connected to the phone. -->
   <string name="adb_active_notification_title">USB سازلاش ئۇلاندى</string>
   <!-- Message of notification shown when ADB is actively connected to the phone. -->
-  <string name="adb_active_notification_message">چېكىلسە USB سازلاش چەكلىنىدۇ.</string>
+  <!-- Title of notification shown to indicate that bug report is being collected. -->
+  <!-- Title of notification shown to ask for user consent for sharing a bugreport that was requested remotely by the IT administrator. -->
+  <!-- Title of notification shown to indicate that bug report is still being collected after sharing was accepted. -->
+  <!-- Message of a notification shown to ask for user consent for sharing a bugreport that was requested remotely by the IT administrator. -->
+  <!-- Acceptance label of notification shown to ask for user consent for sharing the remote bugreport. -->
+  <!-- Decline label of notification shown to ask for user consent for sharing the remote bugreport. -->
   <!-- Used to replace %s in urls retreived from the signin server with locales.  For Some        -->
   <!-- devices we don't support all the locales we ship to and need to replace the '%s' with a    -->
   <!-- locale string based on mcc values.  By default (0-length string) we don't replace the %s   -->
   <!-- at all and later replace it with a locale string based on the users chosen locale          -->
   <!-- DO NOT TRANSLATE -->
   <!-- Title of the pop-up dialog in which the user switches keyboard, also known as input method. -->
-  <!-- Title of a button to open the settings to enable or disable keyboards, also known as input methods [CHAR LIMIT=30] -->
   <!-- Summary text of a toggle switch to enable/disable use of the IME while a physical
-         keyboard is connected[CHAR LIMIT=25] -->
-  <!-- Title of the physical keyboard category in the input method selector [CHAR LIMIT=10] -->
-  <string name="hardware">قاتتىق دېتال</string>
-  <!-- Title of the notification to prompt the user to select a keyboard layout. -->
-  <string name="select_keyboard_layout_notification_title">ھەرپتاختا ئورۇنلاشتۇرۇشىنى تاللاڭ.</string>
-  <!-- Message of the notification to prompt the user to select a keyboard layout. -->
-  <string name="select_keyboard_layout_notification_message">چېكىپ ھەرپتاختا ئورۇنلاشتۇرۇلۇشىدىن بىرنى تاللاڭ.</string>
+         keyboard is connected -->
+  <!-- Title of the physical keyboard category in the input method selector [CHAR LIMIT=30] -->
+  <!-- Title of the notification to prompt the user to configure physical keyboard settings. -->
+  <!-- Message of the notification to prompt the user to configure physical keyboard settings
+         where the user can associate language with physical keyboard layout. -->
   <string name="fast_scroll_alphabet"> ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
   <string name="fast_scroll_numeric_alphabet"> 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
   <string name="candidates_style"><u>"نامزات"</u></string>
@@ -2010,7 +2017,6 @@
   <!-- Title of an application permission that lets it read install sessions. -->
   <!-- Description of an application permission that lets it read install sessions. -->
   <!-- Shown in the tutorial for tap twice for zoom control. -->
-  <string name="tutorial_double_tap_to_zoom_message_short">قوش چىكىپ يىراق-يېقىنلىقىنى باشقۇرغىلى بولىدۇ.</string>
   <!-- Shown in gadget hosts (e.g. the home screen) when there was an error inflating
     the gadget. -->
   <string name="gadget_host_error_inflating">ئەپچە قوشالمىدى</string>
@@ -2059,16 +2065,17 @@
   <!-- Label to show for a service that is running because it is observing
          the user's notifications. -->
   <string name="notification_listener_binding_label">ئۇقتۇرۇش تىڭشىغۇچ</string>
+  <!-- Label to show for a service that is running because the system is in VR mode. -->
   <!-- Label to show for a service that is running because it is providing conditions. -->
+  <!-- Label to show for a service that is running because it is observing and modifying the
+         importance of the user's notifications. -->
   <!-- Do Not Translate: Alternate eri.xml -->
   <!-- The title of the notification when VPN is active. -->
   <string name="vpn_title">VPN ئاكتىپلاندى</string>
   <!-- The title of the notification when VPN is active with an application name. -->
   <string name="vpn_title_long">VPN نى <xliff:g id="APP">%s</xliff:g> ئاكتىپلىدى</string>
   <!-- The text of the notification when VPN is active. -->
-  <string name="vpn_text">چېكىلسە تورنى باشقۇرىدۇ.</string>
   <!-- The text of the notification when VPN is active with a session name. -->
-  <string name="vpn_text_long"><xliff:g id="SESSION">%s</xliff:g> غا باغلاندى. چېكىلسە تورنى باشقۇرىدۇ.</string>
   <!-- Notification title when connecting to lockdown VPN. -->
   <string name="vpn_lockdown_connecting">ھەمىشە ئوچۇق VPN غا باغلىنىۋاتىدۇ…</string>
   <!-- Notification title when connected to lockdown VPN. -->
@@ -2076,7 +2083,6 @@
   <!-- Notification title when error connecting to lockdown VPN. -->
   <string name="vpn_lockdown_error">ھەمىشە ئوچۇق VPN خاتالىقى</string>
   <!-- Notification body that indicates user can touch to configure lockdown VPN connection. -->
-  <string name="vpn_lockdown_config">چېكىلسە سەپلەيدۇ</string>
   <!-- Localized strings for WebView -->
   <!-- Label for button in a WebView that will open a chooser to choose a file to upload -->
   <string name="upload_file">ھۆججەت تاللاڭ</string>
@@ -2089,11 +2095,9 @@
   <!-- Strings for car mode notification -->
   <!-- Shown when car mode is enabled -->
   <string name="car_mode_disable_notification_title">ماشىنا ھالىتى قوزغىتىلدى</string>
-  <string name="car_mode_disable_notification_message">چېكىلسە ماشىنا ھالىتىدىن چېكىنىدۇ.</string>
   <!-- Strings for tethered notification -->
   <!-- Shown when the device is tethered -->
   <string name="tethered_notification_title">USB غا باغلاش ياكى قىزىق نۇقتىنى قوزغىتىش</string>
-  <string name="tethered_notification_message">چېكىسلە تەڭشەيدۇ.</string>
   <!--  Strings for possible PreferenceActivity Back/Next buttons -->
   <string name="back_button_label">قايت</string>
   <string name="next_button_label">كېيىنكى</string>
@@ -2164,7 +2168,6 @@
   <!-- Description of the button to decrease the NumberPicker value. [CHAR LIMIT=NONE] -->
   <string name="number_picker_decrement_button">كىچىكلەت</string>
   <!-- Description of the tap and hold action to get into scroll mode in NumberPicker. [CHAR LIMIT=NONE] -->
-  <string name="number_picker_increment_scroll_mode"><xliff:g id="VALUE">%s</xliff:g> نى چېكىپ بېسىڭ.</string>
   <!-- Description of the scrolling action in NumberPicker. [CHAR LIMIT=NONE] -->
   <string name="number_picker_increment_scroll_action">ئۈستىگە سۈرۈلسە قىممىتى ئاشىدۇ، ئاستىغا سۈرۈلسە قىممىتى كېمىيىدۇ.</string>
   <!-- TimePicker - accessibility support -->
@@ -2246,8 +2249,7 @@
          %1$s is the title. %2$s is the subtitle. %3$s is the description of what
          tapping/clicking the whole thing is going to do. -->
   <string name="action_bar_home_subtitle_description_format">%1$s, %2$s, %3$s</string>
-  <!-- Storage description for internal storage. [CHAR LIMIT=NONE] -->
-  <string name="storage_internal">ئىچىدىكى ساقلىغۇچ</string>
+  <!-- Storage description for internal shared storage. [CHAR LIMIT=NONE] -->
   <!-- Storage description for a generic SD card. [CHAR LIMIT=NONE] -->
   <string name="storage_sd_card">SD كارتا</string>
   <!-- Storage description for a SD card from a specific manufacturer. [CHAR LIMIT=NONE] -->
@@ -2255,10 +2257,11 @@
   <!-- Storage description for a USB drive from a specific manufacturer. [CHAR LIMIT=NONE] -->
   <!-- Storage description for USB storage. [CHAR LIMIT=NONE] -->
   <string name="storage_usb">USB ساقلىغۇچ</string>
+  <!-- Button text for the edit menu in input method extract mode. [CHAR LIMIT=16] -->
+  <string name="extract_edit_menu_button">تەھرىر</string>
   <!-- Notification title when data usage has exceeded warning threshold. [CHAR LIMIT=32] -->
   <string name="data_usage_warning_title">سانلىق مەلۇمات ئىشلىتىش ئاگاھلاندۇرۇشى</string>
   <!-- Notification body when data usage has exceeded warning threshold. [CHAR LIMIT=32] -->
-  <string name="data_usage_warning_body">چېكىلسە ئىشلىتىلىشى ۋە تەڭشەكلەرنى كۆرسىتىدۇ</string>
   <!-- Notification title when 2G-3G data usage has exceeded limit threshold, and has been disabled. [CHAR LIMIT=32] -->
   <!-- Notification title when 4G data usage has exceeded limit threshold, and has been disabled. [CHAR LIMIT=32] -->
   <!-- Notification title when mobile data usage has exceeded limit threshold, and has been disabled. [CHAR LIMIT=32] -->
@@ -2276,7 +2279,6 @@
   <!-- Notification title when background data usage is limited. [CHAR LIMIT=32] -->
   <string name="data_usage_restricted_title">تەگلىك سانلىق مەلۇماتى چەكلىمىگە ئۇچرايدۇ</string>
   <!-- Notification body when background data usage is limited. [CHAR LIMIT=32] -->
-  <string name="data_usage_restricted_body">چېكىلسە چەكلىمە چىقىرىۋېتىلىدۇ.</string>
   <!-- SSL Certificate dialogs -->
   <!-- Title for an SSL Certificate dialog -->
   <string name="ssl_certificate">بىخەتەرلىك گۇۋاھنامىسى</string>
@@ -2312,8 +2314,6 @@
   <string name="activity_chooser_view_dialog_title_default">پائالىيەت تاللاڭ</string>
   <!-- Title for a dialog showing possible activities for sharing in ShareActionProvider [CHAR LIMIT=25] -->
   <string name="share_action_provider_share_with">ھەمبەھىر</string>
-  <!-- Delimeter used between each item in a textual list; for example "Alpha, Beta". [CHAR LIMIT=3] -->
-  <string name="list_delimeter">"« ،»"</string>
   <!-- STK sending DTMF, SMS, USSD, SS -->
   <string name="sending">يوللاۋاتىدۇ…</string>
   <!-- STK launch Browser -->
@@ -2435,15 +2435,10 @@
   <!-- Message shown while device checks username/password in account unlock screen of keyguard -->
   <string name="kg_login_checking_password">ھېساباتنى تەكشۈرۈۋاتىدۇ…</string>
   <!-- Message shown in dialog when max number of attempts are reached for PIN screen of keyguard -->
-  <string name="kg_too_many_failed_pin_attempts_dialog_message">سىز PIN نى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا كىرگۈزدىڭىز.\n\n <xliff:g id="NUMBER_1">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
   <!-- Message shown in dialog when max number of attempts are reached for password screen of keyguard -->
-  <string name="kg_too_many_failed_password_attempts_dialog_message">سىز قۇلۇپ ئېچىش ئىمنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا كىرگۈزدىڭىز.\n\n <xliff:g id="NUMBER_1">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
-  <string name="kg_too_many_failed_pattern_attempts_dialog_message">سىز قۇلۇپ ئېچىش ئەندىزىسىنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىزدىڭىز.\n\n <xliff:g id="NUMBER_1">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
-  <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
-  <string name="kg_failed_attempts_almost_at_wipe" product="tablet">سىز تاختا كومپيۇتېر قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، تاختا كومپيۇتېرنى زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتۇرىدۇ، ھەممە ئىشلەتكۈچى سانلىق مەلۇماتلىرى يوقىلىدۇ.</string>
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
   <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
-  <string name="kg_failed_attempts_almost_at_wipe" product="default">سىز تېلېفون قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، تېلېفوننى زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتۇرىدۇ، ھەممە ئىشلەتكۈچى سانلىق مەلۇماتلىرى يوقىلىدۇ.</string>
+  <!-- Message shown when user is almost at the limit of password attempts where the device will be wiped. -->
   <!-- Message shown in dialog when user has exceeded the maximum attempts and the device will now be wiped -->
   <string name="kg_failed_attempts_now_wiping" product="tablet">سىز تاختا كومپيۇتېر قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. تاختا كومپيۇتېر زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتىدۇ، </string>
   <!-- Message shown in dialog when user has exceeded the maximum attempts and the device will now be wiped -->
@@ -2451,12 +2446,10 @@
   <string name="kg_failed_attempts_now_wiping" product="default">سىز تېلېفون قۇلۇپىنى ئېچىشنى <xliff:g id="NUMBER">%d</xliff:g> قېتىم خاتا سىنىدىڭىز. تېلېفون زاۋۇتتىن چىققان ھالەتكە ئەسلىگە قايتىدۇ، </string>
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="tablet">سىز قۇلۇپ ئېچىش ئەندىزىسىنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىزدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، سىستېما تورخەت ھېساباتىڭىزدىكى تىزىمغا كىرىش ئۇچۇرى بىلەن تاختا كومپيۇتېر قۇلۇپىنى ئېچىشنى تەلەپ قىلىدۇ.\n\nيەنە <xliff:g id="NUMBER_2">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
   <!-- Message shown in dialog when user is almost at the limit where they will be
     locked out and may have to enter an alternate username/password to unlock the phone -->
-  <string name="kg_failed_attempts_almost_at_login" product="default">سىز قۇلۇپ ئېچىش ئەندىزىسىنى <xliff:g id="NUMBER_0">%d</xliff:g> قېتىم خاتا سىزدىڭىز. ئەگەر <xliff:g id="NUMBER_1">%d</xliff:g> قېتىم سىناپمۇ مۇۋەپپەقىيەتلىك بولمىسا، سىستېما تورخەت ھېساباتىڭىزدىكى تىزىمغا كىرىش ئۇچۇرى بىلەن تېلېفون قۇلۇپىنى ئېچىشنى تەلەپ قىلىدۇ.\n\nيەنە <xliff:g id="NUMBER_2">%d</xliff:g> سېكۇنتتىن كېيىن قايتا سىناڭ.</string>
   <!-- Sequence of characters used to separate message strings in keyguard. Typically just em-dash
          with spaces on either side. [CHAR LIMIT=3] -->
   <string name="kg_text_message_separator" product="default">" — "</string>
@@ -2473,6 +2466,7 @@
   <!-- Text spoken when the current user is switched if accessibility is enabled. [CHAR LIMIT=none] -->
   <string name="user_switched">نۆۋەتتىكى ئىشلەتكۈچى <xliff:g id="NAME">%1$s</xliff:g>.</string>
   <!-- Message shown when switching to a user [CHAR LIMIT=none] -->
+  <!-- Message when logging out a user on a split user system -->
   <!-- Default name of the owner user [CHAR LIMIT=20] -->
   <string name="owner_name" msgid="3879126011135546571">ئىگىدار</string>
   <!-- Error message title [CHAR LIMIT=35] -->
@@ -2716,7 +2710,6 @@
   <!-- DO NOT TRANSLATE -->
   <!-- DO NOT TRANSLATE -->
   <!-- Notify use that they are in Lock-to-app -->
-  <!-- Notify use that they are in Lock-to-app in accessibility mode -->
   <!-- Notify user that they are locked in lock-to-app mode -->
   <!-- Starting lock-to-app indication. -->
   <!-- Exting lock-to-app indication. -->
@@ -2727,6 +2720,9 @@
   <!-- Notification shown when device owner silently updates a package [CHAR LIMIT=NONE] -->
   <!-- Notification shown when device owner silently deletes a package [CHAR LIMIT=NONE] -->
   <!-- [CHAR_LIMIT=NONE] Battery saver: Feature description -->
+  <!-- [CHAR_LIMIT=NONE] Data saver: Feature description -->
+  <!-- [CHAR_LIMIT=35] Data saver: Title on first-time dialog -->
+  <!-- [CHAR_LIMIT=16] Data saver: Button to turn it on on first-time dialog -->
   <!-- Zen mode condition - summary: time duration in minutes. [CHAR LIMIT=NONE] -->
   <!-- Zen mode condition - summary: time duration in minutes (short version). [CHAR LIMIT=NONE] -->
   <!-- Zen mode condition - summary: time duration in hours. [CHAR LIMIT=NONE] -->
@@ -2753,6 +2749,8 @@
   <!-- Displayed when the USSD/SS request is modified by STK CC to a
     different request. This will be displayed in a toast. -->
   <!-- Content description of the work profile icon in the notification. -->
+  <!-- Content description of the expand button icon in the notification.-->
+  <!-- Accessibility action description on the expand button. -->
   <!-- User visible name for USB MIDI Peripheral port -->
   <!-- Manufacturer name for USB MIDI Peripheral port -->
   <!-- Product name for USB MIDI Peripheral port -->
@@ -2760,12 +2758,53 @@
   <!-- Content description for the button that opens the floating toolbar overflow. [CHAR LIMIT=NONE] -->
   <string name="floating_toolbar_open_overflow_description">تېخىمۇ كۆپ تاللانما</string>
   <!-- Content description for the button that closes the floating toolbar overflow. [CHAR LIMIT=NONE] -->
+  <!-- Free style window strings -->
+  <!-- Accessibility text for the maximize window button -->
+  <!-- Accessibility text for the close window button -->
   <!-- Ellipsis character to appear in notification templates, e.g.
          notification_template_material_inbox.xml.
          DO NOT TRANSLATE -->
+  <!-- Tempalate for Notification.MessagingStyle to join a conversation name with the name of the sender of a message, to make a notification title [CHAR LIMIT=NONE] -->
   <!-- Label describing the number of selected items [CHAR LIMIT=48] -->
-  <!-- Used to replace a range of characters in text that is too wide
-         for the space allocated to it (three dots). -->
-  <!-- Used to replace a range of characters in text that is too wide
-         for the space allocated to it (two dots). -->
+  <!-- Message to user that app trying to create user for an account that already exists. [CHAR LIMIT=none] -->
+  <!-- Message to user that app is trying to create user for a specified account. [CHAR LIMIT=none] -->
+  <!-- Locale picker strings -->
+  <!-- Title for the language selection screen [CHAR LIMIT=25] -->
+  <!-- Title for the region selection screen [CHAR LIMIT=25] -->
+  <!-- Hint text in a search edit box (used to filter long language / country lists) [CHAR LIMIT=25] -->
+  <!-- List section subheader for the language picker, containing a list of suggested languages determined by the default region [CHAR LIMIT=30] -->
+  <!-- List section subheader for the language picker, containing a list of all languages available [CHAR LIMIT=30] -->
+  <!-- Menu item in the locale menu  [CHAR LIMIT=30] -->
+  <string name="locale_search_menu">ئىزدە</string>
+  <!-- Title for dialog displayed when work profile is turned off. [CHAR LIMIT=30] -->
+  <!-- Message displayed in dialog when work profile is turned off. [CHAR LIMIT=NONE] -->
+  <!-- Title for button to turn on work profile. [CHAR LIMIT=NONE] -->
+  <!-- Notification title shown when new SMS/MMS is received while the device is locked [CHAR LIMIT=NONE] -->
+  <!-- Notification content shown when new SMS/MMS is received while the device is locked [CHAR LIMIT=NONE] -->
+  <!-- Notification title shown when user profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification message shown when user profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification detail shown when user profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification detail shown when work profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Notification message shown when work profile is credential encrypted and requires the user to unlock before some features are usable [CHAR LIMIT=30] -->
+  <!-- Title of notification shown after a MTP device is connected to Android. -->
+  <!-- Description of notification shown after a MTP device is connected to Android. -->
+  <!-- Resolver target actions strings -->
+  <!-- Pin (as in to a bulletin board with a pushpin) a resolver
+         target to the front of the list. -->
+  <!-- Unpin a resolver target such that it sorts normally. -->
+  <!-- View application info for a target. -->
+  <!-- The representation of a time duration when negative. An example is -1:14. This can be used with a countdown timer for example.-->
+  <!-- Title of notification to start a new demo session when device is in retail mode [CHAR LIMIT=NONE] -->
+  <!-- Text of notification to start a new demo session when device is in retail mode [CHAR LIMIT=NONE] -->
+  <!-- Text of dialog shown when starting a demo user for the first time [CHAR LIMIT=40] -->
+  <!-- Text of dialog shown when starting a new demo user in retail demo mode [CHAR LIMIT=40] -->
+  <!-- Title of the dialog shown when user inactivity times out in retail demo mode [CHAR LIMIT=40] -->
+  <!-- Warning message shown when user inactivity times out in retail demo mode [CHAR LIMIT=none] -->
+  <!-- Text of button to allow user to abort countdown and continue current session in retail demo mode [CHAR LIMIT=40] -->
+  <string name="demo_user_inactivity_timeout_left_button">ۋاز كەچ</string>
+  <!-- Text of button to allow user to abort countdown and immediately start another session in retail demo mode [CHAR LIMIT=40] -->
+  <!-- Title of notification shown when device has been forced to safe mode after a security compromise. -->
+  <!-- Description of notification shown when device has been forced to safe mode after a security compromise. -->
+  <!-- Accessibilty string added to a widget that has been suspended [CHAR LIMIT=20] -->
+  <!-- Label used by Telephony code, assigned as the display name for conference calls [CHAR LIMIT=60] -->
 </resources>

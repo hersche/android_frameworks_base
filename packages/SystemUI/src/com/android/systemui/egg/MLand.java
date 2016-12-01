@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2015 The Android Open Source Project
- * Copyright (C) 2014-2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +48,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import com.android.internal.logging.MetricsLogger;
-
 import com.android.systemui.R;
+
+import java.util.ArrayList;
 
 // It's like LLand, but "M"ultiplayer.
 public class MLand extends FrameLayout {
@@ -210,8 +208,6 @@ public class MLand extends FrameLayout {
 
         // we assume everything will be laid out left|top
         setLayoutDirection(LAYOUT_DIRECTION_LTR);
-
-        Player.eggPlayer = getEggPlayer();
 
         setupPlayers(DEFAULT_PLAYERS);
 
@@ -1010,7 +1006,7 @@ public class MLand extends FrameLayout {
         public void step(long t_ms, long dt_ms, float t, float dt);
     }
 
-    protected static class Player extends ImageView implements GameView {
+    private static class Player extends ImageView implements GameView {
         public float dv;
         public int color;
         private MLand mLand;
@@ -1019,8 +1015,6 @@ public class MLand extends FrameLayout {
         private boolean mAlive;
         private int mScore;
         private TextView mScoreField;
-
-        protected static int eggPlayer;
 
         private final int[] sColors = new int[] {
                 //0xFF78C557,
@@ -1093,7 +1087,7 @@ public class MLand extends FrameLayout {
         public Player(Context context) {
             super(context);
 
-            setBackgroundResource(eggPlayer);
+            setBackgroundResource(R.drawable.android);
             getBackground().setTintMode(PorterDuff.Mode.SRC_ATOP);
             color = sColors[(sNextColor++%sColors.length)];
             getBackground().setTint(color);
@@ -1442,9 +1436,5 @@ public class MLand extends FrameLayout {
             w = h = irand(PARAMS.STAR_SIZE_MIN, PARAMS.STAR_SIZE_MAX);
             v = z = 0;
         }
-    }
-
-    protected int getEggPlayer() {
-        return R.drawable.android;
     }
 }
