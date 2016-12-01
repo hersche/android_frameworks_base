@@ -4,16 +4,16 @@
 /**
  * Copyright (c) 2009, The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0 
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 -->
@@ -121,9 +121,10 @@
   <!-- Notification title displayed when a screenshot is saved to the Gallery. [CHAR LIMIT=50] -->
   <string name="screenshot_saved_title">ئېكران كەسمىسىگە ئېرىشتى.</string>
   <!-- Notification text displayed when a screenshot is saved to the Gallery. [CHAR LIMIT=100] -->
-  <string name="screenshot_saved_text">چېكىلسە ئېكران كەسمىسىنى كۆرسىتىدۇ.</string>
   <!-- Notification title displayed when we fail to take a screenshot. [CHAR LIMIT=50] -->
   <string name="screenshot_failed_title">ئېكران كەسمىسىگە ئېرىشەلمەيدۇ.</string>
+  <!-- Notification text displayed when we fail to save a screenshot for unknown reasons. [CHAR LIMIT=100] -->
+  <!-- Notification text displayed when we fail to save a screenshot. [CHAR LIMIT=100] -->
   <!-- Notification text displayed when we fail to take a screenshot. [CHAR LIMIT=100] -->
   <!-- Title for the USB function chooser in UsbPreferenceActivity. [CHAR LIMIT=30] -->
   <string name="usb_preference_title">USB ھۆججەت يوللاش تاللانمىسى</string>
@@ -195,6 +196,7 @@
   <string name="accessibility_data_signal_full">سانلىق مەلۇمات سىگنالى لىق.</string>
   <!-- Content description of the wifi label showing what we are connected to. [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth label showing what we are connected to. [CHAR LIMIT=NONE] -->
+  <!-- Content description of the cast label showing what we are connected to. [CHAR LIMIT=NONE] -->
   <!-- Content description of the WiMAX signal when no signal for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_no_wimax">WiMAX يوق.</string>
   <!-- Content description of the WiMAX signal when it is one bar for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -240,8 +242,10 @@
   <string name="accessibility_data_connection_3.5g">3.5G</string>
   <!-- Content description of the data connection type 4G for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_data_connection_4g">4G</string>
+  <!-- Content description of the data connection type 4G for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the data connection type LTE for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_data_connection_lte">LTE</string>
+  <!-- Content description of the data connection type LTE+ for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the data connection type CDMA for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_data_connection_cdma">CDMA</string>
   <!-- Content description of the roaming data connection type for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -251,14 +255,19 @@
   <!-- Content description of the data connection type WiFi for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the data connection with no SIM for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_no_sim">SIM كارتا يوق.</string>
+  <!-- Content description of the cell data. [CHAR LIMIT=NONE] -->
+  <!-- Content description of the cell data being enabled. [CHAR LIMIT=NONE] -->
+  <!-- Content description of the cell data being disabled. [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth tethering icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_bluetooth_tether">كۆكچىش ھەمبەھىر</string>
   <!-- Content description of the airplane mode icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_airplane_mode">ئايروپىلان ھالىتى</string>
   <!-- Content description of the no sim icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the carrier network changing icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of button to open battery details icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the battery level icon for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_battery_level">توكدان <xliff:g id="NUMBER">%d</xliff:g> پىرسەنت.</string>
+  <!-- Content description of the battery level icon for accessibility while the device is charging (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the button for showing a settings panel in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_settings_button">سىستېما تەڭشەكلىرى</string>
   <!-- Content description of the button for showing a notifications panel in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -276,10 +285,12 @@
   <!-- Content description of the ringer silent icon in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_ringer_silent">قوڭغۇراق ئۈنسىز.</string>
   <!-- Content description of the cast icon in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the work mode icon in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description to tell the user that this button will remove an application from recents -->
   <!-- Content description to tell the user an application has been removed from recents -->
   <string name="accessibility_recents_item_dismissed"><xliff:g id="APP">%s</xliff:g> بوشىتىلدى.</string>
   <!-- Content description to tell the user all applications has been removed from recents -->
+  <!-- Content description to tell the user that this button will open application info for an application in recents -->
   <!-- Content description to tell the user an application has been launched from recents -->
   <!-- Content description of individual recents task. -->
   <!-- Content description to tell the user a notification has been removed from the notification shade -->
@@ -308,9 +319,11 @@
   <!-- Content description of the do not disturb tile in quick settings when on in priority (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the do not disturb tile in quick settings when on in none (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the do not disturb tile in quick settings when on in alarms only (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the do not disturb tile in quick settings (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the do not disturb tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Announcement made when do not disturb changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Announcement made when do not disturb changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the bluetooth tile in quick settings (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth tile in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the bluetooth tile in quick settings when connecting (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -327,6 +340,7 @@
   <!-- Content description of zen mode time condition plus button (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of zen mode time condition minus button (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the flashlight tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the flashlight tile in quick settings when unavailable (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the flashlight tile in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Announcement made when the flashlight state changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Announcement made when the flashlight state changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
@@ -335,6 +349,12 @@
   <!-- Announcement made when the hotspot state changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Announcement made when the hotspot state changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Announcement made when the screen stopped casting (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the work mode title in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Content description of the work mode title in quick settings when on (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the work mode changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the work mode changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the Data Saver changes to off (not shown on the screen). [CHAR LIMIT=NONE] -->
+  <!-- Announcement made when the Data Saver changes to on (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Content description of the display brightness slider (not shown on the screen). [CHAR LIMIT=NONE] -->
   <!-- Title of dialog shown when 2G-3G data usage has exceeded limit and has been disabled. [CHAR LIMIT=48] -->
   <!-- Title of dialog shown when 4G data usage has exceeded limit and has been disabled. [CHAR LIMIT=48] -->
@@ -358,6 +378,8 @@
   <string name="accessibility_location_active">ئورۇن ئۇچۇرى ئىلتىماسى ئاكتىپ</string>
   <!-- Content description of the clear button in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
   <string name="accessibility_clear_all">بارلىق ئۇقتۇرۇشلارنى تازىلا</string>
+  <!-- The overflow indicator shown when a group has more notification inside the group than the visible ones. An example is "+ 3" [CHAR LIMIT=5] -->
+  <!-- Content description describing how many more notifications are in a group [CHAR LIMIT=NONE] -->
   <!-- Content description of button in notification inspector for system settings relating to
          notifications from this application [CHAR LIMIT=NONE] -->
   <!-- Content description of button in notification inspetor for application-provided settings
@@ -374,7 +396,6 @@
   <!-- Name of the K-release easter egg: a display case for all our tastiest desserts. [CHAR LIMIT=30] -->
   <string name="dessert_case">تاتلىق تۈرۈم قۇتىسى</string>
   <!-- Name of the launcher shortcut icon that allows dreams to be started immediately [CHAR LIMIT=20] -->
-  <string name="start_dreams">ئېكران قوغدىغۇچ</string>
   <!-- Textual description of Ethernet connections -->
   <string name="ethernet_label">دائىرىلىك تور</string>
   <!-- QuickSettings: Do not disturb [CHAR LIMIT=NONE] -->
@@ -391,6 +412,9 @@
   <!-- QuickSettings: Brightness [CHAR LIMIT=NONE] -->
   <string name="quick_settings_brightness_label">يورۇقلۇق</string>
   <!-- QuickSettings: Rotation Unlocked [CHAR LIMIT=NONE] -->
+  <!-- Accessibility label for Auto-ratate QuickSettings tile [CHAR LIMIT=NONE] -->
+  <string name="accessibility_quick_settings_rotation">ئېكراننى ئۆزلۈكىدىن ئايلاندۇر</string>
+  <!-- Accessibility label for value of Auto-ratate QuickSettings tile [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Rotation Locked [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Locked to Portrait [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Locked to Landscape [CHAR LIMIT=NONE] -->
@@ -421,6 +445,7 @@
   <string name="quick_settings_wifi_no_network">تور يوق</string>
   <!-- QuickSettings: Wifi (Off) [CHAR LIMIT=NONE] -->
   <string name="quick_settings_wifi_off_label">Wi-Fi تاقاق</string>
+  <!-- QuickSettings: Wifi (On) [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Wifi detail panel, text when there are no items [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Cast title [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Cast detail panel, status text when casting [CHAR LIMIT=NONE] -->
@@ -448,15 +473,24 @@
   <!-- QuickSettings: Cellular detail panel, data used format string [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Cellular detail panel, data limit format string [CHAR LIMIT=NONE] -->
   <!-- QuickSettings: Cellular detail panel, data warning format string [CHAR LIMIT=NONE] -->
+  <!-- QuickSettings: Work mode [CHAR LIMIT=NONE] -->
+  <!-- QuickSettings: Label for the toggle to activate Night display (renamed "Night Light" with title caps). [CHAR LIMIT=20] -->
+  <!-- QuickSettings: Summary for the toggle to deactivate Night display when it's on (renamed "Night Light" with title caps). [CHAR LIMIT=NONE] -->
+  <!-- QuickSettings: Label for the toggle to activate Night display when it's off (renamed "Night Light" with title caps). [CHAR LIMIT=NONE] -->
   <!-- Recents: The empty recents string. [CHAR LIMIT=NONE] -->
+  <!-- Recents: The empty recents string after dismissing all tasks. [CHAR LIMIT=NONE] -->
   <!-- Recents: The info panel app info button string. [CHAR LIMIT=NONE] -->
   <!-- Recents: The screen pinning button. [CHAR LIMIT=NONE] -->
   <!-- Recents: Temporary string for the button in the recents search bar. [CHAR LIMIT=NONE] -->
   <!-- Recents: Launch error string. [CHAR LIMIT=NONE] -->
-  <!-- Recents: Dismiss all button. [CHAR LIMIT=NONE] -->
+  <!-- Recents: Launch disabled string. [CHAR LIMIT=NONE] -->
+  <!-- Recents: Stack action button string. [CHAR LIMIT=NONE] -->
+  <!-- Recents: Incompatible task message. [CHAR LIMIT=NONE] -->
+  <!-- Recents: Hint text that shows on the drop targets to start multiwindow. [CHAR LIMIT=NONE] -->
   <!-- Recents: MultiStack add stack split horizontal radio button. [CHAR LIMIT=NONE] -->
   <!-- Recents: MultiStack add stack split vertical radio button. [CHAR LIMIT=NONE] -->
   <!-- Recents: MultiStack add stack split custom radio button. [CHAR LIMIT=NONE] -->
+  <!-- Fully qualified activity class names to be blacklisted in Recents, add package names into overlay as needed -->
   <!-- Expanded Status Bar Header: Battery Charged [CHAR LIMIT=40] -->
   <!-- Expanded Status Bar Header: Charging, no known time [CHAR LIMIT=40] -->
   <!-- Expanded Status Bar Header: Charging, showing time left until charged [CHAR LIMIT=40] -->
@@ -512,12 +546,17 @@
   <!-- Title of the notification shown to a new guest user [CHAR LIMIT=60] -->
   <!-- Text of the notification shown to a new guest user [CHAR LIMIT=60] -->
   <!-- Remove action in the notification shown to a new guest user [CHAR LIMIT=30] -->
+  <!-- Title of the notification shown to logout the current user [CHAR LIMIT=60] -->
+  <!-- Text of the notification shown to logout the current user [CHAR LIMIT=60] -->
+  <!-- Logout action in the notification shown to logout the current user [CHAR LIMIT=30] -->
   <!-- Title for add user confirmation dialog [CHAR LIMIT=30] -->
   <!-- Message for add user confirmation dialog - short version. [CHAR LIMIT=none] -->
+  <!-- Title of the confirmation dialog for deleting a user [CHAR LIMIT=NONE] -->
+  <!-- Message of the confirmation dialog for deleting a user [CHAR LIMIT=NONE] -->
+  <!-- Label for button in confirmation dialog when exiting guest session [CHAR LIMIT=35] -->
   <!-- Battery saver notification title. [CHAR LIMIT=60]-->
   <!-- Battery saver notification text. [CHAR LIMIT=60] -->
   <!-- Battery saver notification action text. [CHAR LIMIT=60] -->
-  <!-- Text shown in place of notification contents when the notification is hidden on a secure lockscreen -->
   <!-- Media projection permission dialog warning text. [CHAR LIMIT=NONE] -->
   <!-- Media projection permission dialog permanent grant check box. [CHAR LIMIT=NONE] -->
   <!-- The text to clear all notifications. [CHAR LIMIT=60] -->
@@ -546,15 +585,12 @@
   <!-- Body of notification educating the user about enabling notifications on the lockscreen. [CHAR LIMIT=60] -->
   <!-- Cancel action for notification educating the user about enabling notifications on the lockscreen. [CHAR LIMIT=20] -->
   <!-- continue action for notification educating the user about enabling notifications on the lockscreen. [CHAR LIMIT=20] -->
-  <!-- Text for the button to expand the notifications to show notification children [CHAR LIMIT=20] -->
-  <!-- Text for the button to expand the notifications to hide notification children [CHAR LIMIT=20] -->
   <!-- Accessibility string for current zen mode and selected exit condition. A template that simply concatenates existing mode string and the current condition description. [CHAR LIMIT=20] -->
   <!-- Button label for ending zen mode in the volume dialog -->
   <!-- Content description for accessibility (not shown on the screen): volume dialog expand button. [CHAR LIMIT=NONE] -->
   <!-- Content description for accessibility (not shown on the screen): volume dialog collapse button. [CHAR LIMIT=NONE] -->
   <!-- Screen pinning dialog title. -->
   <!-- Screen pinning dialog description. -->
-  <!-- Screen pinning dialog description when in accessibility mode. -->
   <!-- Screen pinning positive response. -->
   <!-- Screen pinning negative response. -->
   <!-- Hide quick settings tile confirmation title -->
@@ -566,11 +602,34 @@
   <!-- VolumeUI restoration notification: title -->
   <!-- VolumeUI restoration notification: text -->
   <!-- Toast shown when user unlocks screen and managed profile activity is in the foreground -->
+  <string-array name="volume_stream_titles">
+    <item>Call</item>
+    <!-- STREAM_VOICE_CALL -->
+    <item>System</item>
+    <!-- STREAM_SYSTEM -->
+    <item>Ring</item>
+    <!-- STREAM_RING -->
+    <item>Media</item>
+    <!-- STREAM_MUSIC -->
+    <item>Alarm</item>
+    <!-- STREAM_ALARM -->
+    <item/>
+    <!-- STREAM_NOTIFICATION -->
+    <item>كۆكچىش</item>
+    <!-- STREAM_BLUETOOTH_SCO -->
+    <item/>
+    <!-- STREAM_SYSTEM_ENFORCED -->
+    <item/>
+    <!-- STREAM_DTMF -->
+    <item/>
+    <!-- STREAM_TTS -->
+  </string-array>
   <!-- Name of special SystemUI debug settings -->
   <!-- Preference to show/hide embedded battery percentage [CHAR LIMIT=50] -->
   <!-- Summary for battery percentage preference [CHAR LIMIT=NONE] -->
   <!-- Name of quick settings -->
   <!-- Name of status bar -->
+  <!-- Name of overview -->
   <!-- Name of demo mode (mode with preset icons for screenshots) -->
   <!-- Enable demo mode -->
   <!-- Show demo mode icons -->
@@ -597,8 +656,165 @@
   <!-- Toast describing tuner has been enabled [CHAR LIMIT=NONE] -->
   <!-- Option to remove the tuner from settings [CHAR LIMIT=NONE] -->
   <!-- Dialog asking if the tuner should really be removed from settings [CHAR LIMIT=NONE]-->
+  <!-- Displayed when user launches an app that was uninstalled  [CHAR LIMIT=NONE] -->
+  <!-- Name of setting to show clock seconds [CHAR LIMIT=40] -->
+  <!-- Description of setting to show clock seconds [CHAR LIMIT=NONE] -->
+  <!-- Button that leads to page to rearrange quick settings tiles [CHAR LIMIT=60] -->
+  <!-- Option to show brightness bar in quick settings [CHAR LIMIT=60] -->
+  <!-- Option to use new paging layout in quick settings [CHAR LIMIT=60] -->
+  <!-- Toggle to enable the gesture to enter split-screen by swiping up from the Overview button. [CHAR LIMIT=60]-->
+  <!-- Description for the toggle to enable the gesture to enter split-screen by swiping up from the Overview button. [CHAR LIMIT=NONE]-->
+  <!-- Category in the System UI Tuner settings, where new/experimental
+         settings are -->
   <!-- Dialog title asking if Bluetooth should be enabled [CHAR LIMIT=NONE] -->
   <!-- Dialog message explaining why Bluetooth should be enabled when a packaged keyboard is
          conncted to the device [CHAR LIMIT=NONE] -->
   <!-- Bluetooth enablement ok text [CHAR LIMIT=40] -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=100] Notification importance option -->
+  <!-- [CHAR LIMIT=NONE] Importance Tuner setting title -->
+  <!-- Notification importance title, user unspecified status-->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: blocked importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: blocked importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: min importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: low importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: normal importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: high importance level description -->
+  <!-- [CHAR LIMIT=100] Notification Importance slider: max importance level description -->
+  <!-- Notification: Control panel: Label for button that launches notification settings. [CHAR LIMIT=NONE] -->
+  <!-- Notification: Control panel: Label for button that dismisses control panel. [CHAR LIMIT=NONE] -->
+  <!-- Notification: Gear: Content description for the gear. [CHAR LIMIT=NONE] -->
+  <!-- Title of the battery settings detail panel [CHAR LIMIT=20] -->
+  <!-- Summary of battery saver not available [CHAR LIMIT=NONE] -->
+  <!-- Title of switch for battery saver [CHAR LIMIT=NONE] -->
+  <!-- Summary of switch for battery saver [CHAR LIMIT=NONE] -->
+  <!-- Name used for certain Keyboard keys on gamepads, e.g. "Button L1". -->
+  <!-- Name used to refer to the "Home" key on the keyboard. -->
+  <string name="keyboard_key_home">باش بەت</string>
+  <!-- Name used to refer to the "Back" key on the keyboard. -->
+  <string name="keyboard_key_back">قايت</string>
+  <!-- Name used to refer to the "Up" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Down" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Left" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Right" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Center" arrow key on the keyboard. -->
+  <!-- Name used to refer to the "Tab" key on the keyboard. -->
+  <!-- Name used to refer to the "Space" key on the keyboard. -->
+  <!-- Name used to refer to the "Enter" key on the keyboard. -->
+  <!-- Name used to refer to the "Backspace" key on the keyboard. -->
+  <!-- Name used to refer to the "Play/Pause" media key on the keyboard. -->
+  <!-- Name used to refer to the "Stop" media key on the keyboard. -->
+  <!-- Name used to refer to the "Next" media key on the keyboard. -->
+  <!-- Name used to refer to the "Previous" media key on the keyboard. -->
+  <!-- Name used to refer to the "Rewind" media key on the keyboard. -->
+  <!-- Name used to refer to the "Fast Forward" media key on the keyboard. -->
+  <!-- Name used to refer to the "Page Up" key on the keyboard. -->
+  <!-- Name used to refer to the "Page Down" key on the keyboard. -->
+  <!-- Name used to refer to the "Delete" key on the keyboard. -->
+  <!-- Name used to refer to the "Home" move key on the keyboard. -->
+  <string name="keyboard_key_move_home">باش بەت</string>
+  <!-- Name used to refer to the "End" move key on the keyboard. -->
+  <!-- Name used to refer to the "Insert" key on the keyboard. -->
+  <!-- Name used to refer to the "Num Lock" key on the keyboard. -->
+  <!-- Name used to refer to keys on the numeric pad of the keyboard, e.g. "Numpad 9". -->
+  <!-- User visible title for the system-wide keyboard shortcuts list. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the home screen. -->
+  <string name="keyboard_shortcut_group_system_home">باش بەت</string>
+  <!-- User visible title for the the keyboard shortcut that takes the user to the recents screen. -->
+  <!-- User visible title for the the keyboard shortcut that triggers the back action. -->
+  <string name="keyboard_shortcut_group_system_back">قايت</string>
+  <!-- User visible title for the the keyboard shortcut that triggers the notification shade. -->
+  <string name="keyboard_shortcut_group_system_notifications">ئۇقتۇرۇشلار</string>
+  <!-- User visible title for the the keyboard shortcut that triggers the keyboard shortcuts helper. -->
+  <!-- User visible title for the the keyboard shortcut that switches input methods. -->
+  <!-- User visible title for the system-wide applications keyboard shortcuts list. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the assist app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the browser app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the contacts app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the email app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the instant messaging app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the music app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the YouTube app. -->
+  <!-- User visible title for the keyboard shortcut that takes the user to the calendar app. -->
+  <!-- SysUI Tuner: Option to show full do not disturb panel in volume [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Label for screen about do not disturb settings [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Switch to control whether volume buttons enter/exit do
+         not disturb [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Switch to control volume up behavior [CHAR LIMIT=60] -->
+  <!-- Name of the battery icon in status bar [CHAR LIMIT=30] -->
+  <!-- Name of the clock in status bar [CHAR LIMIT=30] -->
+  <!-- Name of the headset in status bar [CHAR LIMIT=30] -->
+  <!-- Accessibility description of headphones icon [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of headset icon [CHAR LIMIT=NONE] -->
+  <!-- Label for quick settings tile for data saver [CHAR LIMIT=30] -->
+  <!-- Accessibility description for data saver being on [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description for data saver being off [CHAR LIMIT=NONE] -->
+  <!-- Label for feature switch [CHAR LIMIT=30] -->
+  <!-- Label for feature switch [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Button that leads to the navigation bar customization screen [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Group of buttons that show on the start of the screen [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Group of buttons that show on the center of the screen [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Group of buttons that show on the end of the screen [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Name of space used in custom navigation bar layouts [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Name of Combination Menu / Keyboard Switcher button [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Title for dialog to add a button [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Button to add a button [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Save the current settings [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Reset to default settings [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Title of no home warning dialog [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Message of no home warning dialog [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Adjust button width dialog title [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Nav bar button that holds the clipboard [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Description of nav bar button that holds the clipboard [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Accessibility description for custom nav key [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Nav bar button that emulates a keycode [CHAR LIMIT=30] -->
+  <!-- SysUI Tuner: Description of nav bar button that emulates a keycode [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Title of dialog to select which key to emulate [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Label for preview area in navigation bar tuner [CHAR LIMIT=NONE] -->
+  <!-- Label for area where tiles can be dragged out of [CHAR LIMIT=60] -->
+  <!-- Label for area where tiles can be dragged in to [CHAR LIMIT=60] -->
+  <!-- Button to edit the tile ordering of quick settings [CHAR LIMIT=60] -->
+  <!-- SysUI Tuner: Options for how clock is displayed [CHAR LIMIT=NONE] -->
+  <string name="tuner_time">ۋاقىت</string>
+  <!-- SysUI Tuner: Options for how clock is displayed [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Options for how battery is displayed [CHAR LIMIT=NONE] -->
+  <!-- SysUI Tuner: Other section -->
+  <!-- Accessibility label for the divider that separates the windows in split-screen mode [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen 70% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen 50% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the left screen 30% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the right screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen 70% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen 50% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the top screen 30% [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action for moving docked stack divider to make the bottom screen full screen [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of a QS tile while editing positions [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of a QS tile while editing positions [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of a place to drop a tile while editing positions [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of option to move QS tile [CHAR LIMIT=NONE] -->
+  <!-- Accessibility description of option to remove QS tile [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action when QS tile is added [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action when QS tile is removed [CHAR LIMIT=NONE] -->
+  <!-- Accessibility action when QS tile is moved [CHAR LIMIT=NONE] -->
+  <!-- Accessibility label for window when QS editing is happening [CHAR LIMIT=NONE] -->
+  <!-- Accessibility label for the notification icons in the collapsed status bar. Not shown on screen [CHAR LIMIT=NONE] -->
+  <!-- Label for button that reports a touch that was wrongly rejected by the lockscreen. For debugging only. [CHAR LIMIT=NONE] -->
+  <!-- Multi-Window strings -->
+  <!-- Text that gets shown on top of current activity to inform the user that the system force-resized the current activity and that things might crash/not work properly [CHAR LIMIT=NONE] -->
+  <!-- Warning message when we try to dock a non-resizeble tasks and launch it in fullscreen instead. -->
+  <!-- accessibility label for button to open settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to expand quick settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to collapse quick settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for alarm icon [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to select user [CHAR LIMIT=NONE] -->
+  <string name="accessibility_quick_settings_user">ئىشلەتكۈچى <xliff:g id="USER">%s.</xliff:g></string>
+  <!-- accessibility label for no internet [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for quick settings items that open a details page [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for quick settings items that open a details page [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for button to edit quick settings [CHAR LIMIT=NONE] -->
+  <!-- accessibility label for paging indicator in quick settings [CHAR LIMITi=NONE] -->
 </resources>

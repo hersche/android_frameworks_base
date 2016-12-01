@@ -18,15 +18,12 @@ package android.widget;
 
 import android.annotation.IntDef;
 import android.annotation.StringRes;
-import android.app.ActivityManager;
 import android.app.INotificationManager;
 import android.app.ITransientNotification;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.ServiceManager;
@@ -166,6 +163,7 @@ public class Toast {
      */
     public void setDuration(@Duration int duration) {
         mDuration = duration;
+        mTN.mDuration = duration;
     }
 
     /**
@@ -345,7 +343,7 @@ public class Toast {
         };
 
         private final WindowManager.LayoutParams mParams = new WindowManager.LayoutParams();
-        final Handler mHandler = new Handler();    
+        final Handler mHandler = new Handler();
 
         int mGravity;
         int mX, mY;
@@ -355,8 +353,12 @@ public class Toast {
 
         View mView;
         View mNextView;
+        int mDuration;
 
         WindowManager mWM;
+
+        static final long SHORT_DURATION_TIMEOUT = 5000;
+        static final long LONG_DURATION_TIMEOUT = 1000;
 
         TN() {
             // XXX This should be changed to use a Dialog, with a Theme.Toast
@@ -403,22 +405,6 @@ public class Toast {
                 if (context == null) {
                     context = mView.getContext();
                 }
-
-                ImageView appIcon = (ImageView) mView.findViewById(android.R.id.icon);
-                if (appIcon != null) {
-                    ActivityManager am =
-                            (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                    if (!am.isPackageInForeground(packageName)) {
-                        PackageManager pm = context.getPackageManager();
-                        Drawable icon = null;
-                        try {
-                            icon = pm.getApplicationIcon(packageName);
-                        } catch (PackageManager.NameNotFoundException e) {
-                            // nothing to do
-                        }
-                        appIcon.setImageDrawable(icon);
-                    }
-                }
                 mWM = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
                 // We can resolve the Gravity here by using the Locale for getting
                 // the layout direction
@@ -436,6 +422,8 @@ public class Toast {
                 mParams.verticalMargin = mVerticalMargin;
                 mParams.horizontalMargin = mHorizontalMargin;
                 mParams.packageName = packageName;
+                mParams.removeTimeoutMilliseconds = mDuration ==
+                    Toast.LENGTH_LONG ? LONG_DURATION_TIMEOUT : SHORT_DURATION_TIMEOUT;
                 if (mView.getParent() != null) {
                     if (localLOGV) Log.v(TAG, "REMOVE! " + mView + " in " + this);
                     mWM.removeView(mView);

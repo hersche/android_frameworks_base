@@ -32,7 +32,6 @@ class SkBitmap;
 
 namespace android {
 
-class AudioPlayer;
 class Surface;
 class SurfaceComposerClient;
 class SurfaceControl;
@@ -48,12 +47,6 @@ class BootAnimation : public Thread, public IBinder::DeathRecipient
     friend class FrameManager;
 #endif
 public:
-    enum {
-        eOrientationDefault     = 0,
-        eOrientation90          = 1,
-        eOrientation180         = 2,
-        eOrientation270         = 3,
-    };
                 BootAnimation();
     virtual     ~BootAnimation();
 
@@ -65,6 +58,24 @@ private:
     virtual void        onFirstRef();
     virtual void        binderDied(const wp<IBinder>& who);
 
+    bool                updateIsTimeAccurate();
+
+    class TimeCheckThread : public Thread {
+    public:
+        TimeCheckThread(BootAnimation* bootAnimation);
+        virtual ~TimeCheckThread();
+    private:
+        virtual status_t    readyToRun();
+        virtual bool        threadLoop();
+        bool                doThreadLoop();
+        void                addTimeDirWatch();
+
+        int mInotifyFd;
+        int mSystemWd;
+        int mTimeWd;
+        BootAnimation* mBootAnimation;
+    };
+
     struct Texture {
         GLint   w;
         GLint   h;
@@ -75,59 +86,83 @@ private:
         struct Frame {
             String8 name;
             FileMap* map;
+            int trimX;
+            int trimY;
+            int trimWidth;
+            int trimHeight;
             mutable GLuint tid;
             bool operator < (const Frame& rhs) const {
                 return name < rhs.name;
             }
         };
         struct Part {
-            int count;
-            int pause;
+            int count;  // The number of times this part should repeat, 0 for infinite
+            int pause;  // The number of frames to pause for at the end of this part
+            int clockPosY;  // The y position of the clock, in pixels, from the bottom of the
+                            // display (the clock is centred horizontally). -1 to disable the clock
             String8 path;
+            String8 trimData;
             SortedVector<Frame> frames;
             bool playUntilComplete;
             float backgroundColor[3];
-            FileMap* audioFile;
+            uint8_t* audioData;
+            int audioLength;
+            Animation* animation;
         };
         int fps;
         int width;
         int height;
         Vector<Part> parts;
+        String8 audioConf;
+        String8 fileName;
+        ZipFileRO* zip;
     };
 
+    /**
+     *IMG_OEM: bootanimation file from oem/media
+     *IMG_SYS: bootanimation file from system/media
+     *IMG_ENC: encrypted bootanimation file from system/media
+     */
+    enum ImageID { IMG_OEM = 0, IMG_SYS = 1, IMG_ENC = 2 };
+    const char *getAnimationFileName(ImageID image);
     status_t initTexture(Texture* texture, AssetManager& asset, const char* name);
     status_t initTexture(const Animation::Frame& frame);
     status_t initTexture(SkBitmap *bitmap);
     bool android();
-    bool readFile(const char* name, String8& outString);
     bool movie();
+    void drawTime(const Texture& clockTex, const int yPos);
+    Animation* loadAnimation(const String8&);
+    bool playAnimation(const Animation&);
+    void releaseAnimation(Animation*) const;
+    bool parseAnimationDesc(Animation&);
+    bool preloadZip(Animation &animation);
+    bool playSoundsAllowed() const;
 
-    enum ImageID { IMG_DATA = 0, IMG_SYS = 1, IMG_ENC = 2, IMG_THM = 3 };
-    const char *getAnimationFileName(ImageID image);
-    const char *getBootRingtoneFileName(ImageID image);
-    void playBackgroundMusic();
-    bool checkBootState();
     void checkExit();
-    void checkShowAndroid();
 
     static SkBitmap *decode(const Animation::Frame& frame);
 
     sp<SurfaceComposerClient>       mSession;
-    sp<AudioPlayer>                 mAudioPlayer;
     AssetManager mAssets;
-    Texture     mAndroid[3];
+    Texture     mAndroid[2];
+    Texture     mClock;
     int         mWidth;
     int         mHeight;
+    bool        mUseNpotTextures = false;
     EGLDisplay  mDisplay;
     EGLDisplay  mContext;
     EGLDisplay  mSurface;
     sp<SurfaceControl> mFlingerSurfaceControl;
     sp<Surface> mFlingerSurface;
-    ZipFileRO   *mZip;
+    bool        mClockEnabled;
+    bool        mTimeIsAccurate;
+    bool        mSystemBoot;
+    String8     mZipFileName;
+    SortedVector<String8> mLoadedFiles;
+    sp<TimeCheckThread> mTimeCheckThread;
 };
 
 #ifdef MULTITHREAD_DECODE
-
 class FrameManager {
 public:
     struct DecodeWork {
@@ -136,7 +171,8 @@ public:
         size_t idx;
     };
 
-    FrameManager(int numThreads, size_t maxSize, const SortedVector<BootAnimation::Animation::Frame>& frames);
+    FrameManager(int numThreads, size_t maxSize,
+            const SortedVector<BootAnimation::Animation::Frame>& frames);
     virtual ~FrameManager();
 
     SkBitmap* next();
@@ -167,7 +203,6 @@ private:
     bool mExit;
     Vector<sp<DecodeThread> > mThreads;
 };
-
 #endif
 
 // ---------------------------------------------------------------------------

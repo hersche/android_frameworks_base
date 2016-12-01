@@ -81,9 +81,9 @@ public class KeyguardServiceWrapper implements IKeyguardService {
     }
 
     @Override // Binder interface
-    public void dismiss() {
+    public void dismiss(boolean allowWhileOccluded) {
         try {
-            mService.dismiss();
+            mService.dismiss(allowWhileOccluded);
         } catch (RemoteException e) {
             Slog.w(TAG , "Remote Exception", e);
         }
@@ -117,9 +117,9 @@ public class KeyguardServiceWrapper implements IKeyguardService {
     }
 
     @Override
-    public void onFinishedGoingToSleep(int reason) {
+    public void onFinishedGoingToSleep(int reason, boolean cameraGestureTriggered) {
         try {
-            mService.onFinishedGoingToSleep(reason);
+            mService.onFinishedGoingToSleep(reason, cameraGestureTriggered);
         } catch (RemoteException e) {
             Slog.w(TAG , "Remote Exception", e);
         }
@@ -234,8 +234,16 @@ public class KeyguardServiceWrapper implements IKeyguardService {
         return mKeyguardStateMonitor.isShowing();
     }
 
-    public boolean isSecure() {
-        return mKeyguardStateMonitor.isSecure();
+    public boolean isTrusted() {
+        return mKeyguardStateMonitor.isTrusted();
+    }
+
+    public boolean hasLockscreenWallpaper() {
+        return mKeyguardStateMonitor.hasLockscreenWallpaper();
+    }
+
+    public boolean isSecure(int userId) {
+        return mKeyguardStateMonitor.isSecure(userId);
     }
 
     public boolean isInputRestricted() {
@@ -244,17 +252,5 @@ public class KeyguardServiceWrapper implements IKeyguardService {
 
     public void dump(String prefix, PrintWriter pw) {
         mKeyguardStateMonitor.dump(prefix, pw);
-    }
-
-    public void showKeyguard() {
-        try {
-            mService.showKeyguard();
-        } catch (RemoteException e) {
-            Slog.w(TAG, "Remote Exception", e);
-        }
-    }
-
-    public boolean isKeyguardPanelFocused() {
-        return mKeyguardStateMonitor.isKeyguardPanelFocused();
     }
 }

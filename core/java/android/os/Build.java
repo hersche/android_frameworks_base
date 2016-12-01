@@ -16,6 +16,7 @@
 
 package android.os;
 
+import android.annotation.SystemApi;
 import android.text.TextUtils;
 import android.util.Slog;
 
@@ -23,7 +24,11 @@ import com.android.internal.telephony.TelephonyProperties;
 
 import dalvik.system.VMRuntime;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Information about the current build, extracted from system properties.
@@ -90,6 +95,12 @@ public class Build {
 
     /** The name of the hardware (from the kernel command line or /proc). */
     public static final String HARDWARE = getString("ro.hardware");
+
+    /**
+     * Whether this build was for an emulator device.
+     * @hide
+     */
+    public static final boolean IS_EMULATOR = getString("ro.kernel.qemu").equals("1");
 
     /** A hardware serial number, if available.  Alphanumeric only, case-insensitive. */
     public static final String SERIAL = getString("ro.serialno");
@@ -660,10 +671,61 @@ public class Build {
          * </ul>
          */
         public static final int M = 23;
+
+        /**
+         * N is for Nougat.
+         *
+         * <p>Applications targeting this or a later release will get these
+         * new changes in behavior:</p>
+         * <ul>
+         * <li> {@link android.app.DownloadManager.Request#setAllowedNetworkTypes
+         * DownloadManager.Request.setAllowedNetworkTypes}
+         * will disable "allow over metered" when specifying only
+         * {@link android.app.DownloadManager.Request#NETWORK_WIFI}.</li>
+         * <li> {@link android.app.DownloadManager} no longer allows access to raw
+         * file paths.</li>
+         * <li> {@link android.app.Notification.Builder#setShowWhen
+         * Notification.Builder.setShowWhen}
+         * must be called explicitly to have the time shown, and various other changes in
+         * {@link android.app.Notification.Builder Notification.Builder} to how notifications
+         * are shown.</li>
+         * <li>{@link android.content.Context#MODE_WORLD_READABLE} and
+         * {@link android.content.Context#MODE_WORLD_WRITEABLE} are no longer supported.</li>
+         * <li>{@link android.os.FileUriExposedException} will be thrown to applications.</li>
+         * <li>Applications will see global drag and drops as per
+         * {@link android.view.View#DRAG_FLAG_GLOBAL}.</li>
+         * <li>{@link android.webkit.WebView#evaluateJavascript WebView.evaluateJavascript}
+         * will not persist state from an empty WebView.</li>
+         * <li>{@link android.animation.AnimatorSet} will not ignore calls to end() before
+         * start().</li>
+         * <li>{@link android.app.AlarmManager#cancel(android.app.PendingIntent)
+         * AlarmManager.cancel} will throw a NullPointerException if given a null operation.</li>
+         * <li>{@link android.app.FragmentManager} will ensure fragments have been created
+         * before being placed on the back stack.</li>
+         * <li>{@link android.app.FragmentManager} restores fragments in
+         * {@link android.app.Fragment#onCreate Fragment.onCreate} rather than after the
+         * method returns.</li>
+         * <li>{@link android.R.attr#resizeableActivity} defaults to true.</li>
+         * <li>{@link android.graphics.drawable.AnimatedVectorDrawable} throws exceptions when
+         * opening invalid VectorDrawable animations.</li>
+         * <li>{@link android.view.ViewGroup.MarginLayoutParams} will no longer be dropped
+         * when converting between some types of layout params (such as
+         * {@link android.widget.LinearLayout.LayoutParams LinearLayout.LayoutParams} to
+         * {@link android.widget.RelativeLayout.LayoutParams RelativeLayout.LayoutParams}).</li>
+         * <li>Your application processes will not be killed when the device density changes.</li>
+         * </ul>
+         */
+        public static final int N = 24;
+
+        /**
+         * N MR1: Nougat++.
+         */
+        public static final int N_MR1 = 25;
     }
 
     /** The type of build, like "user" or "eng". */
     public static final String TYPE = getString("ro.build.type");
+    private static String TYPE_FOR_APPS = parseBuildTypeFromFingerprint();
 
     /** Comma-separated tags describing the build, like "unsigned,debug". */
     public static final String TAGS = getString("ro.build.tags");
@@ -688,6 +750,44 @@ public class Build {
                     getString("ro.build.tags");
         }
         return finger;
+    }
+
+    /*
+     * Some apps like to compare the build type embedded in fingerprint
+     * to the actual build type. As the fingerprint in our case is almost
+     * always hardcoded to the stock ROM fingerprint, provide that instead
+     * of the actual one if possible.
+     */
+    private static String parseBuildTypeFromFingerprint() {
+        final String fingerprint = SystemProperties.get("ro.build.fingerprint");
+        if (TextUtils.isEmpty(fingerprint)) {
+            return null;
+        }
+        Pattern fingerprintPattern =
+                Pattern.compile("(.*)\\/(.*)\\/(.*):(.*)\\/(.*)\\/(.*):(.*)\\/(.*)");
+        Matcher matcher = fingerprintPattern.matcher(fingerprint);
+        return matcher.matches() ? matcher.group(7) : null;
+    }
+
+    /** @hide */
+    public static void adjustBuildTypeIfNeeded() {
+        if (Process.isApplicationUid(Process.myUid()) && !TextUtils.isEmpty(TYPE_FOR_APPS)) {
+            try {
+                // This is sick. TYPE is final (which can't be changed because it's an API
+                // guarantee), but we have to reassign it. Resort to reflection to unset the
+                // final modifier, change the value and restore the final modifier afterwards.
+                Field typeField = Build.class.getField("TYPE");
+                Field accessFlagsField = Field.class.getDeclaredField("accessFlags");
+                accessFlagsField.setAccessible(true);
+                int currentFlags = accessFlagsField.getInt(typeField);
+                accessFlagsField.setInt(typeField, currentFlags & ~Modifier.FINAL);
+                typeField.set(null, TYPE_FOR_APPS);
+                accessFlagsField.setInt(typeField, currentFlags);
+                accessFlagsField.setAccessible(false);
+            } catch (Exception e) {
+                // shouldn't happen, but we don't want to crash the app even if it does happen
+            }
+        }
     }
 
     /**
@@ -717,6 +817,9 @@ public class Build {
      * @hide
      */
     public static boolean isBuildConsistent() {
+        // Don't care on eng builds.  Incremental build may trigger false negative.
+        if ("eng".equals(TYPE)) return true;
+
         final String system = SystemProperties.get("ro.build.fingerprint");
         final String vendor = SystemProperties.get("ro.vendor.build.fingerprint");
         final String bootimage = SystemProperties.get("ro.bootimage.build.fingerprint");
@@ -778,6 +881,19 @@ public class Build {
      */
     public static final boolean IS_DEBUGGABLE =
             SystemProperties.getInt("ro.debuggable", 0) == 1;
+
+    /**
+     * Specifies whether the permissions needed by a legacy app should be
+     * reviewed before any of its components can run. A legacy app is one
+     * with targetSdkVersion < 23, i.e apps using the old permission model.
+     * If review is not required, permissions are reviewed before the app
+     * is installed.
+     *
+     * @hide
+     */
+    @SystemApi
+    public static final boolean PERMISSIONS_REVIEW_REQUIRED =
+            SystemProperties.getInt("ro.permission_review_required", 0) == 1;
 
     /**
      * Returns the version string for the radio firmware.  May return

@@ -16,11 +16,11 @@
 
 package com.android.systemui.statusbar;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.hardware.fingerprint.FingerprintManager;
@@ -31,6 +31,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
+import android.os.UserManager;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -49,8 +50,8 @@ import com.android.systemui.statusbar.phone.StatusBarKeyguardViewManager;
  */
 public class KeyguardIndicationController {
 
-    private static final String TAG = "KeyguardIndicationController";
-    private static final boolean DEBUG_CHARGING_CURRENT = false;
+    private static final String TAG = "KeyguardIndication";
+    private static final boolean DEBUG_CHARGING_SPEED = false;
 
     private static final int MSG_HIDE_TRANSIENT = 1;
     private static final int MSG_CLEAR_FP_MSG = 2;
@@ -58,6 +59,7 @@ public class KeyguardIndicationController {
 
     private final Context mContext;
     private final KeyguardIndicationTextView mTextView;
+    private final UserManager mUserManager;
     private final IBatteryStats mBatteryInfo;
 
     private final int mSlowThreshold;
@@ -73,29 +75,26 @@ public class KeyguardIndicationController {
     private boolean mPowerPluggedIn;
     private boolean mPowerCharged;
     private int mChargingSpeed;
-    private int mChargingCurrent;
+    private int mChargingWattage;
     private String mMessageToShowOnScreenOn;
-    private IndicationDirection mIndicationDirection;
-    private boolean mScreenOnHintsEnabled;
 
     public KeyguardIndicationController(Context context, KeyguardIndicationTextView textView,
                                         LockIcon lockIcon) {
         mContext = context;
         mTextView = textView;
         mLockIcon = lockIcon;
-        mIndicationDirection = IndicationDirection.NONE;
 
         Resources res = context.getResources();
         mSlowThreshold = res.getInteger(R.integer.config_chargingSlowlyThreshold);
         mFastThreshold = res.getInteger(R.integer.config_chargingFastThreshold);
-        mScreenOnHintsEnabled = res.getBoolean(R.bool.config_showScreenOnLockScreenHints);
 
-
+        mUserManager = context.getSystemService(UserManager.class);
         mBatteryInfo = IBatteryStats.Stub.asInterface(
                 ServiceManager.getService(BatteryStats.SERVICE_NAME));
+
         KeyguardUpdateMonitor.getInstance(context).registerCallback(mUpdateMonitor);
-        context.registerReceiverAsUser(
-                mReceiver, UserHandle.OWNER, new IntentFilter(Intent.ACTION_TIME_TICK), null, null);
+        context.registerReceiverAsUser(mReceiver, UserHandle.SYSTEM,
+                new IntentFilter(Intent.ACTION_TIME_TICK), null, null);
     }
 
     public void setVisible(boolean visible) {
@@ -126,20 +125,6 @@ public class KeyguardIndicationController {
     /**
      * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
      */
-    public void showTransientIndication(int transientIndication, IndicationDirection direction) {
-        showTransientIndication(mContext.getResources().getString(transientIndication), direction);
-    }
-
-    /**
-     * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
-     */
-    public void showTransientIndication(String transientIndication, IndicationDirection direction) {
-        showTransientIndication(transientIndication, Color.WHITE, direction);
-    }
-
-    /**
-     * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
-     */
     public void showTransientIndication(int transientIndication) {
         showTransientIndication(mContext.getResources().getString(transientIndication));
     }
@@ -148,24 +133,15 @@ public class KeyguardIndicationController {
      * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
      */
     public void showTransientIndication(String transientIndication) {
-        showTransientIndication(transientIndication, Color.WHITE, IndicationDirection.NONE);
+        showTransientIndication(transientIndication, Color.WHITE);
     }
 
     /**
      * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
      */
     public void showTransientIndication(String transientIndication, int textColor) {
-        showTransientIndication(transientIndication, textColor, IndicationDirection.NONE);
-    }
-
-    /**
-     * Shows {@param transientIndication} until it is hidden by {@link #hideTransientIndication}.
-     */
-    public void showTransientIndication(String transientIndication, int textColor,
-            IndicationDirection direction) {
         mTransientIndication = transientIndication;
         mTransientTextColor = textColor;
-        mIndicationDirection = direction;
         mHandler.removeMessages(MSG_HIDE_TRANSIENT);
         updateIndication();
     }
@@ -181,61 +157,31 @@ public class KeyguardIndicationController {
         }
     }
 
-    public void cleanup() {
-        KeyguardUpdateMonitor.getInstance(mContext).removeCallback(mUpdateMonitor);
-        mContext.unregisterReceiver(mReceiver);
-    }
-
     private void updateIndication() {
         if (mVisible) {
-            final int color = computeColor();
-            mTextView.switchIndication(computeIndication());
-            mTextView.setTextColor(color);
-            int top = 0, left = 0, right = 0;
-            // pad the bottom using ic_empty_space to keep text vertically aligned if needed
-            int bottom = mScreenOnHintsEnabled ? R.drawable.ic_empty_space : 0;
-            switch (mIndicationDirection) {
-                case UP:
-                    top = R.drawable.ic_keyboard_arrow_up;
-                    break;
-                case DOWN:
-                    bottom = R.drawable.ic_keyboard_arrow_down;
-                    break;
-                case LEFT:
-                    left = R.drawable.ic_keyboard_arrow_left;
-                    break;
-                case RIGHT:
-                    right = R.drawable.ic_keyboard_arrow_right;
-                    break;
-                case NONE:
-                default:
-                    break;
-            }
-            mTextView.setCompoundDrawablesWithIntrinsicBounds(left, top, right, bottom);
-            mTextView.setCompoundDrawableTintList(ColorStateList.valueOf(color));
-        }
-    }
+            // Walk down a precedence-ordered list of what should indication
+            // should be shown based on user or device state
+            if (!mUserManager.isUserUnlocked(ActivityManager.getCurrentUser())) {
+                mTextView.switchIndication(com.android.internal.R.string.lockscreen_storage_locked);
+                mTextView.setTextColor(Color.WHITE);
 
-    private int computeColor() {
-        if (!TextUtils.isEmpty(mTransientIndication)) {
-            return mTransientTextColor;
-        }
-        return Color.WHITE;
-    }
+            } else if (!TextUtils.isEmpty(mTransientIndication)) {
+                mTextView.switchIndication(mTransientIndication);
+                mTextView.setTextColor(mTransientTextColor);
 
-    private String computeIndication() {
-        if (!TextUtils.isEmpty(mTransientIndication)) {
-            return mTransientIndication;
-        }
-        mIndicationDirection = IndicationDirection.NONE;
-        if (mPowerPluggedIn) {
-            String indication = computePowerIndication();
-            if (DEBUG_CHARGING_CURRENT) {
-                indication += ",  " + (mChargingCurrent / 1000) + " mA";
+            } else if (mPowerPluggedIn) {
+                String indication = computePowerIndication();
+                if (DEBUG_CHARGING_SPEED) {
+                    indication += ",  " + (mChargingWattage / 1000) + " mW";
+                }
+                mTextView.switchIndication(indication);
+                mTextView.setTextColor(Color.WHITE);
+
+            } else {
+                mTextView.switchIndication(mRestingIndication);
+                mTextView.setTextColor(Color.WHITE);
             }
-            return indication;
         }
-        return mRestingIndication;
     }
 
     private String computePowerIndication() {
@@ -282,13 +228,15 @@ public class KeyguardIndicationController {
     }
 
     KeyguardUpdateMonitorCallback mUpdateMonitor = new KeyguardUpdateMonitorCallback() {
+        public int mLastSuccessiveErrorMessage = -1;
+
         @Override
         public void onRefreshBatteryInfo(KeyguardUpdateMonitor.BatteryStatus status) {
             boolean isChargingOrFull = status.status == BatteryManager.BATTERY_STATUS_CHARGING
                     || status.status == BatteryManager.BATTERY_STATUS_FULL;
             mPowerPluggedIn = status.isPluggedIn() && isChargingOrFull;
             mPowerCharged = status.isCharged();
-            mChargingCurrent = status.maxChargingCurrent;
+            mChargingWattage = status.maxChargingWattage;
             mChargingSpeed = status.getChargingSpeed(mSlowThreshold, mFastThreshold);
             updateIndication();
         }
@@ -309,6 +257,9 @@ public class KeyguardIndicationController {
                 mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_CLEAR_FP_MSG),
                         TRANSIENT_FP_ERROR_TIMEOUT);
             }
+            // Help messages indicate that there was actually a try since the last error, so those
+            // are not two successive error messages anymore.
+            mLastSuccessiveErrorMessage = -1;
         }
 
         @Override
@@ -320,15 +271,22 @@ public class KeyguardIndicationController {
             }
             int errorColor = mContext.getResources().getColor(R.color.system_warning_color, null);
             if (mStatusBarKeyguardViewManager.isBouncerShowing()) {
-                mStatusBarKeyguardViewManager.showBouncerMessage(errString, errorColor);
+                // When swiping up right after receiving a fingerprint error, the bouncer calls
+                // authenticate leading to the same message being shown again on the bouncer.
+                // We want to avoid this, as it may confuse the user when the message is too
+                // generic.
+                if (mLastSuccessiveErrorMessage != msgId) {
+                    mStatusBarKeyguardViewManager.showBouncerMessage(errString, errorColor);
+                }
             } else if (updateMonitor.isDeviceInteractive()) {
-                    showTransientIndication(errString, errorColor);
-                    // We want to keep this message around in case the screen was off
-                    mHandler.removeMessages(MSG_HIDE_TRANSIENT);
-                    hideTransientIndicationDelayed(5000);
-             } else {
-                    mMessageToShowOnScreenOn = errString;
+                showTransientIndication(errString, errorColor);
+                // We want to keep this message around in case the screen was off
+                mHandler.removeMessages(MSG_HIDE_TRANSIENT);
+                hideTransientIndicationDelayed(5000);
+            } else {
+                mMessageToShowOnScreenOn = errString;
             }
+            mLastSuccessiveErrorMessage = msgId;
         }
 
         @Override
@@ -349,6 +307,18 @@ public class KeyguardIndicationController {
             if (running) {
                 mMessageToShowOnScreenOn = null;
             }
+        }
+
+        @Override
+        public void onFingerprintAuthenticated(int userId) {
+            super.onFingerprintAuthenticated(userId);
+            mLastSuccessiveErrorMessage = -1;
+        }
+
+        @Override
+        public void onFingerprintAuthFailed() {
+            super.onFingerprintAuthFailed();
+            mLastSuccessiveErrorMessage = -1;
         }
     };
 
@@ -377,13 +347,5 @@ public class KeyguardIndicationController {
     public void setStatusBarKeyguardViewManager(
             StatusBarKeyguardViewManager statusBarKeyguardViewManager) {
         mStatusBarKeyguardViewManager = statusBarKeyguardViewManager;
-    }
-
-    public enum IndicationDirection {
-        NONE,
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT
     }
 }

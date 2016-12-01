@@ -46,7 +46,6 @@ public class CarrierText extends TextView {
     private static final String TAG = "CarrierText";
 
     private static CharSequence mSeparator;
-    private static CharSequence mSubSeparator;
 
     private final boolean mIsEmergencyCallCapable;
 
@@ -169,7 +168,7 @@ public class CarrierText extends TextView {
             }
             if (carrierTextForSimState != null) {
                 allSimsMissing = false;
-                displayText = concatenate(displayText, carrierTextForSimState, mSubSeparator);
+                displayText = concatenate(displayText, carrierTextForSimState);
             }
             if (simState == IccCardConstants.State.READY) {
                 ServiceState ss = mKeyguardUpdateMonitor.mServiceStates.get(subId);
@@ -186,25 +185,6 @@ public class CarrierText extends TextView {
                         anySimReadyAndInService = true;
                     }
                 }
-            }
-        }
-        /*
-         * In the case where there is only one sim inserted in a multisim device, if
-         * the voice registration service state is reported as 12 (no service with emergency)
-         * for at least one of the sim concatenate the sim state with Emergency calls only"
-         */
-        if (N < TelephonyManager.getDefault().getPhoneCount() &&
-                 mKeyguardUpdateMonitor.isEmergencyOnly()) {
-            int presentSubId = mKeyguardUpdateMonitor.getPresentSubId();
-
-            if (DEBUG) {
-                Log.d(TAG, " Present sim - sub id: " + presentSubId);
-            }
-            if (presentSubId != -1) {
-                CharSequence emergencyOnlyText =
-                        getContext().getText(com.android.internal.R.string.emergency_calls_only);
-                displayText = getCarrierTextForSimState(
-                        mKeyguardUpdateMonitor.getSimState(presentSubId), emergencyOnlyText);
             }
         }
         if (allSimsMissing) {
@@ -262,8 +242,6 @@ public class CarrierText extends TextView {
         super.onFinishInflate();
         mSeparator = getResources().getString(
                 com.android.internal.R.string.kg_text_message_separator);
-        mSubSeparator = getResources().getString(
-                com.android.internal.R.string.kg_sub_separator);
         boolean shouldMarquee = KeyguardUpdateMonitor.getInstance(mContext).isDeviceInteractive();
         setSelected(shouldMarquee); // Allow marquee to work.
     }
@@ -315,7 +293,7 @@ public class CarrierText extends TextView {
 
             case NetworkLocked:
                 carrierText = makeCarrierStringOnEmergencyCapable(
-                        getContext().getText(R.string.keyguard_perso_locked_message), text);
+                        mContext.getText(R.string.keyguard_network_locked_message), text);
                 break;
 
             case SimMissing:
@@ -383,7 +361,7 @@ public class CarrierText extends TextView {
             case ABSENT:
                 return StatusMode.SimMissing;
             case NETWORK_LOCKED:
-                return StatusMode.NetworkLocked;
+                return StatusMode.SimMissingLocked;
             case NOT_READY:
                 return StatusMode.SimNotReady;
             case PIN_REQUIRED:
@@ -403,15 +381,10 @@ public class CarrierText extends TextView {
     }
 
     private static CharSequence concatenate(CharSequence plmn, CharSequence spn) {
-        return concatenate(plmn, spn, mSeparator);
-    }
-
-    private static CharSequence concatenate(CharSequence plmn, CharSequence spn,
-            CharSequence separator) {
         final boolean plmnValid = !TextUtils.isEmpty(plmn);
         final boolean spnValid = !TextUtils.isEmpty(spn);
         if (plmnValid && spnValid) {
-            return new StringBuilder().append(plmn).append(separator).append(spn).toString();
+            return new StringBuilder().append(plmn).append(mSeparator).append(spn).toString();
         } else if (plmnValid) {
             return plmn;
         } else if (spnValid) {

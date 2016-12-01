@@ -1,7 +1,4 @@
 /*
- * Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
- * Not a Contribution.
- *
  * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
-import android.text.format.DateFormat;
+import android.icu.text.DateFormat;
+import android.icu.text.DisplayContext;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import android.provider.Settings;
 
 import com.android.systemui.R;
 
@@ -39,7 +38,7 @@ public class DateView extends TextView {
 
     private final Date mCurrentTime = new Date();
 
-    private SimpleDateFormat mDateFormat;
+    private DateFormat mDateFormat;
     private String mLastText;
     private String mDatePattern;
 
@@ -103,11 +102,13 @@ public class DateView extends TextView {
     protected void updateClock() {
         if (mDateFormat == null) {
             final Locale l = Locale.getDefault();
-            final String fmt = DateFormat.getBestDateTimePattern(l, mDatePattern);
-            mDateFormat = new SimpleDateFormat(fmt, l);
+            DateFormat format = DateFormat.getInstanceForSkeleton(mDatePattern, l);
+            format.setContext(DisplayContext.CAPITALIZATION_FOR_STANDALONE);
+            mDateFormat = format;
         }
 
         mCurrentTime.setTime(System.currentTimeMillis());
+
         final String text = getDateFormat();
         if (!text.equals(mLastText)) {
             setText(text);
@@ -116,9 +117,10 @@ public class DateView extends TextView {
     }
 
     private String getDateFormat() {
-        if (getContext().getResources().getBoolean(
-                com.android.internal.R.bool.def_custom_dateformat)) {
-            return DateFormat.getDateFormat(getContext()).format(mCurrentTime);
+        if (getContext().getResources().getBoolean(com.android.internal.R.bool.config_dateformat)) {
+            String dateformat = Settings.System.getString(getContext().getContentResolver(),
+                    Settings.System.DATE_FORMAT);
+            return android.text.format.DateFormat.format(dateformat, mCurrentTime).toString();
         } else {
             return mDateFormat.format(mCurrentTime);
         }

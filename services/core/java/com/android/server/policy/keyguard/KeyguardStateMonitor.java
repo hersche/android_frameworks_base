@@ -43,7 +43,8 @@ public class KeyguardStateMonitor extends IKeyguardStateCallback.Stub {
     private volatile boolean mIsShowing = true;
     private volatile boolean mSimSecure = true;
     private volatile boolean mInputRestricted = true;
-    private volatile boolean mKeyguardPanelFocused = false;
+    private volatile boolean mTrusted = false;
+    private volatile boolean mHasLockscreenWallpaper = false;
 
     private int mCurrentUserId;
 
@@ -63,16 +64,20 @@ public class KeyguardStateMonitor extends IKeyguardStateCallback.Stub {
         return mIsShowing;
     }
 
-    public boolean isSecure() {
-        return mLockPatternUtils.isSecure(getCurrentUser()) || mSimSecure;
+    public boolean isSecure(int userId) {
+        return mLockPatternUtils.isSecure(userId) || mSimSecure;
     }
 
     public boolean isInputRestricted() {
         return mInputRestricted;
     }
 
-    public boolean isKeyguardPanelFocused() {
-        return mKeyguardPanelFocused;
+    public boolean isTrusted() {
+        return mTrusted;
+    }
+
+    public boolean hasLockscreenWallpaper() {
+        return mHasLockscreenWallpaper;
     }
 
     @Override // Binder interface
@@ -83,11 +88,6 @@ public class KeyguardStateMonitor extends IKeyguardStateCallback.Stub {
     @Override // Binder interface
     public void onSimSecureStateChanged(boolean simSecure) {
         mSimSecure = simSecure;
-    }
-
-    @Override // Binder interface
-    public void onKeyguardPanelFocusChanged(boolean focused) {
-        mKeyguardPanelFocused = focused;
     }
 
     public synchronized void setCurrentUser(int userId) {
@@ -103,13 +103,23 @@ public class KeyguardStateMonitor extends IKeyguardStateCallback.Stub {
         mInputRestricted = inputRestricted;
     }
 
+    @Override // Binder interface
+    public void onTrustedChanged(boolean trusted) {
+        mTrusted = trusted;
+    }
+
+    @Override // Binder interface
+    public void onHasLockscreenWallpaperChanged(boolean hasLockscreenWallpaper) {
+        mHasLockscreenWallpaper = hasLockscreenWallpaper;
+    }
+
     public void dump(String prefix, PrintWriter pw) {
         pw.println(prefix + TAG);
         prefix += "  ";
         pw.println(prefix + "mIsShowing=" + mIsShowing);
         pw.println(prefix + "mSimSecure=" + mSimSecure);
         pw.println(prefix + "mInputRestricted=" + mInputRestricted);
+        pw.println(prefix + "mTrusted=" + mTrusted);
         pw.println(prefix + "mCurrentUserId=" + mCurrentUserId);
-        pw.println(prefix + "mKeyguardPanelFocused=" + mKeyguardPanelFocused);
     }
 }

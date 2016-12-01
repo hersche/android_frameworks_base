@@ -21,8 +21,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.os.UserHandle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -30,11 +31,10 @@ import android.text.format.DateFormat;
 import android.text.style.CharacterStyle;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.widget.TextView;
 
 import com.android.systemui.DemoMode;
-import com.android.systemui.R;
-import com.android.systemui.cm.UserContentObserver;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,10 +47,14 @@ import libcore.icu.LocaleData;
  * Digital clock for the status bar.
  */
 public class Clock extends TextView implements DemoMode {
+
+    public static final String CLOCK_SECONDS = "clock_seconds";
+
     private boolean mAttached;
     private Calendar mCalendar;
     private String mClockFormatString;
     private SimpleDateFormat mClockFormat;
+    private SimpleDateFormat mContentDescriptionFormat;
     private Locale mLocale;
 
     public static final int AM_PM_STYLE_NORMAL  = 0;
@@ -58,6 +62,8 @@ public class Clock extends TextView implements DemoMode {
     public static final int AM_PM_STYLE_GONE    = 2;
 
     private int mAmPmStyle = AM_PM_STYLE_GONE;
+    private boolean mShowSeconds;
+    private Handler mSecondsHandler;
 
     public Clock(Context context) {
         this(context, null);
@@ -97,6 +103,7 @@ public class Clock extends TextView implements DemoMode {
 
         // Make sure we update to the current time
         updateClock();
+        updateShowSeconds();
     }
 
     @Override
@@ -133,6 +140,30 @@ public class Clock extends TextView implements DemoMode {
         if (mDemoMode || mCalendar == null) return;
         mCalendar.setTimeInMillis(System.currentTimeMillis());
         setText(getSmallTime());
+        setContentDescription(mContentDescriptionFormat.format(mCalendar.getTime()));
+    }
+
+    private void updateShowSeconds() {
+        if (mShowSeconds) {
+            // Wait until we have a display to start trying to show seconds.
+            if (mSecondsHandler == null && getDisplay() != null) {
+                mSecondsHandler = new Handler();
+                if (getDisplay().getState() == Display.STATE_ON) {
+                    mSecondsHandler.postAtTime(mSecondTick,
+                            SystemClock.uptimeMillis() / 1000 * 1000 + 1000);
+                }
+                IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+                filter.addAction(Intent.ACTION_SCREEN_ON);
+                mContext.registerReceiver(mScreenReceiver, filter);
+            }
+        } else {
+            if (mSecondsHandler != null) {
+                mContext.unregisterReceiver(mScreenReceiver);
+                mSecondsHandler.removeCallbacks(mSecondTick);
+                mSecondsHandler = null;
+                updateClock();
+            }
+        }
     }
 
     private final CharSequence getSmallTime() {
@@ -144,8 +175,11 @@ public class Clock extends TextView implements DemoMode {
         final char MAGIC2 = '\uEF01';
 
         SimpleDateFormat sdf;
-        String format = is24 ? d.timeFormat_Hm : d.timeFormat_hm;
+        String format = mShowSeconds
+                ? is24 ? d.timeFormat_Hms : d.timeFormat_hms
+                : is24 ? d.timeFormat_Hm : d.timeFormat_hm;
         if (!format.equals(mClockFormatString)) {
+            mContentDescriptionFormat = new SimpleDateFormat(format);
             /*
              * Search for an unquoted "a" in the format string, so we can
              * add dummy characters around it to let us find it again after
@@ -234,13 +268,46 @@ public class Clock extends TextView implements DemoMode {
                 mCalendar.set(Calendar.MINUTE, mm);
             }
             setText(getSmallTime());
+            setContentDescription(mContentDescriptionFormat.format(mCalendar.getTime()));
         }
     }
+
+    private final BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                if (mSecondsHandler != null) {
+                    mSecondsHandler.removeCallbacks(mSecondTick);
+                }
+            } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                if (mSecondsHandler != null) {
+                    mSecondsHandler.postAtTime(mSecondTick,
+                            SystemClock.uptimeMillis() / 1000 * 1000 + 1000);
+                }
+            }
+        }
+    };
+
+    private final Runnable mSecondTick = new Runnable() {
+        @Override
+        public void run() {
+            if (mCalendar != null) {
+                updateClock();
+            }
+            mSecondsHandler.postAtTime(this, SystemClock.uptimeMillis() / 1000 * 1000 + 1000);
+        }
+    };
 
     public void setAmPmStyle(int style) {
         mAmPmStyle = style;
         mClockFormatString = "";
         updateClock();
+    }
+
+    public void setShowSeconds(boolean showSeconds) {
+        mShowSeconds = showSeconds;
+        updateShowSeconds();;
     }
 }
 

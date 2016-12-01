@@ -24,6 +24,7 @@ import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -56,8 +57,7 @@ public class NumPadKey extends ViewGroup {
             if (mTextView != null && mTextView.isEnabled()) {
                 mTextView.append(Character.forDigit(mDigit, 10));
             }
-            userActivity();
-            doHapticKeyClick();
+            userActivity();;
         }
     };
 
@@ -74,6 +74,10 @@ public class NumPadKey extends ViewGroup {
     }
 
     public NumPadKey(Context context, AttributeSet attrs, int defStyle) {
+        this(context, attrs, defStyle, R.layout.keyguard_num_pad_key);
+    }
+
+    protected NumPadKey(Context context, AttributeSet attrs, int defStyle, int contentResource) {
         super(context, attrs, defStyle);
         setFocusable(true);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.NumPadKey);
@@ -93,7 +97,7 @@ public class NumPadKey extends ViewGroup {
         mPM = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.keyguard_num_pad_key, this, true);
+        inflater.inflate(contentResource, this, true);
 
         mDigitText = (TextView) findViewById(R.id.digit_text);
         mDigitText.setText(Integer.toString(mDigit));
@@ -137,6 +141,13 @@ public class NumPadKey extends ViewGroup {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            doHapticKeyClick();
+        }
+        return super.onTouchEvent(event);
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

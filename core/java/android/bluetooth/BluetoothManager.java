@@ -38,8 +38,11 @@ import java.util.List;
  *
  * <div class="special reference">
  * <h3>Developer Guides</h3>
- * <p>For more information about using BLUETOOTH, read the
- * <a href="{@docRoot}guide/topics/connectivity/bluetooth.html">Bluetooth</a> developer guide.</p>
+ * <p>
+ * For more information about using BLUETOOTH, read the <a href=
+ * "{@docRoot}guide/topics/connectivity/bluetooth.html">Bluetooth</a> developer
+ * guide.
+ * </p>
  * </div>
  *
  * @see Context#getSystemService
@@ -144,7 +147,7 @@ public final class BluetoothManager {
     }
 
     /**
-     * 
+     *
      * Get a list of devices that match any of the given connection
      * states.
      *

@@ -42,7 +42,6 @@ import android.os.RemoteException;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.service.notification.Condition;
-import android.service.notification.ZenModeConfig;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -132,10 +131,6 @@ public class VolumeDialogController {
 
     public AudioManager getAudioManager() {
         return mAudio;
-    }
-
-    public ZenModeConfig getZenModeConfig() {
-        return mNoMan.getZenModeConfig();
     }
 
     public void dismiss() {
@@ -293,7 +288,7 @@ public class VolumeDialogController {
         return changed;
     }
 
-    private void onVolumeChangedW(int stream, int flags) {
+    private boolean onVolumeChangedW(int stream, int flags) {
         final boolean showUI = (flags & AudioManager.FLAG_SHOW_UI) != 0;
         final boolean fromKey = (flags & AudioManager.FLAG_FROM_KEY) != 0;
         final boolean showVibrateHint = (flags & AudioManager.FLAG_SHOW_VIBRATE_HINT) != 0;
@@ -334,6 +329,7 @@ public class VolumeDialogController {
         if (changed && fromKey) {
             Events.writeEvent(mContext, Events.EVENT_KEY, stream, lastAudibleStreamVolume);
         }
+        return changed;
     }
 
     private boolean updateActiveStreamW(int activeStream) {
@@ -370,8 +366,6 @@ public class VolumeDialogController {
         updateRingerModeExternalW(mAudio.getRingerMode());
         updateZenModeW();
         updateEffectsSuppressorW(mNoMan.getEffectsSuppressor());
-        updateZenModeConfigW();
-        updateLinkNotificationConfigW();
         mCallbacks.onStateChanged(mState);
     }
 
@@ -431,13 +425,6 @@ public class VolumeDialogController {
             return false;
         }
         mState.linkedNotification = linkNotificationWithVolume;
-        return true;
-    }
-
-    private boolean updateZenModeConfigW() {
-        final ZenModeConfig zenModeConfig = getZenModeConfig();
-        if (Objects.equals(mState.zenModeConfig, zenModeConfig)) return false;
-        mState.zenModeConfig = zenModeConfig;
         return true;
     }
 
@@ -851,9 +838,6 @@ public class VolumeDialogController {
             if (ZEN_MODE_URI.equals(uri)) {
                 changed = updateZenModeW();
             }
-            if (ZEN_MODE_CONFIG_URI.equals(uri)) {
-                changed = updateZenModeConfigW();
-            }
             if (VOLUME_LINK_NOTIFICATION_URI.equals(uri)) {
                 changed = updateLinkNotificationConfigW();
             }
@@ -904,6 +888,7 @@ public class VolumeDialogController {
                 if (D.BUG) Log.d(TAG, "onReceive STREAM_DEVICES_CHANGED_ACTION stream="
                         + stream + " devices=" + devices + " oldDevices=" + oldDevices);
                 changed = checkRoutedToBluetoothW(stream);
+                changed |= onVolumeChangedW(stream, 0);
             } else if (action.equals(AudioManager.RINGER_MODE_CHANGED_ACTION)) {
                 final int rm = intent.getIntExtra(AudioManager.EXTRA_RINGER_MODE, -1);
                 if (D.BUG) Log.d(TAG, "onReceive RINGER_MODE_CHANGED_ACTION rm="
@@ -975,13 +960,6 @@ public class VolumeDialogController {
 
         @Override
         public void onRemoteVolumeChanged(Token token, int flags) {
-            // If an inactive session changed the remoteVolume, bail
-            // since we don't have any active streams to update
-            if (!mRemoteStreams.containsKey(token)) {
-                Log.i(TAG, "onRemoteVolumeChanged called on inactive" +
-                        "stream. Ignoring");
-                return;
-            }
             final int stream = mRemoteStreams.get(token);
             final boolean showUI = (flags & AudioManager.FLAG_SHOW_UI) != 0;
             boolean changed = updateActiveStreamW(stream);
@@ -1059,7 +1037,6 @@ public class VolumeDialogController {
         public int zenMode;
         public ComponentName effectsSuppressor;
         public String effectsSuppressorName;
-        public ZenModeConfig zenModeConfig;
         public int activeStream = NO_ACTIVE_STREAM;
         public boolean linkedNotification;
 
@@ -1073,7 +1050,6 @@ public class VolumeDialogController {
             rt.zenMode = zenMode;
             if (effectsSuppressor != null) rt.effectsSuppressor = effectsSuppressor.clone();
             rt.effectsSuppressorName = effectsSuppressorName;
-            if (zenModeConfig != null) rt.zenModeConfig = zenModeConfig.copy();
             rt.activeStream = activeStream;
             rt.linkedNotification = linkedNotification;
             return rt;
@@ -1103,7 +1079,6 @@ public class VolumeDialogController {
             sep(sb, indent); sb.append("zenMode:").append(zenMode);
             sep(sb, indent); sb.append("effectsSuppressor:").append(effectsSuppressor);
             sep(sb, indent); sb.append("effectsSuppressorName:").append(effectsSuppressorName);
-            sep(sb, indent); sb.append("zenModeConfig:").append(zenModeConfig);
             sep(sb, indent); sb.append("activeStream:").append(activeStream);
             sep(sb, indent); sb.append("linkedNotification:").append(linkedNotification);
             if (indent > 0) sep(sb, indent);
@@ -1119,11 +1094,6 @@ public class VolumeDialogController {
             } else {
                 sb.append(',');
             }
-        }
-
-        public Condition getManualExitCondition() {
-            return zenModeConfig != null && zenModeConfig.manualRule != null
-                    ? zenModeConfig.manualRule.condition : null;
         }
     }
 

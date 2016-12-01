@@ -97,11 +97,11 @@ public final class RemoteConference {
          *
          * @param conference The {@code RemoteConference} invoking this method.
          * @param connectionProperties The new properties of the {@code RemoteConference}.
-         * @hide
          */
         public void onConnectionPropertiesChanged(
                 RemoteConference conference,
                 int connectionProperties) {}
+
 
         /**
          * Invoked when the set of {@link RemoteConnection}s which can be added to this conference
@@ -256,7 +256,7 @@ public final class RemoteConference {
         }
     }
 
-    /** {@hide} */
+    /** @hide */
     void setConnectionProperties(final int connectionProperties) {
         if (mConnectionProperties != connectionProperties) {
             mConnectionProperties = connectionProperties;
@@ -310,15 +310,35 @@ public final class RemoteConference {
     }
 
     /** @hide */
-    void setExtras(final Bundle extras) {
-        mExtras = extras;
+    void putExtras(final Bundle extras) {
+        if (mExtras == null) {
+            mExtras = new Bundle();
+        }
+        mExtras.putAll(extras);
+
+        notifyExtrasChanged();
+    }
+
+    /** @hide */
+    void removeExtras(List<String> keys) {
+        if (mExtras == null || keys == null || keys.isEmpty()) {
+            return;
+        }
+        for (String key : keys) {
+            mExtras.remove(key);
+        }
+
+        notifyExtrasChanged();
+    }
+
+    private void notifyExtrasChanged() {
         for (CallbackRecord<Callback> record : mCallbackRecords) {
             final RemoteConference conference = this;
             final Callback callback = record.getCallback();
             record.getHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    callback.onExtrasChanged(conference, extras);
+                    callback.onExtrasChanged(conference, mExtras);
                 }
             });
         }
@@ -357,7 +377,6 @@ public final class RemoteConference {
      * {@link Connection} for valid values.
      *
      * @return A bitmask of the properties of the conference call.
-     * @hide
      */
     public final int getConnectionProperties() {
         return mConnectionProperties;

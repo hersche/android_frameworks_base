@@ -25,6 +25,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.DisplayMetrics;
@@ -131,8 +132,8 @@ public class SubscriptionInfo implements Parcelable {
         this.mIconBitmap = icon;
         this.mMcc = mcc;
         this.mMnc = mnc;
-        this.mUserNwMode = userNwMode;
         this.mCountryIso = countryIso;
+        this.mUserNwMode = userNwMode;
     }
 
     /**
@@ -283,18 +284,18 @@ public class SubscriptionInfo implements Parcelable {
     }
 
     /**
-     * Returns the User set Network mode.
-     * @hide
-     */
-    public int getUserNwMode() {
-        return this.mUserNwMode;
-    }
-
-    /**
      * @return the ISO country code
      */
     public String getCountryIso() {
         return this.mCountryIso;
+    }
+
+    /**
+     * Returns the user set network mode.
+     * @hide
+     */
+    public int getUserNwMode() {
+        return this.mUserNwMode;
     }
 
     public static final Parcelable.Creator<SubscriptionInfo> CREATOR = new Parcelable.Creator<SubscriptionInfo>() {
@@ -354,7 +355,7 @@ public class SubscriptionInfo implements Parcelable {
     public static String givePrintableIccid(String iccId) {
         String iccIdToPrint = null;
         if (iccId != null) {
-            if (iccId.length() > 9) {
+            if (iccId.length() > 9 && !Build.IS_DEBUGGABLE) {
                 iccIdToPrint = iccId.substring(0, 9) + "XXXXXXXXXXX";
             } else {
                 iccIdToPrint = iccId;
@@ -370,6 +371,6 @@ public class SubscriptionInfo implements Parcelable {
                 + " displayName=" + mDisplayName + " carrierName=" + mCarrierName
                 + " nameSource=" + mNameSource + " iconTint=" + mIconTint
                 + " dataRoaming=" + mDataRoaming + " iconBitmap=" + mIconBitmap + " mcc " + mMcc
-                + " mnc " + mMnc + " mUserNwMode=" + mUserNwMode + "}";
+                + " mnc " + mMnc + " userNwMode=" + mUserNwMode + "}";
     }
 }

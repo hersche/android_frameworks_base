@@ -643,7 +643,7 @@ imageView.setOnLongClickListener(new View.OnLongClickListener() {
         // Defines a callback that sends the drag shadow dimensions and touch point back to the
         // system.
         &#64;Override
-        public void onProvideShadowMetrics (Point size, Point touch)
+        public void onProvideShadowMetrics (Point size, Point touch) {
             // Defines local variables
             private int width, height;
 
@@ -978,7 +978,7 @@ protected class myDragEventListener implements View.OnDragListener {
                 Log.e("DragDrop Example","Unknown action type received by OnDragListener.");
                 break;
         }
-        
+
         return false;
     }
 };

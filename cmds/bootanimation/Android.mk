@@ -3,14 +3,16 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
     bootanimation_main.cpp \
-    AudioPlayer.cpp \
+    audioplay.cpp \
     BootAnimation.cpp
 
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
 
 LOCAL_CFLAGS += -Wall -Werror -Wunused -Wunreachable-code
 
-LOCAL_C_INCLUDES += external/tinyalsa/include
+LOCAL_C_INCLUDES += \
+    external/tinyalsa/include \
+    frameworks/wilhelm/include
 
 LOCAL_SHARED_LIBRARIES := \
     libcutils \
@@ -23,11 +25,12 @@ LOCAL_SHARED_LIBRARIES := \
     libEGL \
     libGLESv1_CM \
     libgui \
+    libOpenSLES \
     libtinyalsa \
-    libmedia
+    libregionalization
 
-ifeq ($(TARGET_CONTINUOUS_SPLASH_ENABLED),true)
-    LOCAL_CFLAGS += -DCONTINUOUS_SPLASH
+ifneq ($(TARGET_BOOTANIMATION_MULTITHREAD_DECODE),false)
+    LOCAL_CFLAGS += -DMULTITHREAD_DECODE
 endif
 
 ifeq ($(TARGET_BOOTANIMATION_PRELOAD),true)
@@ -46,11 +49,9 @@ ifeq ($(TARGET_BOOTANIMATION_USE_RGB565),true)
     LOCAL_CFLAGS += -DUSE_565
 endif
 
-ifneq ($(TARGET_BOOTANIMATION_MULTITHREAD_DECODE),false)
-    LOCAL_CFLAGS += -DMULTITHREAD_DECODE
-endif
-
 LOCAL_MODULE:= bootanimation
+
+LOCAL_INIT_RC := bootanim.rc
 
 ifdef TARGET_32_BIT_SURFACEFLINGER
 LOCAL_32_BIT_ONLY := true

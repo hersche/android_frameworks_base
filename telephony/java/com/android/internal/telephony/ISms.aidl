@@ -184,7 +184,7 @@ interface ISms {
      */
     void sendTextForSubscriberWithSelfPermissions(in int subId, String callingPkg,
             in String destAddr, in String scAddr, in String text, in PendingIntent sentIntent,
-            in PendingIntent deliveryIntent);
+            in PendingIntent deliveryIntent, in boolean persistMessage);
 
     /**
      * Send an SMS with options using Subscription Id.
@@ -467,16 +467,11 @@ interface ISms {
      */
     String getImsSmsFormatForSubscriber(int subId);
 
-    /**
+    /*
      * Get SMS prompt property,  enabled or not
      * @return true if enabled, false otherwise
      */
     boolean isSMSPromptEnabled();
-
-    /**
-     * Set SMS prompt property,  enabled or not
-     */
-    void setSMSPromptEnabled(boolean bool);
 
     /**
      * Send a system stored text message.

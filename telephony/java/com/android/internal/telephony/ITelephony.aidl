@@ -18,14 +18,22 @@ package com.android.internal.telephony;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.ResultReceiver;
+import android.net.Uri;
+import android.service.carrier.CarrierIdentifier;
 import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
 import android.telephony.CellInfo;
 import android.telephony.IccOpenLogicalChannelResponse;
+import android.telephony.ModemActivityInfo;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.RadioAccessFamily;
-import android.telephony.ModemActivityInfo;
+import android.telephony.ServiceState;
+import android.telephony.TelephonyHistogram;
+import android.telephony.VisualVoicemailSmsFilterSettings;
 import com.android.internal.telephony.CellNetworkScanResult;
 import com.android.internal.telephony.OperatorInfo;
+
 import java.util.List;
 
 
@@ -177,13 +185,6 @@ interface ITelephony {
      * @return returns true if the radio is on.
      */
     boolean isRadioOnForSubscriber(int subId, String callingPackage);
-
-    /**
-     * Check if the SIM pin lock is enabled.
-     * @return true if the SIM pin lock is enabled.
-     * @param callingPackage The package making the call.
-     */
-    boolean isSimPinEnabled(String callingPackage);
 
     /**
      * Supply a pin to unlock the SIM.  Blocks until a result is determined.
@@ -364,9 +365,9 @@ interface ITelephony {
      int getCallState();
 
     /**
-     * Returns the call state for a subId.
+     * Returns the call state for a slot.
      */
-     int getCallStateForSubscriber(int subId);
+     int getCallStateForSlot(int slotId);
 
      int getDataActivity();
      int getDataState();
@@ -379,12 +380,12 @@ interface ITelephony {
     int getActivePhoneType();
 
     /**
-     * Returns the current active phone type as integer for particular subId.
+     * Returns the current active phone type as integer for particular slot.
      * Returns TelephonyManager.PHONE_TYPE_CDMA if RILConstants.CDMA_PHONE
      * and TelephonyManager.PHONE_TYPE_GSM if RILConstants.GSM_PHONE
-     * @param subId user preferred subId.
+     * @param slotId - slot to query.
      */
-    int getActivePhoneTypeForSubscriber(int subId);
+    int getActivePhoneTypeForSlot(int slotId);
 
     /**
      * Returns the CDMA ERI icon index to display
@@ -453,6 +454,26 @@ interface ITelephony {
      */
     int getVoiceMessageCountForSubscriber(int subId);
 
+    oneway void setVisualVoicemailEnabled(String callingPackage,
+            in PhoneAccountHandle accountHandle, boolean enabled);
+
+    boolean isVisualVoicemailEnabled(String callingPackage,
+            in PhoneAccountHandle accountHandle);
+
+    // Not oneway, caller needs to make sure the vaule is set before receiving a SMS
+    void enableVisualVoicemailSmsFilter(String callingPackage, int subId,
+            in VisualVoicemailSmsFilterSettings settings);
+
+    oneway void disableVisualVoicemailSmsFilter(String callingPackage, int subId);
+
+    // Get settings set by the calling package
+    VisualVoicemailSmsFilterSettings getVisualVoicemailSmsFilterSettings(String callingPackage,
+            int subId);
+
+    // Get settings set by the package, requires READ_PRIVILEGED_PHONE_STATE permission
+    VisualVoicemailSmsFilterSettings getSystemVisualVoicemailSmsFilterSettings(String packageName,
+            int subId);
+
     /**
      * Returns the network type for data transmission
      * Legacy call, permission-free
@@ -486,13 +507,6 @@ interface ITelephony {
       * Returns the network type
       */
     int getVoiceNetworkTypeForSubscriber(int subId, String callingPackage);
-
-    /**
-      * Return icc operator numeric for given subId
-      * @param subId user preferred subId.
-      * Returns icc operator numeric
-      */
-    String getIccOperatorNumericForData(int subId);
 
     /**
      * Return true if an ICC card is present
@@ -545,16 +559,6 @@ interface ITelephony {
     int getLteOnGsmMode();
 
     /**
-     * Adds a protected sms address to the {@link Settings.Secure.PROTECTED_SMS_ADDRESSES}
-     */
-    void addProtectedSmsAddress(String address);
-
-    /**
-     * Revokes a protected sms address from {@link Settings.Secure.PROTECTED_SMS_ADDRESSES}
-     */
-    boolean revokeProtectedSmsAddress(String address);
-
-    /**
      * get default sim
      * @return sim id
      */
@@ -565,32 +569,11 @@ interface ITelephony {
      *
      * Input parameters equivalent to TS 27.007 AT+CCHO command.
      *
+     * @param subId The subscription to use.
      * @param AID Application id. See ETSI 102.221 and 101.220.
      * @return an IccOpenLogicalChannelResponse object.
      */
-    IccOpenLogicalChannelResponse iccOpenLogicalChannel(String AID);
-
-    /**
-     * Opens a logical channel to the ICC card.
-     *
-     * Input parameters equivalent to TS 27.007 AT+CCHO command.
-     *
-     * @param p2 P2 parameter
-     * @param AID Application id.
-     * @return an IccOpenLogicalChannelResponse object.
-     */
-    IccOpenLogicalChannelResponse iccOpenLogicalChannelWithP2(String AID, byte p2);
-
-    /**
-     * Opens a logical channel to the ICC card for a particular subId.
-     *
-     * Input parameters equivalent to TS 27.007 AT+CCHO command.
-     *
-     * @param subId user preferred subId.
-     * @param AID Application id. See ETSI 102.221 and 101.220.
-     * @return an IccOpenLogicalChannelResponse object.
-     */
-    IccOpenLogicalChannelResponse iccOpenLogicalChannelUsingSubId(int subId, String AID);
+    IccOpenLogicalChannelResponse iccOpenLogicalChannel(int subId, String AID);
 
     /**
      * Opens a logical channel to the ICC card for a particular subID
@@ -599,7 +582,7 @@ interface ITelephony {
      * @param p2 P2 parameter
      * @param AID Application id. See ETSI 102.221 and 101.220
      */
-    IccOpenLogicalChannelResponse iccOpenLogicalChannelUsingSubIdWithP2(int subId,
+    IccOpenLogicalChannelResponse iccOpenLogicalChannelWithP2(int subId,
         String AID, byte p2);
 
     /**
@@ -607,30 +590,19 @@ interface ITelephony {
      *
      * Input parameters equivalent to TS 27.007 AT+CCHC command.
      *
+     * @param subId The subscription to use.
      * @param channel is the channel id to be closed as retruned by a
      *            successful iccOpenLogicalChannel.
      * @return true if the channel was closed successfully.
      */
-    boolean iccCloseLogicalChannel(int channel);
-
-    /**
-     * Closes a previously opened logical channel to the ICC card for a
-     * particular subId.
-     *
-     * Input parameters equivalent to TS 27.007 AT+CCHC command.
-     *
-     * @param subId user preferred subId.
-     * @param channel is the channel id to be closed as retruned by a
-     *            successful iccOpenLogicalChannel.
-     * @return true if the channel was closed successfully.
-     */
-    boolean iccCloseLogicalChannelUsingSubId(int subId, int channel);
+    boolean iccCloseLogicalChannel(int subId, int channel);
 
     /**
      * Transmit an APDU to the ICC card over a logical channel.
      *
      * Input parameters equivalent to TS 27.007 AT+CGLA command.
      *
+     * @param subId The subscription to use.
      * @param channel is the channel id to be closed as retruned by a
      *            successful iccOpenLogicalChannel.
      * @param cla Class of the APDU command.
@@ -643,36 +615,15 @@ interface ITelephony {
      * @return The APDU response from the ICC card with the status appended at
      *            the end.
      */
-    String iccTransmitApduLogicalChannel(int channel, int cla, int instruction,
+    String iccTransmitApduLogicalChannel(int subId, int channel, int cla, int instruction,
             int p1, int p2, int p3, String data);
-
-    /**
-     * Transmit an APDU to the ICC card over a logical channel for a
-     * particular subId.
-     *
-     * Input parameters equivalent to TS 27.007 AT+CGLA command.
-     *
-     * @param subId user preferred subId.
-     * @param channel is the channel id to be closed as retruned by a
-     *            successful iccOpenLogicalChannel.
-     * @param cla Class of the APDU command.
-     * @param instruction Instruction of the APDU command.
-     * @param p1 P1 value of the APDU command.
-     * @param p2 P2 value of the APDU command.
-     * @param p3 P3 value of the APDU command. If p3 is negative a 4 byte APDU
-     *            is sent to the SIM.
-     * @param data Data to be sent with the APDU.
-     * @return The APDU response from the ICC card with the status appended at
-     *            the end.
-     */
-    String iccTransmitApduLogicalChannelUsingSubId(int subId, int channel, int cla,
-            int instruction, int p1, int p2, int p3, String data);
 
     /**
      * Transmit an APDU to the ICC card over the basic channel.
      *
      * Input parameters equivalent to TS 27.007 AT+CSIM command.
      *
+     * @param subId The subscription to use.
      * @param cla Class of the APDU command.
      * @param instruction Instruction of the APDU command.
      * @param p1 P1 value of the APDU command.
@@ -683,32 +634,13 @@ interface ITelephony {
      * @return The APDU response from the ICC card with the status appended at
      *            the end.
      */
-    String iccTransmitApduBasicChannel(int cla, int instruction,
-            int p1, int p2, int p3, String data);
-
-    /**
-     * Transmit an APDU to the ICC card over the basic channel for a particular
-     * subId.
-     *
-     * Input parameters equivalent to TS 27.007 AT+CSIM command.
-     *
-     * @param subId user preferred subId.
-     * @param cla Class of the APDU command.
-     * @param instruction Instruction of the APDU command.
-     * @param p1 P1 value of the APDU command.
-     * @param p2 P2 value of the APDU command.
-     * @param p3 P3 value of the APDU command. If p3 is negative a 4 byte APDU
-     *            is sent to the SIM.
-     * @param data Data to be sent with the APDU.
-     * @return The APDU response from the ICC card with the status appended at
-     *            the end.
-     */
-    String iccTransmitApduBasicChannelUsingSubId(int subId, int cla, int instruction,
+    String iccTransmitApduBasicChannel(int subId, int cla, int instruction,
             int p1, int p2, int p3, String data);
 
     /**
      * Returns the response APDU for a command APDU sent through SIM_IO.
      *
+     * @param subId The subscription to use.
      * @param fileID
      * @param command
      * @param p1 P1 value of the APDU command.
@@ -717,28 +649,13 @@ interface ITelephony {
      * @param filePath
      * @return The APDU response.
      */
-    byte[] iccExchangeSimIO(int fileID, int command, int p1, int p2, int p3,
+    byte[] iccExchangeSimIO(int subId, int fileID, int command, int p1, int p2, int p3,
             String filePath);
-
-    /**
-     * Returns the response APDU for a command APDU sent through SIM_IO
-     * for a particular subId.
-     *
-     * @param subId user preferred subId.
-     * @param fileID
-     * @param command
-     * @param p1 P1 value of the APDU command.
-     * @param p2 P2 value of the APDU command.
-     * @param p3 P3 value of the APDU command.
-     * @param filePath
-     * @return The APDU response.
-     */
-    byte[] iccExchangeSimIOUsingSubId(int subId, int fileID, int command, int p1, int p2,
-            int p3, String filePath);
 
     /**
      * Send ENVELOPE to the SIM and returns the response.
      *
+     * @param subId The subscription to use.
      * @param contents  String containing SAT/USAT response in hexadecimal
      *                  format starting with command tag. See TS 102 223 for
      *                  details.
@@ -746,7 +663,7 @@ interface ITelephony {
      *         being the status word. If the command fails, returns an empty
      *         string.
      */
-    String sendEnvelopeWithStatus(String content);
+    String sendEnvelopeWithStatus(int subId, String content);
 
     /**
      * Read one of the NV items defined in {@link RadioNVItems} / {@code ril_nv_items.h}.
@@ -898,9 +815,10 @@ interface ITelephony {
      *
      * TODO: Add a link to documentation.
      *
+     * @param subId The subscription to use.
      * @return carrier privilege status defined in TelephonyManager.
      */
-    int getCarrierPrivilegeStatus();
+    int getCarrierPrivilegeStatus(int subId);
 
     /**
      * Similar to above, but check for the package whose name is pkgName.
@@ -972,10 +890,11 @@ interface ITelephony {
      *   {@link android.Manifest.permission#MODIFY_PHONE_STATE MODIFY_PHONE_STATE}
      *  or has to be carrier app - see #hasCarrierPrivileges.
      *
+     * @param subId The subscription to use.
      * @param brand The brand name to display/set.
      * @return true if the operation was executed correctly.
      */
-    boolean setOperatorBrandOverride(String brand);
+    boolean setOperatorBrandOverride(int subId, String brand);
 
     /**
      * Override the roaming indicator for the current ICCID.
@@ -988,13 +907,14 @@ interface ITelephony {
      *
      * <p>Requires that the caller have carrier privilege. See #hasCarrierPrivileges.
      *
+     * @param subId for which the roaming overrides apply.
      * @param gsmRoamingList - List of MCCMNCs to be considered roaming for 3GPP RATs.
      * @param gsmNonRoamingList - List of MCCMNCs to be considered not roaming for 3GPP RATs.
      * @param cdmaRoamingList - List of SIDs to be considered roaming for 3GPP2 RATs.
      * @param cdmaNonRoamingList - List of SIDs to be considered not roaming for 3GPP2 RATs.
      * @return true if the operation was executed correctly.
      */
-    boolean setRoamingOverride(in List<String> gsmRoamingList,
+    boolean setRoamingOverride(int subId, in List<String> gsmRoamingList,
             in List<String> gsmNonRoamingList, in List<String> cdmaRoamingList,
             in List<String> cdmaNonRoamingList);
 
@@ -1091,7 +1011,7 @@ interface ITelephony {
      * Returns the Status of Wi-Fi Calling
      */
     boolean isWifiCallingAvailable();
-    
+
     /**
      * Returns the Status of Volte
      */
@@ -1113,6 +1033,26 @@ interface ITelephony {
     String getDeviceId(String callingPackage);
 
     /**
+     * Returns the IMEI for the given slot.
+     *
+     * @param slotId - device slot.
+     * @param callingPackage The package making the call.
+     * <p>Requires Permission:
+     *   {@link android.Manifest.permission#READ_PHONE_STATE READ_PHONE_STATE}
+     */
+    String getImeiForSlot(int slotId, String callingPackage);
+
+    /**
+     * Returns the device software version.
+     *
+     * @param slotId - device slot.
+     * @param callingPackage The package making the call.
+     * <p>Requires Permission:
+     *   {@link android.Manifest.permission#READ_PHONE_STATE READ_PHONE_STATE}
+     */
+    String getDeviceSoftwareVersionForSlot(int slotId, String callingPackage);
+
+    /**
      * Returns the subscription ID associated with the specified PhoneAccount.
      */
     int getSubIdForPhoneAccount(in PhoneAccount phoneAccount);
@@ -1128,18 +1068,140 @@ interface ITelephony {
     String getLocaleFromDefaultSim();
 
     /**
-     * Return the modem activity info.
+     * Requests the modem activity info asynchronously.
+     * The implementor is expected to reply with the
+     * {@link android.telephony.ModemActivityInfo} object placed into the Bundle with the key
+     * {@link android.telephony.TelephonyManager#MODEM_ACTIVITY_RESULT_KEY}.
+     * The result code is ignored.
      */
-    ModemActivityInfo getModemActivityInfo();
+    oneway void requestModemActivityInfo(in ResultReceiver result);
 
     /**
-     * Get ATR (Answer To Reset; as per ISO/IEC 7816-4) from SIM card
+     * Get the service state on specified subscription
+     * @param subId Subscription id
+     * @param callingPackage The package making the call
+     * @return Service state on specified subscription.
      */
-    byte[] getAtr();
+    ServiceState getServiceStateForSubscriber(int subId, String callingPackage);
+
+    /**
+     * Returns the URI for the per-account voicemail ringtone set in Phone settings.
+     *
+     * @param accountHandle The handle for the {@link PhoneAccount} for which to retrieve the
+     * voicemail ringtone.
+     * @return The URI for the ringtone to play when receiving a voicemail from a specific
+     * PhoneAccount.
+     */
+    Uri getVoicemailRingtoneUri(in PhoneAccountHandle accountHandle);
+
+    /**
+     * Returns whether vibration is set for voicemail notification in Phone settings.
+     *
+     * @param accountHandle The handle for the {@link PhoneAccount} for which to retrieve the
+     * voicemail vibration setting.
+     * @return {@code true} if the vibration is set for this PhoneAccount, {@code false} otherwise.
+     */
+    boolean isVoicemailVibrationEnabled(in PhoneAccountHandle accountHandle);
+
+    /**
+     * Returns a list of packages that have carrier privileges.
+     */
+    List<String> getPackagesWithCarrierPrivileges();
 
     /**
      * Get ATR (Answer To Reset; as per ISO/IEC 7816-4) from SIM card
      * for a particular subId.
      */
-    byte[] getAtrUsingSubId(int subId);
+    byte[] getAtr(int subId);
+
+    /**
+     * Return the application ID for the app type.
+     *
+     * @param subId the subscription ID that this request applies to.
+     * @param appType the uicc app type,
+     * @return Application ID for specificied app type or null if no uicc or error.
+     */
+    String getAidForAppType(int subId, int appType);
+
+    /**
+    * Return the Electronic Serial Number.
+    *
+    * Requires that the calling app has READ_PRIVILEGED_PHONE_STATE permission
+    *
+    * @param subId the subscription ID that this request applies to.
+    * @return ESN or null if error.
+    * @hide
+    */
+    String getEsn(int subId);
+
+    /**
+    * Return the Preferred Roaming List Version
+    *
+    * Requires that the calling app has READ_PRIVILEGED_PHONE_STATE permission
+    * @param subId the subscription ID that this request applies to.
+    * @return PRLVersion or null if error.
+    * @hide
+    */
+    String getCdmaPrlVersion(int subId);
+
+    /**
+     * Get snapshot of Telephony histograms
+     * @return List of Telephony histograms
+     * Requires Permission:
+     *   {@link android.Manifest.permission#MODIFY_PHONE_STATE MODIFY_PHONE_STATE}
+     * Or the calling app has carrier privileges.
+     */
+    List<TelephonyHistogram> getTelephonyHistograms();
+
+    /**
+     * Set the allowed carrier list for slotId
+     * Require system privileges. In the future we may add this to carrier APIs.
+     *
+     * @return The number of carriers set successfully. Should match length of
+     * carriers on success.
+     */
+    int setAllowedCarriers(int slotId, in List<CarrierIdentifier> carriers);
+
+    /**
+     * Get the allowed carrier list for slotId.
+     * Require system privileges. In the future we may add this to carrier APIs.
+     *
+     * @return List of {@link android.service.carrier.CarrierIdentifier}; empty list
+     * means all carriers are allowed.
+     */
+    List<CarrierIdentifier> getAllowedCarriers(int slotId);
+
+    /**
+     * Action set from carrier signalling broadcast receivers to enable/disable metered apns
+     * Permissions android.Manifest.permission.MODIFY_PHONE_STATE is required
+     * @param subId the subscription ID that this action applies to.
+     * @param enabled control enable or disable metered apns.
+     * @hide
+     */
+    void carrierActionSetMeteredApnsEnabled(int subId, boolean visible);
+
+    /**
+     * Action set from carrier signalling broadcast receivers to enable/disable radio
+     * Permissions android.Manifest.permission.MODIFY_PHONE_STATE is required
+     * @param subId the subscription ID that this action applies to.
+     * @param enabled control enable or disable radio.
+     * @hide
+     */
+    void carrierActionSetRadioEnabled(int subId, boolean enabled);
+
+    /**
+     * Get aggregated video call data usage since boot.
+     * Permissions android.Manifest.permission.READ_NETWORK_USAGE_HISTORY is required.
+     * @return total data usage in bytes
+     * @hide
+     */
+    long getVtDataUsage();
+
+    /**
+     * Policy control of data connection. Usually used when data limit is passed.
+     * @param enabled True if enabling the data, otherwise disabling.
+     * @param subId Subscription index
+     * @hide
+     */
+    void setPolicyDataEnabled(boolean enabled, int subId);
 }

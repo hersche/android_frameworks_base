@@ -21,6 +21,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.Shape;
 import android.util.AttributeSet;
+import android.view.accessibility.AccessibilityNodeInfo;
 import com.android.internal.R;
 
 /**
@@ -109,8 +110,8 @@ public class RatingBar extends AbsSeekBar {
         }
 
         // A touch inside a star fill up to that fractional area (slightly more
-        // than 1 so boundaries round up).
-        mTouchProgressOffset = 1.1f;
+        // than 0.5 so boundaries round up).
+        mTouchProgressOffset = 0.6f;
     }
 
     public RatingBar(Context context, AttributeSet attrs) {
@@ -331,5 +332,20 @@ public class RatingBar extends AbsSeekBar {
     @Override
     public CharSequence getAccessibilityClassName() {
         return RatingBar.class.getName();
+    }
+
+    /** @hide */
+    @Override
+    public void onInitializeAccessibilityNodeInfoInternal(AccessibilityNodeInfo info) {
+        super.onInitializeAccessibilityNodeInfoInternal(info);
+
+        if (canUserSetProgress()) {
+            info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_PROGRESS);
+        }
+    }
+
+    @Override
+    boolean canUserSetProgress() {
+        return super.canUserSetProgress() && !isIndicator();
     }
 }

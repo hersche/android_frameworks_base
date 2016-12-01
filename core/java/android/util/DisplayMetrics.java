@@ -16,7 +16,6 @@
 
 package android.util;
 
-import android.graphics.Bitmap;
 import android.os.SystemProperties;
 
 
@@ -67,12 +66,34 @@ public class DisplayMetrics {
      * {@link #DENSITY_XHIGH} (320dpi). This is not a density that applications should target,
      * instead relying on the system to scale their {@link #DENSITY_XHIGH} assets for them.
      */
+    public static final int DENSITY_260 = 260;
+
+    /**
+     * Intermediate density for screens that sit between {@link #DENSITY_HIGH} (240dpi) and
+     * {@link #DENSITY_XHIGH} (320dpi). This is not a density that applications should target,
+     * instead relying on the system to scale their {@link #DENSITY_XHIGH} assets for them.
+     */
     public static final int DENSITY_280 = 280;
+
+    /**
+     * Intermediate density for screens that sit between {@link #DENSITY_HIGH} (240dpi) and
+     * {@link #DENSITY_XHIGH} (320dpi). This is not a density that applications should target,
+     * instead relying on the system to scale their {@link #DENSITY_XHIGH} assets for them.
+     */
+    public static final int DENSITY_300 = 300;
 
     /**
      * Standard quantized DPI for extra-high-density screens.
      */
     public static final int DENSITY_XHIGH = 320;
+
+    /**
+     * Intermediate density for screens that sit somewhere between
+     * {@link #DENSITY_XHIGH} (320 dpi) and {@link #DENSITY_XXHIGH} (480 dpi).
+     * This is not a density that applications should target, instead relying
+     * on the system to scale their {@link #DENSITY_XXHIGH} assets for them.
+     */
+    public static final int DENSITY_340 = 340;
 
     /**
      * Intermediate density for screens that sit somewhere between
@@ -132,34 +153,34 @@ public class DisplayMetrics {
     public static final float DENSITY_DEFAULT_SCALE = 1.0f / DENSITY_DEFAULT;
 
     /**
-     * The device's density.
-     * @hide because eventually this should be able to change while
-     * running, so shouldn't be a constant.
-     * @deprecated There is no longer a static density; you can find the
-     * density for a display in {@link #densityDpi}.
+     * The device's current density.
+     * <p>
+     * This value reflects any changes made to the device density. To obtain
+     * the device's stable density, use {@link #DENSITY_DEVICE_STABLE}.
+     *
+     * @hide This value should not be used.
+     * @deprecated Use {@link #DENSITY_DEVICE_STABLE} to obtain the stable
+     *             device density or {@link #densityDpi} to obtain the current
+     *             density for a specific display.
      */
     @Deprecated
-    public static int DENSITY_DEVICE;
-
-    /** @hide */
-    public static int DENSITY_PREFERRED;
-
-    /** @hide */
-    public static int DENSITY_DEVICE_DEFAULT;
-
-    static {
-        DENSITY_DEVICE = SystemProperties.getInt("qemu.sf.lcd_density", SystemProperties
-            .getInt("ro.sf.lcd_density", DENSITY_DEFAULT));
-        DENSITY_DEVICE_DEFAULT = DENSITY_DEVICE;
-        DENSITY_PREFERRED = SystemProperties.getInt("persist.sys.lcd_density", DENSITY_DEVICE);
-    }
+    public static int DENSITY_DEVICE = getDeviceDensity();
 
     /**
-     * The absolute width of the display in pixels.
+     * The device's stable density.
+     * <p>
+     * This value is constant at run time and may not reflect the current
+     * display density. To obtain the current density for a specific display,
+     * use {@link #densityDpi}.
+     */
+    public static final int DENSITY_DEVICE_STABLE = getDeviceDensity();
+
+    /**
+     * The absolute width of the available display size in pixels.
      */
     public int widthPixels;
     /**
-     * The absolute height of the display in pixels.
+     * The absolute height of the available display size in pixels.
      */
     public int heightPixels;
     /**
@@ -242,24 +263,6 @@ public class DisplayMetrics {
      * @hide
      */
     public float noncompatYdpi;
-
-    /** @hide */
-    public void setDensity(int inDensity) {
-        density = inDensity / (float) DENSITY_DEFAULT;
-        densityDpi = inDensity;
-        scaledDensity = density;
-        xdpi = inDensity;
-        ydpi = inDensity;
-
-        noncompatDensity = density;
-        noncompatDensityDpi = densityDpi;
-        noncompatScaledDensity = scaledDensity;
-        noncompatXdpi = xdpi;
-        noncompatYdpi = ydpi;
-
-        DENSITY_DEVICE = inDensity;
-        Bitmap.setDefaultDensity(inDensity);
-    }
 
     public DisplayMetrics() {
     }
@@ -350,5 +353,14 @@ public class DisplayMetrics {
         return "DisplayMetrics{density=" + density + ", width=" + widthPixels +
             ", height=" + heightPixels + ", scaledDensity=" + scaledDensity +
             ", xdpi=" + xdpi + ", ydpi=" + ydpi + "}";
+    }
+
+    private static int getDeviceDensity() {
+        // qemu.sf.lcd_density can be used to override ro.sf.lcd_density
+        // when running in the emulator, allowing for dynamic configurations.
+        // The reason for this is that ro.sf.lcd_density is write-once and is
+        // set by the init process when it parses build.prop before anything else.
+        return SystemProperties.getInt("qemu.sf.lcd_density",
+                SystemProperties.getInt("ro.sf.lcd_density", DENSITY_DEFAULT));
     }
 }

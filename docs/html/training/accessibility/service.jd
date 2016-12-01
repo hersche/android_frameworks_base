@@ -67,7 +67,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
 <p>Like any other service, you also declare it in the manifest file.
 Remember to specify that it handles the {@code android.accessibilityservice} intent,
-so that the service is called when applications fire an 
+so that the service is called when applications fire an
 {@link android.view.accessibility.AccessibilityEvent}.</p>
 
 <pre>
@@ -132,7 +132,7 @@ public void onServiceConnected() {
 }
 </pre>
 
-<p>Starting with Android 4.0, there is a second option available: configure the
+<p>The second option is to configure the
 service using an XML file.  Certain configuration options like
 {@link android.R.attr#canRetrieveWindowContent} are only available if you
 configure your service using XML.  The same configuration options above, defined
@@ -174,7 +174,7 @@ android.accessibilityservice.AccessibilityService#onAccessibilityEvent} method.
 In that method, use {@link
 android.view.accessibility.AccessibilityEvent#getEventType} to determine the
 type of event, and {@link
-android.view.accessibility.AccessibilityEvent#getContentDescription} to extract
+android.view.accessibility.AccessibilityRecord#getContentDescription} to extract
 any label text associated with the view that fired the event.</pre>
 
 <pre>
@@ -201,8 +201,7 @@ public void onAccessibilityEvent(AccessibilityEvent event) {
 </pre>
 
 <h2 id="query">Query the View Heirarchy for More Context</h2>
-<p>This step is optional, but highly useful.  One of the new features in Android
-4.0 (API Level 14) is the ability for an
+<p>This step is optional, but highly useful. The Android platform provides the ability for an
 {@link android.accessibilityservice.AccessibilityService} to query the view
 hierarchy, collecting information about the UI component that generated an event, and
 its parent and children.  In order to do this, make sure that you set the
@@ -212,7 +211,7 @@ android:canRetrieveWindowContent="true"
 </pre>
 <p>Once that's done, get an {@link
 android.view.accessibility.AccessibilityNodeInfo} object using {@link
-android.view.accessibility.AccessibilityEvent#getSource}.  This call only
+android.view.accessibility.AccessibilityRecord#getSource}.  This call only
 returns an object if the window where the event originated is still the active
 window.  If not, it will return null, so <em>behave accordingly</em>.  The
 following example is a snippet of code that, when it receives an event, does

@@ -221,24 +221,6 @@ bool isValidResourceType(const String8& type)
         || type == "color" || type == "menu" || type == "mipmap";
 }
 
-sp<AaptFile> getResourceFile(const sp<AaptAssets>& assets, bool makeIfNecessary)
-{
-    sp<AaptGroup> group = assets->getFiles().valueFor(String8("resources.arsc"));
-    sp<AaptFile> file;
-    if (group != NULL) {
-        file = group->getFiles().valueFor(AaptGroupEntry());
-        if (file != NULL) {
-            return file;
-        }
-    }
-
-    if (!makeIfNecessary) {
-        return NULL;
-    }
-    return assets->addFile(String8("resources.arsc"), AaptGroupEntry(), String8(),
-                            NULL, String8());
-}
-
 static status_t parsePackage(Bundle* bundle, const sp<AaptAssets>& assets,
     const sp<AaptGroup>& grp)
 {
@@ -344,13 +326,18 @@ static status_t makeFileResources(Bundle* bundle, const sp<AaptAssets>& assets,
         }
         String8 resPath = it.getPath();
         resPath.convertToResPath();
-        table->addEntry(SourcePos(it.getPath(), 0), String16(assets->getPackage()),
+        status_t result = table->addEntry(SourcePos(it.getPath(), 0),
+                        String16(assets->getPackage()),
                         type16,
                         baseName,
                         String16(resPath),
                         NULL,
                         &it.getParams());
-        assets->addResource(it.getLeafName(), resPath, it.getFile(), type8);
+        if (result != NO_ERROR) {
+            hasErrors = true;
+        } else {
+            assets->addResource(it.getLeafName(), resPath, it.getFile(), type8);
+        }
     }
 
     return hasErrors ? STATUST(UNKNOWN_ERROR) : NO_ERROR;
@@ -1046,7 +1033,6 @@ static ssize_t extractPlatformBuildVersion(AssetManager& assets, Bundle* bundle)
         return NO_ERROR;
     }
 
-    ResXMLTree tree;
     Asset* asset = assets.openNonAsset(cookie, "AndroidManifest.xml", Asset::ACCESS_STREAMING);
     if (asset == NULL) {
         fprintf(stderr, "ERROR: Platform AndroidManifest.xml not found\n");
@@ -1054,11 +1040,17 @@ static ssize_t extractPlatformBuildVersion(AssetManager& assets, Bundle* bundle)
     }
 
     ssize_t result = NO_ERROR;
-    if (tree.setTo(asset->getBuffer(true), asset->getLength()) != NO_ERROR) {
-        fprintf(stderr, "ERROR: Platform AndroidManifest.xml is corrupt\n");
-        result = UNKNOWN_ERROR;
-    } else {
-        result = extractPlatformBuildVersion(tree, bundle);
+
+    // Create a new scope so that ResXMLTree is destroyed before we delete the memory over
+    // which it iterates (asset).
+    {
+        ResXMLTree tree;
+        if (tree.setTo(asset->getBuffer(true), asset->getLength()) != NO_ERROR) {
+            fprintf(stderr, "ERROR: Platform AndroidManifest.xml is corrupt\n");
+            result = UNKNOWN_ERROR;
+        } else {
+            result = extractPlatformBuildVersion(tree, bundle);
+        }
     }
 
     delete asset;
@@ -1179,6 +1171,12 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
         printf("Creating resources for package %s\n", assets->getPackage().string());
     }
 
+    // Set the private symbols package if it was declared.
+    // This can also be declared in XML as <private-symbols name="package" />
+    if (bundle->getPrivateSymbolsPackage().size() != 0) {
+        assets->setSymbolsPrivatePackage(bundle->getPrivateSymbolsPackage());
+    }
+
     ResourceTable::PackageType packageType = ResourceTable::App;
     if (bundle->getBuildSharedLibrary()) {
         packageType = ResourceTable::SharedLibrary;
@@ -1189,7 +1187,6 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
     }
 
     int extendedPackageId = bundle->getExtendedPackageId();
-
     ResourceTable table(bundle, String16(assets->getPackage()), packageType, extendedPackageId);
     err = table.addIncludedResources(bundle, assets);
     if (err != NO_ERROR) {
@@ -1272,7 +1269,7 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
     bool hasErrors = false;
 
     if (drawables != NULL) {
-        if (bundle->getOutputAPKFile() != NULL || bundle->getOutputResApk()) {
+        if (bundle->getOutputAPKFile() != NULL) {
             err = preProcessImages(bundle, assets, drawables, "drawable");
         }
         if (err == NO_ERROR) {
@@ -1382,6 +1379,10 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
         if (err != NO_ERROR) {
             hasErrors = true;
         }
+    }
+
+    if (hasErrors) {
+        return UNKNOWN_ERROR;
     }
 
     // --------------------------------------------------------------------
@@ -1557,12 +1558,20 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
     std::queue<CompileResourceWorkItem>& workQueue = table.getWorkQueue();
     while (!workQueue.empty()) {
         CompileResourceWorkItem& workItem = workQueue.front();
-        err = compileXmlFile(bundle, assets, workItem.resourceName, workItem.file, &table, xmlFlags);
+        int xmlCompilationFlags = xmlFlags | XML_COMPILE_PARSE_VALUES
+                | XML_COMPILE_ASSIGN_ATTRIBUTE_IDS;
+        if (!workItem.needsCompiling) {
+            xmlCompilationFlags &= ~XML_COMPILE_ASSIGN_ATTRIBUTE_IDS;
+            xmlCompilationFlags &= ~XML_COMPILE_PARSE_VALUES;
+        }
+        err = compileXmlFile(bundle, assets, workItem.resourceName, workItem.xmlRoot,
+                             workItem.file, &table, xmlCompilationFlags);
+
         if (err == NO_ERROR) {
             assets->addResource(workItem.resPath.getPathLeaf(),
-                    workItem.resPath,
-                    workItem.file,
-                    workItem.file->getResourceType());
+                                workItem.resPath,
+                                workItem.file,
+                                workItem.file->getResourceType());
         } else {
             hasErrors = true;
         }
@@ -1757,9 +1766,7 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
             manifestFile->getGroupEntry(),
             manifestFile->getResourceType());
     err = compileXmlFile(bundle, assets, String16(), manifestFile,
-            outManifestFile, &table,
-            XML_COMPILE_ASSIGN_ATTRIBUTE_IDS
-            | XML_COMPILE_STRIP_WHITESPACE | XML_COMPILE_STRIP_RAW_VALUES);
+            outManifestFile, &table, XML_COMPILE_STANDARD_RESOURCE & ~XML_COMPILE_STRIP_COMMENTS);
     if (err < NO_ERROR) {
         return err;
     }
@@ -1891,8 +1898,6 @@ status_t buildResources(Bundle* bundle, const sp<AaptAssets>& assets, sp<ApkBuil
                     //printf("Comment of %s: %s\n", String8(e).string(),
                     //        String8(cmt).string());
                     syms->appendComment(String8(e), String16(cmt), srcPos);
-                } else {
-                    //printf("No comment for %s\n", String8(e).string());
                 }
                 syms->makeSymbolPublic(String8(e), srcPos);
             } else if (strcmp16(block.getElementName(&len), uses_permission16.string()) == 0) {
@@ -2127,7 +2132,7 @@ static status_t writeResourceLoadedCallbackForLayoutClasses(
                 indentStr);
     }
 
-    return hasErrors ? UNKNOWN_ERROR : NO_ERROR;
+    return hasErrors ? STATUST(UNKNOWN_ERROR) : NO_ERROR;
 }
 
 static status_t writeResourceLoadedCallback(
@@ -2140,7 +2145,7 @@ static status_t writeResourceLoadedCallback(
     size_t N = symbols->getSymbols().size();
     for (i=0; i<N; i++) {
         const AaptSymbolEntry& sym = symbols->getSymbols().valueAt(i);
-        if (sym.typeCode == AaptSymbolEntry::TYPE_UNKNOWN) {
+        if (sym.typeCode != AaptSymbolEntry::TYPE_INT32) {
             continue;
         }
         if (!assets->isJavaSymbol(sym, includePrivate)) {
@@ -2264,6 +2269,9 @@ static status_t writeLayoutClasses(
                 String16 comment(sym.comment);
                 if (comment.size() <= 0) {
                     comment = getAttributeComment(assets, name8);
+                }
+                if (comment.contains(u"@removed")) {
+                    continue;
                 }
                 if (comment.size() > 0) {
                     const char16_t* p = comment.string();
@@ -2543,10 +2551,6 @@ static status_t writeSymbolClass(
             fprintf(fp,
                     "%s/** %s\n",
                     getIndentSpace(indent), cmt.string());
-        } else if (sym.isPublic && !includePrivate && kIsDebug) {
-            sym.sourcePos.warning("No comment for public symbol %s:%s/%s",
-                assets->getPackage().string(), className.string(),
-                String8(sym.name).string());
         }
         String16 typeComment(sym.typeComment);
         if (typeComment.size() > 0) {
@@ -2589,10 +2593,6 @@ static status_t writeSymbolClass(
                      "%s */\n",
                     getIndentSpace(indent), cmt.string(),
                     getIndentSpace(indent));
-        } else if (sym.isPublic && !includePrivate && kIsDebug) {
-            sym.sourcePos.warning("No comment for public symbol %s:%s/%s",
-                assets->getPackage().string(), className.string(),
-                String8(sym.name).string());
         }
         ann.printAnnotations(fp, getIndentSpace(indent));
         fprintf(fp, "%spublic static final String %s=\"%s\";\n",
@@ -2702,7 +2702,7 @@ status_t writeResourceSymbols(Bundle* bundle, const sp<AaptAssets>& assets,
                 if (s > last && (*s == '.' || *s == 0)) {
                     String8 part(last, s-last);
                     dest.appendPath(part);
-#ifdef HAVE_MS_C_RUNTIME
+#ifdef _WIN32
                     _mkdir(dest.string());
 #else
                     mkdir(dest.string(), S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP);
@@ -2850,7 +2850,7 @@ addProguardKeepMethodRule(ProguardKeepSet* keep, const String8& memberName,
 }
 
 status_t
-writeProguardForAndroidManifest(ProguardKeepSet* keep, const sp<AaptAssets>& assets)
+writeProguardForAndroidManifest(ProguardKeepSet* keep, const sp<AaptAssets>& assets, bool mainDex)
 {
     status_t err;
     ResXMLTree tree;
@@ -2862,6 +2862,7 @@ writeProguardForAndroidManifest(ProguardKeepSet* keep, const sp<AaptAssets>& ass
     sp<AaptGroup> assGroup;
     sp<AaptFile> assFile;
     String8 pkg;
+    String8 defaultProcess;
 
     // First, look for a package file to parse.  This is required to
     // be able to generate the resource information.
@@ -2918,6 +2919,15 @@ writeProguardForAndroidManifest(ProguardKeepSet* keep, const sp<AaptAssets>& ass
                     addProguardKeepRule(keep, agent, pkg.string(),
                             assFile->getPrintableSource(), tree.getLineNumber());
                 }
+
+                if (mainDex) {
+                    defaultProcess = AaptXml::getAttribute(tree,
+                            "http://schemas.android.com/apk/res/android", "process", &error);
+                    if (error != "") {
+                        fprintf(stderr, "ERROR: %s\n", error.string());
+                        return -1;
+                    }
+                }
             } else if (tag == "instrumentation") {
                 keepTag = true;
             }
@@ -2934,7 +2944,23 @@ writeProguardForAndroidManifest(ProguardKeepSet* keep, const sp<AaptAssets>& ass
                 fprintf(stderr, "ERROR: %s\n", error.string());
                 return -1;
             }
-            if (name.length() > 0) {
+
+            keepTag = name.length() > 0;
+
+            if (keepTag && mainDex) {
+                String8 componentProcess = AaptXml::getAttribute(tree,
+                        "http://schemas.android.com/apk/res/android", "process", &error);
+                if (error != "") {
+                    fprintf(stderr, "ERROR: %s\n", error.string());
+                    return -1;
+                }
+
+                const String8& process =
+                        componentProcess.length() > 0 ? componentProcess : defaultProcess;
+                keepTag = process.length() > 0 && process.find(":") != 0;
+            }
+
+            if (keepTag) {
                 addProguardKeepRule(keep, name, pkg.string(),
                         assFile->getPrintableSource(), tree.getLineNumber());
             }
@@ -3117,30 +3143,12 @@ writeProguardForLayouts(ProguardKeepSet* keep, const sp<AaptAssets>& assets)
 }
 
 status_t
-writeProguardFile(Bundle* bundle, const sp<AaptAssets>& assets)
+writeProguardSpec(const char* filename, const ProguardKeepSet& keep, status_t err)
 {
-    status_t err = -1;
-
-    if (!bundle->getProguardFile()) {
-        return NO_ERROR;
-    }
-
-    ProguardKeepSet keep;
-
-    err = writeProguardForAndroidManifest(&keep, assets);
-    if (err < 0) {
-        return err;
-    }
-
-    err = writeProguardForLayouts(&keep, assets);
-    if (err < 0) {
-        return err;
-    }
-
-    FILE* fp = fopen(bundle->getProguardFile(), "w+");
+    FILE* fp = fopen(filename, "w+");
     if (fp == NULL) {
         fprintf(stderr, "ERROR: Unable to open class file %s: %s\n",
-                bundle->getProguardFile(), strerror(errno));
+                filename, strerror(errno));
         return UNKNOWN_ERROR;
     }
 
@@ -3157,6 +3165,49 @@ writeProguardFile(Bundle* bundle, const sp<AaptAssets>& assets)
     fclose(fp);
 
     return err;
+}
+
+status_t
+writeProguardFile(Bundle* bundle, const sp<AaptAssets>& assets)
+{
+    status_t err = -1;
+
+    if (!bundle->getProguardFile()) {
+        return NO_ERROR;
+    }
+
+    ProguardKeepSet keep;
+
+    err = writeProguardForAndroidManifest(&keep, assets, false);
+    if (err < 0) {
+        return err;
+    }
+
+    err = writeProguardForLayouts(&keep, assets);
+    if (err < 0) {
+        return err;
+    }
+
+    return writeProguardSpec(bundle->getProguardFile(), keep, err);
+}
+
+status_t
+writeMainDexProguardFile(Bundle* bundle, const sp<AaptAssets>& assets)
+{
+    status_t err = -1;
+
+    if (!bundle->getMainDexProguardFile()) {
+        return NO_ERROR;
+    }
+
+    ProguardKeepSet keep;
+
+    err = writeProguardForAndroidManifest(&keep, assets, true);
+    if (err < 0) {
+        return err;
+    }
+
+    return writeProguardSpec(bundle->getMainDexProguardFile(), keep, err);
 }
 
 // Loops through the string paths and writes them to the file pointer

@@ -49,7 +49,7 @@ public final class ParcelableCall implements Parcelable {
     private final PhoneAccountHandle mAccountHandle;
     private final boolean mIsVideoCallProviderChanged;
     private final IVideoProvider mVideoCallProvider;
-    private InCallService.VideoCall mVideoCall;
+    private VideoCallImpl mVideoCall;
     private final String mParentCallId;
     private final List<String> mChildCallIds;
     private final StatusHints mStatusHints;
@@ -57,7 +57,6 @@ public final class ParcelableCall implements Parcelable {
     private final List<String> mConferenceableCallIds;
     private final Bundle mIntentExtras;
     private final Bundle mExtras;
-    private final boolean mIsActiveSub;
 
     public ParcelableCall(
             String id,
@@ -82,8 +81,7 @@ public final class ParcelableCall implements Parcelable {
             int videoState,
             List<String> conferenceableCallIds,
             Bundle intentExtras,
-            Bundle extras,
-            boolean isActiveSub) {
+            Bundle extras) {
         mId = id;
         mState = state;
         mDisconnectCause = disconnectCause;
@@ -107,7 +105,6 @@ public final class ParcelableCall implements Parcelable {
         mConferenceableCallIds = Collections.unmodifiableList(conferenceableCallIds);
         mIntentExtras = intentExtras;
         mExtras = extras;
-        mIsActiveSub = isActiveSub;
     }
 
     /** The unique ID of the call. */
@@ -190,12 +187,13 @@ public final class ParcelableCall implements Parcelable {
 
     /**
      * Returns an object for remotely communicating through the video call provider's binder.
+
      * @return The video call.
      */
-    public InCallService.VideoCall getVideoCall(Call call) {
+    public VideoCallImpl getVideoCallImpl() {
         if (mVideoCall == null && mVideoCallProvider != null) {
             try {
-                mVideoCall = new VideoCallImpl(mVideoCallProvider, call);
+                mVideoCall = new VideoCallImpl(mVideoCallProvider);
             } catch (RemoteException ignored) {
                 // Ignore RemoteException.
             }
@@ -270,13 +268,6 @@ public final class ParcelableCall implements Parcelable {
         return mIsVideoCallProviderChanged;
     }
 
-    /**
-     *  return if this call object belongs to active subscription.
-     */
-    public boolean isActive() {
-        return mIsActiveSub;
-    }
-
     /** Responsible for creating ParcelableCall objects for deserialized Parcels. */
     public static final Parcelable.Creator<ParcelableCall> CREATOR =
             new Parcelable.Creator<ParcelableCall> () {
@@ -310,7 +301,6 @@ public final class ParcelableCall implements Parcelable {
             source.readList(conferenceableCallIds, classLoader);
             Bundle intentExtras = source.readBundle(classLoader);
             Bundle extras = source.readBundle(classLoader);
-            boolean isActiveSub = (source.readInt() == 1) ? true : false;
             return new ParcelableCall(
                     id,
                     state,
@@ -334,8 +324,7 @@ public final class ParcelableCall implements Parcelable {
                     videoState,
                     conferenceableCallIds,
                     intentExtras,
-                    extras,
-                    isActiveSub);
+                    extras);
         }
 
         @Override
@@ -377,7 +366,6 @@ public final class ParcelableCall implements Parcelable {
         destination.writeList(mConferenceableCallIds);
         destination.writeBundle(mIntentExtras);
         destination.writeBundle(mExtras);
-        destination.writeInt(mIsActiveSub ? 1 : 0);
     }
 
     @Override
